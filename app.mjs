@@ -29,8 +29,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post("/", async (req, res) => {
     const result = await documents.addOne(req.body);
-    console.log(result);
-    
 
     return res.redirect(`/${result.lastID}`);
 });
@@ -40,6 +38,11 @@ app.get('/:id', async (req, res) => {
         "doc",
         { doc: await documents.getOne(req.params.id) }
     );
+});
+app.put('/:id', async (req, res) => {
+    const result = await documents.updateOne(req.params.id, req.body);
+    console.log(result);
+    return res.redirect(`/${req.params.id}`);
 });
 
 app.get('/', async (req, res) => {

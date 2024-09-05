@@ -1,6 +1,6 @@
 <%- include('includes/header'); %>
     <h2>Dokument</h2>
-    <form method="POST" action="/" class="new-doc">
+    <form class="new-doc">
         <label for="title">Titel</label>
         <input type="text" name="title" value="<%= doc.title %>" />
 
@@ -9,4 +9,25 @@
 
         <input type="submit" value="Uppdatera" />
     </form>
+    <script>
+        const updateBtn = document.querySelector('.new-doc input[type="submit"]');
+        updateBtn.addEventListener("click", () => {
+            const title = document.querySelector('.new-doc input[name="title"]').value;
+            const content = document.querySelector('.new-doc textarea[name="content"]').value;
+            fetch("/<%= doc.id %>", {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title,
+                    content
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+            })
+        })
+    </script>
 <%- include('includes/footer'); %>
