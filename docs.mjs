@@ -19,7 +19,7 @@ const docs = {
         let db = await openDb();
 
         try {
-            return await db.get('SELECT * FROM documents WHERE rowid=?', id);
+            return await db.get('SELECT * FROM documents WHERE id=?', id);
         } catch (e) {
             console.error(e);
 
@@ -50,7 +50,7 @@ const docs = {
 
         try {
             return await db.run(
-                'UPDATE INTO documents (title, content) VALUES (?, ?) WHERE rowid=?',
+                'UPDATE documents SET title=?, content=? WHERE id=?',
                 body.title,
                 body.content,
                 id,

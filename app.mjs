@@ -40,9 +40,18 @@ app.get('/:id', async (req, res) => {
     );
 });
 app.put('/:id', async (req, res) => {
-    const result = await documents.updateOne(req.params.id, req.body);
-    console.log(result);
-    return res.redirect(`/${req.params.id}`);
+    try {
+        const result = await documents.updateOne(req.params.id, req.body);
+        console.log(result);
+        if (result.modifiedCount > 0) {
+            return res.redirect(`/dgfhhfg`);
+        } else {
+            return res.status(404).send("Document not found or not updated.");
+        }
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send("An error occurred during the update.");
+    }
 });
 
 app.get('/', async (req, res) => {

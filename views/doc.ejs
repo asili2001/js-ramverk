@@ -10,8 +10,9 @@
         <input type="submit" value="Uppdatera" />
     </form>
     <script>
-        const updateBtn = document.querySelector('.new-doc input[type="submit"]');
-        updateBtn.addEventListener("click", () => {
+        const form = document.querySelector('.new-doc');
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
             const title = document.querySelector('.new-doc input[name="title"]').value;
             const content = document.querySelector('.new-doc textarea[name="content"]').value;
             fetch("/<%= doc.id %>", {
