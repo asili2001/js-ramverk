@@ -67,3 +67,26 @@ footer {
     padding: 1.4rem 8rem;
     flex-shrink: 0;
 }
+
+.header-a {
+    color: white;
+}
+
+.header-a:hover {
+    color: rgb(194, 194, 194);
+}
+
+
+#new-doc-btn {
+    border: solid rgb(73, 96, 190) 2px;
+    border-radius: 15px;
+    padding: 10px;
+    width: 20%;
+    color: white;
+    background-color: rgb(73, 96, 190);
+}
+
+#new-doc-btn:hover {
+    background-color: rgb(65, 85, 163);
+    border: solid rgb(109, 163, 230) 2px;
+}

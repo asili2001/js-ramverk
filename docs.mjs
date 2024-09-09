@@ -33,10 +33,13 @@ const docs = {
         let db = await openDb();
 
         try {
+            //return await db.run(
+                //'INSERT INTO documents (title, content) VALUES ("New Document", "Add content...")'//,
+                //body.title,
+                //body.content,
+            //);
             return await db.run(
-                'INSERT INTO documents (title, content) VALUES (?, ?)',
-                body.title,
-                body.content,
+                'INSERT INTO documents (title, content) VALUES ("New Document", "Add content...")'
             );
         } catch (e) {
             console.error(e);

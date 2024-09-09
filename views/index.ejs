@@ -1,6 +1,24 @@
 <%- include('includes/header'); %>
-    <h2>Dokument</h2>
+    <h2>Dokumment</h2>
+    <div id="new-doc-btn">Add new document</div>
     <% docs.forEach(function(doc){ %>
         <h3><a href="/<%= doc.id %>"><%= doc.title %></a></h3>
     <% }); %>
+    <script>
+        const btn = document.getElementById('new-doc-btn');
+        btn.addEventListener('click', async(e) => {
+            const response = await fetch("/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            if (response.redirected) {
+                window.location.href = response.url;
+            } else {
+                console.error('Error creating a new document');
+            }
+        })
+
+    </script>
 <%- include('includes/footer'); %>
