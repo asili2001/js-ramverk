@@ -4,3 +4,9 @@ CREATE TABLE IF NOT EXISTS documents (
     content TEXT,
     created_at DATE DEFAULT (datetime('now','localtime'))
 );
+
+INSERT INTO documents
+    (title, content)
+VALUES
+    ('New Document', 'Add Content..')
+;
