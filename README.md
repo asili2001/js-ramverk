@@ -1,16 +1,24 @@
 # SSR Editor
 
-Starter project for DV1677 JSRamverk
+Group project for DV1677 js-ramverk course at BTH.
+
+**Members:**
+*Axel Jönsson*
+*Ahmad Asili*
 
 ## Val av ramverk
-Vi var lite inne på att välja React Native, men landade
-i att det inte var nödvändigt eller speciellt lämpat just för denna kursen, då det inte fanns ett tydligt användningsområde
-för Native funktionalitet i detta projektet. 
-Sedan funderade vi lite på att Angular eftersom ingen av oss hade tidigare erfarenhet av det och det hade varit kul att välja ett ramverk
-som vi inte redan kände till. Vi funderade även lite på Vue, men men vi landade till slut i ett beslut att välja React.
-Vi var båda överens om att det inte spelade så stor roll vilket ramverk vi valde, och det fanns för och nackdelar med samtliga.
-En av anledningarna till varför vi valde React över de andra har att göra med hur html, css och javascript organiseras. Vi känner båda att Reacts sätt att strukturera på är intuitivt och bidrar till en enkel och organiserad kodstruktur. 
+Vi var lite inne på att välja React Native, men landade i att det varken var nödvändigt eller speciellt lämpat just för denna kursen eftersom det inte fanns ett tydligt användningsområde för just Native-specifik funktionalitet i projektet. 
+Sedan funderade vi lite på Angular eftersom vi inte hade tidigare erfarenhet av det och det vore kul att testa något nytt.
+Vi funderade även lite på Vue men vi landade till slut i ett beslut att välja React.
+Vi var båda överens om att det inte spelade så stor roll vilket ramverk vi valde, det fanns för och nackdelar för samtliga.
+De mest avgörande faktorerna som vi vägde in när vi valde ramverk var:
+- Att välja ett ramverk vi *var* vana vid sedan tidigare och fördjupa oss i det.
+- Att välja ett ramverk i *inte var* vana vid sedan tidigare och lära oss något nytt. 
+- Generell känsla för de olika ramverkens struktur och syntax.
+- Arbetsmarknadens efterfrågan av kunskap för de olika ramverken.
 
-React är ett ramverk som vi båda är vana vid. När vi valde React tänkte vi att det skulle ge oss möjligheten att
-lära oss ramverket på en grundlig nivå genom repetition av redan etablerad kunskap samt att det skulle ge oss möjligheten att fördjupa oss i ramverket på en mer avancerad nivå genom förkovring av ytterligare kunskap. 
-Valet av React ger oss förhoppningsvis även tid att implementera fler av den tredje inlämningens krav.
+En avgörande anledning till varför vi valde React var hur React organiserar html, css och javascript. Vi känner båda att Reacts struktur bidrar till en enkel och organiserad kodstruktur. För oss är det mer intuitivt att gruppera HTML (JSX) och JavaScript tillsammans, och hålla CSS separat. 
+
+React är ett ramverk som vi båda har andvänt tidigare.
+Genom att välja React hoppas vi få möjligheten att lära oss ramverket på en grundlig nivå genom repetition av redan etablerad kunskap samt att fördjupa oss i ramverket på en mer avancerad nivå genom förkovring av ytterligare kunskap. 
+Valet av React ger oss förhoppningsvis även mer tid att implementera fler av den tredje inlämningens krav.
