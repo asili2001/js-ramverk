@@ -22,3 +22,15 @@ En avgörande anledning till varför vi valde React var hur React organiserar ht
 React är ett ramverk som vi båda har andvänt tidigare.
 Genom att välja React hoppas vi få möjligheten att lära oss ramverket på en grundlig nivå genom repetition av redan etablerad kunskap samt att fördjupa oss i ramverket på en mer avancerad nivå genom förkovring av ytterligare kunskap. 
 Valet av React ger oss förhoppningsvis även mer tid att implementera fler av den tredje inlämningens krav.
+
+
+## Steg för att få applikationen att funka
+Vi började med att starta appen men märkte snabbt att vi behövte initiera databasen genom att köra
+"bash ./db/reset_db.bash". Sedan märkte vi även att vi saknade en ".env" fil för att systemet skulle fungera, här lade vi till vår PORT.
+Tabellen saknade primär-nyckel så vi lade till "id" för att vi skulle ha möjligheten att uppdatera dokumentet utifrån dess primär-nyckel. Vi insertade även ett nytt dokument i databasen i migrate.sql för att ha något att utgå ifrån när man resettade databasen.
+
+Efter implementationen märkte vi att form-elementen endast supportar POST- och GET-requests, därför har vi använt oss av JavaScripts "fetch" för att kunna skicka PUT requests till servern, för att utföra uppdateringar av dokument. 
+
+## Applikationens arbetsflöde
+För att skapa ett nytt dokument så tycker man på knappen "New Document".
+För att uppdatera ett dokument så klickar man på det i listan av dokument för att komma till dokumentet; därefter utför man sina uppdateringar.
