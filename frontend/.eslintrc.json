@@ -1,0 +1,24 @@
+{
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:@typescript-eslint/recommended"
+    ],
+    "plugins": [
+        "react",
+        "@typescript-eslint",
+        "react-hooks"
+    ],
+    "rules": {
+        "react/react-in-jsx-scope": "off",
+        "@typescript-eslint/no-unused-vars": "warn",
+        "semi": ["error", "always"],
+        "indent": ["error", "tab", { "SwitchCase": 1 }]
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    }
+}
