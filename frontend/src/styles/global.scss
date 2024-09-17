@@ -4,40 +4,55 @@
     font-family: $font-family-base;
     font-size: $font-size-base;
     line-height: $line-height-base;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 h1 {
     font-size: $h1-font-size;
 }
+
 h2 {
     font-size: $h2-font-size;
 }
+
 h3 {
     font-size: $h3-font-size;
 }
+
 h4 {
     font-size: $h4-font-size;
 }
+
 h5 {
     font-size: $h5-font-size;
 }
+
 h6 {
     font-size: $h6-font-size;
+}
+
+p {
+    font-size: $p-font-size;
 }
 
 a {
     color: $color-primary;
     text-decoration: none;
     transition: color 0.2s ease-in;
-  
+
     &:hover {
-      color: darken($color-primary, 10%);
-      text-decoration: underline;
+        color: darken($color-primary, 10%);
+        text-decoration: underline;
     }
-  
+
     &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba($color-primary, 0.5);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.5);
     }
-  }
-  
+}
+
+ul {
+    list-style: none;
+}

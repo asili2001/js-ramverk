@@ -1,0 +1,73 @@
+@import "../../styles/variables.scss";
+
+.a4 {
+    width: 793px;
+    height: 1122px;
+    margin: auto;
+}
+
+.document-page {
+    background-color: $background-color;
+    margin-top: 5rem;
+    
+    .main-textbox {
+        padding: 2rem;
+        background-color: white;
+        border: 1px solid #ccc;
+    }
+}
+
+.documents-page {
+    margin-top: 5rem;
+    .document-list{
+        padding: 1rem;
+        display: flex;
+        gap: 1rem;
+        flex-direction: row;
+        margin: auto;
+
+        .document-card {
+            width: 10rem;
+            max-height: 14rem;
+            border: 1px solid #ccc;
+            padding: 0.5rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+
+            &:hover {
+                box-shadow: $default-box-shadow;
+            }
+    
+            img.preview {
+                height: 10rem;
+                width: 100%;
+                object-fit: cover;
+            }
+        }
+    }
+
+    .new-document-btn {
+        height: 4rem;
+        width: 4rem;
+        background-color: $background-color;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: $color-primary;
+        position: fixed;
+        bottom: 1rem;
+        right: 1rem;
+
+        &:hover {
+            background-color: darken($background-color, 5%);
+            box-shadow: $default-box-shadow;
+            color: $color-secondary;
+        }
+
+        svg {
+            font-size: inherit;
+        }
+    }
+}

@@ -1,0 +1,47 @@
+@import "../../styles/variables.scss";
+
+.navbar {
+    display: flex;
+    margin-top: -5rem;
+    height: 5rem;
+    position: fixed;
+    width: 100%;
+    background-color: white;
+    box-shadow: $default-box-shadow;
+
+    .logo {
+        display: flex;
+        align-content: center;
+        flex-wrap: wrap;
+        img {
+            width: 3rem;
+            padding: .5rem;
+        }
+
+        * {
+            display: flex;
+            align-items: center;
+            color: $color-primary;
+        }
+    }
+    .title-n-menubar {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 5rem;
+
+        input[type=text] {
+            border: 0;
+        }
+
+        .document-menubar {
+            display: flex;
+            gap: .2rem;
+
+            button {
+                min-width: 2.5rem;
+                text-align: left;
+            }
+        }
+    }
+}
