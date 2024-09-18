@@ -7,17 +7,42 @@ import PrivateRoute from './PrivateRoute';
 import Unauthorized from './pages/Other/Unauthorized';
 import Documents from './pages/Docs';
 import Document from './pages/Docs/Document';
-import useShortCuts from './utils/useShortCuts';
+import { useShortcutsContext } from './context/ShortcutsContext';
 
 const AppRouter: React.FC = () => {
-  const { registerShortcut } = useShortCuts();
+  const { registerShortcut, unregisterShortcut } = useShortcutsContext();
 
   useEffect(() => {
     registerShortcut(
-      ['Ctrl', 's'],
-      () => alert('Save action triggered!'),
-      'Save'
+      ['Ctrl', 'o'],
+      () => alert('Open action triggered!'),
+      'Open'
     );
+    registerShortcut(
+      ['Ctrl', 'f'],
+      () => alert('New action triggered!'),
+      'New'
+    );
+    registerShortcut(
+      ['Ctrl', '<'],
+      () => alert('Share action triggered!'),
+      'Share'
+    );
+    registerShortcut(
+      ['Ctrl', 'z'],
+      () => alert('Undo action triggered!'),
+      'Undo'
+    );
+    registerShortcut(
+      ['Ctrl', 'y'],
+      () => alert('Redo action triggered!'),
+      'Redo'
+    );
+
+    return () => {
+      unregisterShortcut(['Ctrl', 's']);
+      unregisterShortcut(['Ctrl', 'f']);
+    }
   }, [registerShortcut]);
 
   return (

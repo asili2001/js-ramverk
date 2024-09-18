@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // Define the type for a single shortcut
-interface Shortcut {
+export interface Shortcut {
   keys: string[];
   action: () => void;
   label: string;
@@ -14,6 +14,7 @@ const useShortCuts = () => {
   // Register a new shortcut
   const registerShortcut = useCallback(
     (keys: string[], action: () => void, label: string) => {
+      unregisterShortcut(keys);
       setShortcuts((prevShortcuts) => [
         ...prevShortcuts,
         { keys, action, label },
@@ -28,19 +29,6 @@ const useShortCuts = () => {
       prevShortcuts.filter((s) => !arraysEqual(s.keys, keys))
     );
   }, []);
-
-  // Change the key combination of an existing shortcut
-  const changeShortcutKeys = useCallback(
-    (oldKeys: string[], newKeys: string[]) => {
-      setShortcuts((prevShortcuts) => {
-        const updatedShortcuts = prevShortcuts.map((s) =>
-          arraysEqual(s.keys, oldKeys) ? { ...s, keys: newKeys } : s
-        );
-        return updatedShortcuts;
-      });
-    },
-    []
-  );
 
   // Utility function to compare arrays
   const arraysEqual = (a: string[], b: string[]) => {
@@ -75,7 +63,6 @@ const useShortCuts = () => {
   return {
     registerShortcut,
     unregisterShortcut,
-    changeShortcutKeys,
     shortcuts,
   };
 };

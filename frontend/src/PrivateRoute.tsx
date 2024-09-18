@@ -1,6 +1,6 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useRole } from './context/RoleContext';
+import { useRoleContext } from './context/RoleContext';
 
 interface PrivateRouteProps {
   component: JSX.Element;
@@ -11,7 +11,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
   component,
   requiredRoles,
 }) => {
-  const { role } = useRole();
+  const { role } = useRoleContext();
 
   return requiredRoles.includes(role) ? (
     component

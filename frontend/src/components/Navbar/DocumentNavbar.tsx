@@ -6,11 +6,11 @@ import { FaUndo } from 'react-icons/fa';
 import { FaRedo } from 'react-icons/fa';
 import Logo from '../../assets/logo.svg';
 import DropDownMenuButton from '../DropDownMenu/Button';
-import useShortCuts from '../../utils/useShortCuts';
 import './main.scss';
 import React, { useMemo, useState } from 'react';
 import { debounce } from 'arias';
 import { useNavigate } from 'react-router-dom';
+import { useShortcutsContext } from '../../context/ShortcutsContext';
 
 export interface DocumentNavbarProps {
   documentTitle: string;
@@ -21,7 +21,7 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
   documentTitle,
   onTitleChange,
 }) => {
-  const { shortcuts } = useShortCuts();
+  const { shortcuts } = useShortcutsContext();
   const [title, setTitle] = useState<string>(documentTitle);
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
         action: () => {},
         rightContent: shortcuts
           .find((shortcut) => shortcut.label === 'New')
-          ?.keys.join(' + '),
+          ?.keys.join(' + ')
       },
       {
         title: 'Open',
@@ -41,7 +41,7 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
         action: () => {},
         rightContent: shortcuts
           .find((shortcut) => shortcut.label === 'Open')
-          ?.keys.join(' + '),
+          ?.keys.join(' + ')
       },
       {
         title: 'Share',

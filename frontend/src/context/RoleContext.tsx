@@ -20,7 +20,7 @@ export const RoleProvider: React.FC<{ children: ReactNode }> = ({
 };
 
 /* eslint-disable react-refresh/only-export-components */
-export const useRole = (): RoleContextType => {
+export const useRoleContext = (): RoleContextType => {
   const context = useContext(RoleContext);
   if (!context) {
     throw new Error('useRole must be used within a RoleProvider');
