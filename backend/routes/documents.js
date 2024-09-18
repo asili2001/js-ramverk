@@ -24,15 +24,15 @@ router.post("/", function(request, response) {
 });
 
 
-router.put("/", function(request, result) {
+router.put("/", function(request, response) {
     // PUT requests should return 204 No Content
-    result.status(204).send();
+    response.status(204).send();
 });
 
 
-router.delete("/", function(request, result) {
+router.delete("/", function(request, response) {
     // DELETE requests should return 204 No Content
-    result.status(204).send();
+    response.status(204).send();
 });
 
 

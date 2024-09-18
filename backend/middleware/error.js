@@ -13,7 +13,7 @@ async function catchError(request, result, next) {
 
 
 // 404 error handler
-async function errorHandler(error, request, result, next) {
+export default async function errorHandler(error, request, result, next) {
     if (result.headersSent) {
         return next(error);
     }
@@ -32,6 +32,6 @@ async function errorHandler(error, request, result, next) {
 
 
 // EXPORT MIDDLEWARE
-module.exports = {
-    errorHandler: errorHandler,
-};
+//module.exports = {
+//    errorHandler: errorHandler,
+//};

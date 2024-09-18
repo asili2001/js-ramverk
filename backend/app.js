@@ -1,10 +1,10 @@
 /*
     RESTful API with JSON-responses
 */
-const express = require("express");
-const cors = require('cors');
-const bodyParser = require("body-parser");
-const morgan = require('morgan');
+import express from 'express';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import morgan from 'morgan';
 
 const app = express();
 
@@ -22,28 +22,18 @@ if (process.env.NODE_ENV !== 'test') {
 
 
 
+// Routes
+import documents from './routes/documents/index.js';
 
 // Routes
-const index = require('./routes/index');
-const hello = require('./routes/helloExample');
-const user = require('./routes/userExample');
-const documents = require('./routes/documents');
-
-
-
-// Routes
-app.use('/', index);
-app.use('/hello', hello);
-app.use('/user', user);
-app.use('/documents', documents);
+app.use('/', documents);
 
 
 
 // Errors
-const errorMiddleware = require('./middleware/error');
-app.use(errorMiddleware.errorHandler);
-
-
+//const errorMiddleware = require('./middleware/error');
+import errorMiddleware from './middleware/error.js';
+app.use(errorMiddleware);
 
 
 const port = 1338;

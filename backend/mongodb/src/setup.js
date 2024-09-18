@@ -3,11 +3,16 @@
  */
 "use strict";
 
-const mongo = require("mongodb").MongoClient;
+//const mongo = require("mongodb").MongoClient;
+import { MongoClient as mongo} from 'mongodb';
+
 const dsn =  process.env.DBWEBB_DSN || "mongodb://localhost:27017/mumin";
 
-const fs = require("fs");
-const path = require("path");
+//const fs = require("fs");
+//const path = require("path");
+import fs from 'fs';
+import path from 'path';
+
 const docs = JSON.parse(fs.readFileSync(
     path.resolve(__dirname, "setup.json"),
     "utf8"

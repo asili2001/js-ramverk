@@ -1,9 +1,12 @@
-const mongo = require("mongodb").MongoClient;
-const config = require("./config.json");
+//const mongo = require("mongodb").MongoClient;
+//const config = require("./config.json");
+
+import { MongoClient as mongo} from 'mongodb';
+
 //const collectionName = "crowd";
 
 const database = {
-    getCollection: async function getCollection (collectionName) {
+    getCollection: async function getCollection(collectionName) {
         let dsn = `mongodb://localhost:27017/mumin`;
 
         if (process.env.NODE_ENV === 'test') {
@@ -18,12 +21,12 @@ const database = {
         const db = await client.db();
         const collection = await db.collection(collectionName);
 
-        //return {
-        //    collection: collection,
-        //    client: client,
-        //};
-        return collection;
+        return {
+            collection: collection,
+            client: client,
+        };
+        //return collection;
     }
 };
 
-module.exports = database;
+export default database;

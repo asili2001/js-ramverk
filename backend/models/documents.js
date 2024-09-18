@@ -1,11 +1,12 @@
-const database = require('./mongodb/database.js');
+//const database = require('./mongodb/database.js');
+import db from '../mongodb/database.js';
 
 const documents = {
     getAllDocuments: async function getAllDocuments() {
         try {
-            db = await database.getCollection("documents");
+            const { collection, client } = await db.getCollection("crowd");
         
-            const keyObject = await db.collection.find();
+            const keyObject = await collection.find();
         
             if (keyObject) {
                 return res.json({ data: keyObject });
@@ -20,16 +21,16 @@ const documents = {
                 }
             });
         } finally {
-            await db.client.close();
+            await client.close();
         }
     },
 
-    getSingleDocument: async function getSingleDocument(email) {
+    getSingleDocument: async function getSingleDocument(id) {
         try {
-            db = await database.getCollection("documents");
+            const database = await db.getCollection("documents");
         
-            const filter = { email: email };
-            const keyObject = await db.collection.findOne(filter);
+            const filter = { id: id };
+            const keyObject = await database.collection.findOne(filter);
         
             if (keyObject) {
                 return res.json({ data: keyObject });
@@ -44,10 +45,10 @@ const documents = {
                 }
             });
         } finally {
-            await db.client.close();
+            await database.client.close();
         }
     }
 
 };
 
-module.exports = orders;
+export default documents;
