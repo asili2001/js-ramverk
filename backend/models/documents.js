@@ -4,22 +4,16 @@ import db from '../mongodb/database.js';
 const documents = {
     getAllDocuments: async function getAllDocuments() {
         try {
-            const { collection, client } = await db.getCollection("crowd");
+            var { collection, client } = await db.getCollection("persons");
         
-            const keyObject = await collection.find();
+            const keyObject = await collection.find().toArray();
         
             if (keyObject) {
-                return res.json({ data: keyObject });
+                //return response.json({ data: keyObject });
+                return keyObject;
             }
         } catch (e) {
-            return res.status(500).json({
-                errors: {
-                    status: 500,
-                    source: "/",
-                    title: "Database error",
-                    detail: e.message
-                }
-            });
+            throw new Error('Database query failed');
         } finally {
             await client.close();
         }
