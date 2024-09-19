@@ -20,7 +20,7 @@ const Document = () => {
       />
       <TextBox
         content=""
-        className="main-textbox a4"
+        className="main-textbox"
         onChange={handleDraftChange}
         editable
       />

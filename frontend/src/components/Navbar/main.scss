@@ -8,6 +8,7 @@
     width: 100%;
     background-color: white;
     box-shadow: $default-box-shadow;
+    z-index: 999;
 
     .logo {
         display: flex;
