@@ -6,11 +6,11 @@ import './styles/global.scss';
 import { ShortcutsProvider } from './context/ShortcutsContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <ShortcutsProvider>
-      <RoleProvider>
-        <AppRouter />
-      </RoleProvider>
-    </ShortcutsProvider>
-  </StrictMode>
+	<StrictMode>
+		<ShortcutsProvider>
+			<RoleProvider>
+				<AppRouter />
+			</RoleProvider>
+		</ShortcutsProvider>
+	</StrictMode>
 );
