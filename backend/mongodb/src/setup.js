@@ -1,5 +1,6 @@
 /**
- * Connect to the database and setup it with some default data.
+ * DENNA FILEN ÄR FRÅN ÖVNINGEN, DEN ANVÄNDS INTE I NULÄGET
+ * KAN UPPDATERA DEN FÖR ATT HA ETT LÄTT "ÅTERSTÄLLNINGSALTERNATIV"
  */
 "use strict";
 

@@ -6,7 +6,7 @@ const deleteDocument = async function deleteDocument(request, response) {
     await documentsModel.deleteDocument(id);
 
     // DELETE requests should return 204 No Content
-    result.status(204).send();
+    response.status(204).send();
 };
 
 export default deleteDocument;

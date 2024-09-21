@@ -3,10 +3,16 @@ import documentsModel from '../../../models/documents.js';
 
 const updateDocument = async function updateDocument(request, response) {
     const id = request.params.id;
-    await documentsModel.updateDocument(id);
+    const updateData = request.body;
 
-    // PUT requests should return 204 No Content
-    result.status(204).send();
+    try {
+        await documentsModel.updateDocument(id, updateData);
+
+        response.status(204).send();
+    } catch (error) {
+        console.error('Error updating document:', error.message);
+        response.status(500).json({ message: error.message });
+    }
 };
 
 export default updateDocument;
