@@ -6,8 +6,8 @@
     height: 5rem;
     position: fixed;
     width: 100%;
-    background-color: white;
-    box-shadow: $default-box-shadow;
+    background-color: #fff;
+    box-shadow: $box-shadow;
     z-index: 999;
 
     .logo {
@@ -42,6 +42,32 @@
             button {
                 min-width: 2.5rem;
                 text-align: left;
+            }
+        }
+    }
+
+    @include color-scheme(dark) {
+        background-color: $dark-background-color;
+        box-shadow: $dark-box-shadow;
+        color: $dark-text-color;
+
+        .title-n-menubar {
+            color: $dark-background-color;
+            input[type=text] {
+                border: 0;
+                color: $dark-text-color;
+                background-color: $dark-background-color;
+            }
+    
+            .document-menubar {
+                display: flex;
+                gap: .2rem;
+    
+                button {
+                    min-width: 2.5rem;
+                    text-align: left;
+                    color: white;
+                }
             }
         }
     }

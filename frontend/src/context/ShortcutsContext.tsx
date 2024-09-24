@@ -1,5 +1,5 @@
 import { createContext, useContext, ReactNode } from 'react';
-import useShortCuts, { Shortcut } from '../utils/useShortCuts';
+import useShortCuts, { Shortcut } from '../hooks/useShortCuts';
 
 interface ShortcutsContextType {
 	shortcuts: Shortcut[];

@@ -9,6 +9,15 @@
     box-sizing: border-box;
 }
 
+html {
+    background-color: $background-color;
+
+    @include color-scheme(dark) {
+        background-color: $dark-background-color;
+        color: $dark-text-color;
+    }
+}
+
 h1 {
     font-size: $h1-font-size;
 }
@@ -55,4 +64,9 @@ a {
 
 ul {
     list-style: none;
+}
+
+button {
+    background-color: inherit;
+    color: inherit;
 }

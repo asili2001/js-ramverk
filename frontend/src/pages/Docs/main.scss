@@ -3,11 +3,15 @@
 .document-page {
     background-color: $background-color;
     margin-top: 5rem;
+
     
     .main-textbox {
         padding: 2rem;
-        background-color: white;
-        border: 1px solid #ccc;
+    }
+
+    @include color-scheme(dark) {
+        background-color: $dark-background-color;
+        color: $dark-text-color;
     }
 }
 
@@ -29,7 +33,7 @@
             border-radius: 0.5rem;
 
             &:hover {
-                box-shadow: $default-box-shadow;
+                box-shadow: $box-shadow;
             }
     
             img.preview {
@@ -56,12 +60,34 @@
 
         &:hover {
             background-color: darken($background-color, 5%);
-            box-shadow: $default-box-shadow;
+            box-shadow: $box-shadow;
             color: $color-secondary;
         }
 
         svg {
             font-size: inherit;
+        }
+    }
+
+    @include color-scheme(dark) {
+        .document-card {
+            &:hover {
+                box-shadow: $dark-box-shadow;
+            }
+            
+            img.preview {
+                height: 10rem;
+                width: 100%;
+                object-fit: cover;
+            }
+        }
+        
+        .new-document-btn {
+            background-color: darken($dark-background-color, 5%);
+            &:hover {
+                background-color: darken($dark-background-color, 5%);
+                box-shadow: $dark-box-shadow;
+            }
         }
     }
 }

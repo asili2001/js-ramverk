@@ -1,3 +1,5 @@
+@import "../../styles/variables.scss";
+
 .page {
     width: 816px;
     min-height: 1056px;
@@ -5,6 +7,8 @@
     height: auto;
     margin: auto;
     overflow: hidden;
+    background-color: $paper-color;
+    border: 1px solid $dark-background-color;
 
   &::before {
     content: '';
@@ -20,5 +24,10 @@
       transparent 1049px,
       rgba(175, 175, 175, 0.5) 1056px
     );
+  }
+
+  @include color-scheme(dark) {
+    background-color: $dark-paper-color;
+    border: 1px solid $background-color;
   }
 }

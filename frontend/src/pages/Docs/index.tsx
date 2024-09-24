@@ -1,75 +1,30 @@
 import './main.scss';
-import { Document } from './types';
-import previewImg from '../../assets/previewImg.png';
 import DocumentsNavbar from '../../components/Navbar/DocumentsNavbar';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import useAPIDocs from '../../hooks/useAPIDocs';
 
 const Documents = () => {
+	const [docs, setDocs] = useState<Doc[]>([]);
 	const navigate = useNavigate();
-	const documents: Document[] = [
-		{
-			id: 1,
-			usersWithAccess: [
-				{
-					id: 1,
-					name: 'Ahmad Asili',
-					email: 'ahmadasili1928@gmail.com',
-					accessLevel: 'owner',
-				},
-				{
-					id: 1,
-					name: 'Axel Jönsson',
-					email: 'axel@gmail.com',
-					accessLevel: 'editor',
-				},
-			],
-			title: 'Assignment 1',
-		},
-		{
-			id: 2,
-			usersWithAccess: [
-				{
-					id: 1,
-					name: 'Ahmad Asili',
-					email: 'ahmadasili1928@gmail.com',
-					accessLevel: 'owner',
-				},
-				{
-					id: 1,
-					name: 'Axel Jönsson',
-					email: 'axel@gmail.com',
-					accessLevel: 'editor',
-				},
-			],
-			title: 'Assignment 1',
-		},
-		{
-			id: 3,
-			usersWithAccess: [
-				{
-					id: 1,
-					name: 'Ahmad Asili',
-					email: 'ahmadasili1928@gmail.com',
-					accessLevel: 'owner',
-				},
-				{
-					id: 1,
-					name: 'Axel Jönsson',
-					email: 'axel@gmail.com',
-					accessLevel: 'editor',
-				},
-			],
-			title: 'Assignment 1',
-			previewImage: previewImg,
-		},
-	];
+	const { getDocs } = useAPIDocs();
+
+	const loadDocs = async () => {
+		const result = await getDocs();
+		setDocs(result);
+	};
+
+	useEffect(() => {
+		loadDocs();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
 	return (
 		<div className="documents-page">
 			<DocumentsNavbar />
 			<div className="document-list">
-				{documents.map((document, index) => {
+				{docs.map((document, index) => {
 					const documentOwner = document.usersWithAccess.find(
 						(user) => user.accessLevel === 'owner'
 					);

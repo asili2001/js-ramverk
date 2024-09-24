@@ -1,14 +1,14 @@
-export type Document = {
-	id: number;
+type Doc = {
+	id: string;
 	title: string;
 	previewImage?: string;
 	usersWithAccess: UserWithAccess[];
 };
 
-export interface UserWithAccess extends User {
+interface UserWithAccess extends User {
 	accessLevel: 'viewer' | 'editor' | 'owner';
 }
 
-export interface FullDocument extends Document {
+interface FullDoc extends Doc {
 	content: string;
 }

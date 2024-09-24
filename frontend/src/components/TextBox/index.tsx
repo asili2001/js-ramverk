@@ -22,6 +22,8 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const sanitizedContent = DOMPurify.sanitize(content, sanitizeConfig);
 	const [draftContent, setDraftContent] = useState(sanitizedContent);
 	const editableRef = useRef<HTMLDivElement>(null);
+	const [totalPages, setTotalPages] = useState<number>(1);
+	const PAGE_HEIGHT = 1056 - 32; // the 32px is the padding
 
 	useEffect(() => {
 		if (onChange) onChange(draftContent);
@@ -77,6 +79,20 @@ const TextBox: React.FC<TextBoxProps> = ({
 		}
 	};
 
+	function getTotalHeight(element: HTMLElement | null): number {
+		if (!element) return 0; // Return 0 if the element is not provided
+
+		const children = element.children; // Get all child elements
+		let totalHeight = 0;
+
+		// Loop through each child element and accumulate their heights
+		for (let i = 0; i < children.length; i++) {
+			totalHeight += (children[i] as HTMLElement).offsetHeight; // Add the offsetHeight of each child
+		}
+
+		return totalHeight; // Return the total height
+	}
+
 	const handleInput = () => {
 		if (editableRef.current) {
 			if (maxLines) {
@@ -91,6 +107,10 @@ const TextBox: React.FC<TextBoxProps> = ({
 				}
 			}
 
+			console.log(getTotalHeight(editableRef.current));
+
+			getTotalPages(getTotalHeight(editableRef.current));
+
 			// Sanitize the content before updating the state
 			setDraftContent(
 				DOMPurify.sanitize(
@@ -101,12 +121,23 @@ const TextBox: React.FC<TextBoxProps> = ({
 		}
 	};
 
+	const getTotalPages = (height: number) => {
+		if (height <= 0) {
+			setTotalPages(1);
+			return;
+		}
+
+		const pages = Math.ceil(height / PAGE_HEIGHT);
+		setTotalPages(pages);
+	};
+
 	return (
 		<div
 			ref={editableRef}
+			style={{ minHeight: `${PAGE_HEIGHT * totalPages}px` }}
 			contentEditable={editable}
 			onInput={handleInput}
-			dangerouslySetInnerHTML={{ __html: draftContent }}
+			dangerouslySetInnerHTML={{ __html: sanitizedContent }}
 			className={`page ${className}`}
 			onPaste={handlePaste}
 		/>
