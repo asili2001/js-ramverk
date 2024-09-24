@@ -5,13 +5,13 @@ const documents = {
     getAllDocuments: async function getAllDocuments() {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const keyObject = await collection.find().toArray();
+            const dbResponse = await collection.find().toArray();
 
-            if (keyObject) {
-                return keyObject;
+            if (dbResponse) {
+                return dbResponse;
             }
         } catch (e) {
-            throw new Error('Database find query failed');
+            throw new Error(`Database find query failed, ${e.message}`);
         } finally {
             await client.close();
         }
@@ -19,20 +19,23 @@ const documents = {
 
     getSingleDocument: async function getSingleDocument(id) {
         try {
-            var { collection, client } = await db.getCollection("documents");
-            const keyObject = await collection.findOne(filter);
+            const filter = { _id: new ObjectId(id) };
 
-            if (keyObject) {
-                return keyObject;
+            var { collection, client } = await db.getCollection("documents");
+            const dbResponse = await collection.findOne(filter);
+
+            if (dbResponse) {
+                return dbResponse;
             }
         } catch (e) {
-            throw new Error('Database findOne query failed');
+            throw new Error(`Database findOne query failed, ${e.message}`);
         } finally {
             await client.close();
         }
     },
 
-    createDocument: async function createDocument(user, title, content) {
+    createDocument: async function createDocument(title) {
+        // users id should be passed as parameter, when we actually have users
         try {
             var { collection, client } = await db.getCollection("documents");
             const data = {
@@ -40,22 +43,21 @@ const documents = {
                 "previewImage": null,
                 "usersWithAccess": [
                     {
-                        "name": user.name,
-                        "email": user.email,
-                        "accessLevel": "Owner"
+                        "_id": new ObjectId(), // change objectId for the user
+                        "accessLevel": "owner"
                     }
                 ],
-                "content": content,
+                "content": null
             };
 
-            await collection.createIndex({ id: 1 });
-            const keyObject = await collection.insertOne(data);
+            //await collection.createIndex({ id: 1 });
+            const dbResponse = await collection.insertOne(data);
 
-            if (keyObject) {
-                return keyObject;
+            if (dbResponse) {
+                return dbResponse;
             }
         } catch (e) {
-            throw new Error('Database insertOne query failed');
+            throw new Error(`Database insertOne query failed, ${e.message}`);
         } finally {
             await client.close();
         }
@@ -64,7 +66,7 @@ const documents = {
     updateDocument: async function updateDocument(id, updateData) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: id };
 
             // än sålänge kan man endast uppdatera titel, content och image. lägg till fler
             const update = {
@@ -74,13 +76,13 @@ const documents = {
                     ...(updateData.previewImage && { previewImage: updateData.previewImage })
                 }
             };
-            const keyObject = await collection.updateOne(filter, update);
+            const dbResponse = await collection.updateOne(filter, update);
 
-            if (keyObject) {
-                return keyObject;
+            if (dbResponse) {
+                return dbResponse;
             }
         } catch (e) {
-            throw new Error('Database updateOne query failed');
+            throw new Error(`Database updateOne query failed, ${e.message}`);
         } finally {
             await client.close();
         }
@@ -89,14 +91,14 @@ const documents = {
     deleteDocument: async function deleteDocument(id) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: new ObjectId(id) };
-            const keyObject = await collection.deleteOne(filter);
+            const filter = { _id: id };
+            const dbResponse = await collection.deleteOne(filter);
 
-            if (keyObject) {
-                return keyObject;
+            if (dbResponse) {
+                return dbResponse;
             }
         } catch (e) {
-            throw new Error('Database deleteOne query failed');
+            throw new Error(`Database deleteOne query failed, ${e.message}`);
         } finally {
             await client.close();
         }

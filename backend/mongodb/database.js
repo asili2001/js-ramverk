@@ -12,8 +12,12 @@ const database = {
         try {
             const { collection, client } = await this.getCollection("documents");
 
-            await collection.createIndex({ id: 1 });
+            // nedan 2 rader kan vara användbar för att fixa unique identifier för ngt,
+            // ex ifall man ofta söker efter email
+            //const { collection, client } = await this.getCollection("users");
+            //await collection.createIndex({ email: 1 });
 
+            /*
             const schema = {
                 $jsonSchema: {
                     bsonType: "object",
@@ -37,11 +41,35 @@ const database = {
                     }
                 }
             };
+            */
+
+            const schema = {
+                $jsonSchema: {
+                    bsonType: "object",
+                    required: ["title", "usersWithAccess"],
+                    properties: {
+                        title: { bsonType: "string" },
+                        previewImage: { bsonType: ["null", "string", "object"] },
+                        usersWithAccess: {
+                            bsonType: "array",
+                            items: {
+                                bsonType: "object",
+                                required: ["_id", "accessLevel"],
+                                properties: {
+                                    _id: { bsonType: "objectId" },
+                                    accessLevel: { bsonType: "string" }
+                                }
+                            }
+                        },
+                        content: { bsonType: ["null", "string"] }
+                    }
+                }
+            };
 
             const db = client.db();
             const collections = await db.listCollections({ name: "documents" }).toArray();
 
-            //await db.dropCollection("documents"); to reset the collection
+            //await db.dropCollection("documents");// to reset the collection
             if (collections.length == 0) {
                 await db.createCollection("documents", { validator: schema });
                 console.log('Collection blueprint created with schema validation');
@@ -58,7 +86,7 @@ const database = {
 
     getCollection: async function getCollection(collectionName) {
         try {
-            let dsn = `mongodb://localhost:27017/text-editor`;
+            let dsn = `mongodb://localhost:27017/editor`;
 
             if (process.env.NODE_ENV === 'test') {
                 dsn = "mongodb://localhost:27017/test";

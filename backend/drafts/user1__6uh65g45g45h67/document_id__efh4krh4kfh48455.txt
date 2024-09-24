@@ -1,0 +1,36 @@
+flfhellojerlfjerlfjljfrljllygeyrlglergrlerlgerlgl
+
+
+
+
+{
+    "type": "success",
+    "messages": [{  
+        "type": "success",
+        "title": "my title",
+        "details": "string to explain message"
+    },
+    {  
+        "type": "success",
+        "title": "my title",
+        "details": "string to explain message"
+    }],
+    "data": {
+        "_id": "66ef4423d46884eb4e5afdcb",
+        "title": "Extreme rollerblading",
+        "previewImage": "This is a new image",
+        "content": "content-url",
+        "usersWithAccess": [
+                {
+                    "name": "JACKSSON bethsson",
+                    "email": "JACKSSON.bettzzz@example.com",
+                    "accessLevel": "Owner"
+                },
+                                {
+                    "name": "JACKSSON bethsson",
+                    "email": "JACKSSON.bettzzz@example.com",
+                    "accessLevel": "Owner"
+                }
+        ]
+    }
+}

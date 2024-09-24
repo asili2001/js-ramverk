@@ -5,9 +5,15 @@ const getDocuments = async function getDocuments(request, response) {
     try {
         const data = await documentsModel.getAllDocuments();
         response.json({
-            data: {
+                type: "success",
+                messages: [
+                    {
+                        type: "success",
+                        title: "Message: Success",
+                        details: "Everything went ok"
+                    }
+                ],
                 data: data
-            }
         });
     } catch(error) {
         return response.status(500).json({

@@ -3,14 +3,20 @@ import documentsModel from '../../../models/documents.js';
 
 const createDocument = async function createDocument(request, response) {
     try {
-        const { user, title, content } = request.body;
-        const data = await documentsModel.createDocument(user, title, content);
+        const { title } = request.body;
+        const data = await documentsModel.createDocument(title);
 
         // 201 Created
         response.status(201).json({
-            data: {
-                data: data
-            }
+            type: "success",
+            messages: [
+                {
+                    type: "success",
+                    title: "Message: Success",
+                    details: "Everything went ok"
+                }
+            ],
+            data: data
         });
     } catch (error) {
         // Handle errors and send an appropriate response
