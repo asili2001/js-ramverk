@@ -165,3 +165,61 @@ Description:
 
 
 
+
+<br><br>
+
+## PUT /documents/:id
+
+Description:
+
+    Update a single document with :id. Don't forget to add the body.
+
+
+
+
+#### Example body:
+```json
+    {
+        "title": "Updated title rollerblading",
+        "previewImage": "some image",
+        "content": "this is my updated content"
+    }
+```
+
+### Result examples:
+
+#### On Success:
+```
+    status 204
+```
+
+#### On Failure:
+```
+    status 500
+```
+
+
+
+
+
+<br><br>
+
+## DELETE /documents/:id
+
+Description:
+    Delete a single document with :id
+
+
+### Result examples:
+
+#### On Success:
+```
+    status 204
+```
+
+#### On Failure:
+```
+    status 500
+```
+
+

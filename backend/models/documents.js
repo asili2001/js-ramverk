@@ -66,9 +66,8 @@ const documents = {
     updateDocument: async function updateDocument(id, updateData) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: id };
+            const filter = { _id: new ObjectId(id) };
 
-            // än sålänge kan man endast uppdatera titel, content och image. lägg till fler
             const update = {
                 $set: {
                     ...(updateData.title && { title: updateData.title }),
@@ -91,7 +90,7 @@ const documents = {
     deleteDocument: async function deleteDocument(id) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: id };
+            const filter = { _id: new ObjectId(id) };
             const dbResponse = await collection.deleteOne(filter);
 
             if (dbResponse) {
