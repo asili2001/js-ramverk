@@ -19,7 +19,7 @@ const documents = {
 
     getSingleDocument: async function getSingleDocument(id) {
         try {
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: ObjectId.createFromHexString(id) };
 
             var { collection, client } = await db.getCollection("documents");
             const dbResponse = await collection.findOne(filter);
@@ -66,7 +66,7 @@ const documents = {
     updateDocument: async function updateDocument(id, updateData) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: ObjectId.createFromHexString(id) };
 
             const update = {
                 $set: {
@@ -90,7 +90,7 @@ const documents = {
     deleteDocument: async function deleteDocument(id) {
         try {
             var { collection, client } = await db.getCollection("documents");
-            const filter = { _id: new ObjectId(id) };
+            const filter = { _id: ObjectId.createFromHexString(id) };
             const dbResponse = await collection.deleteOne(filter);
 
             if (dbResponse) {
