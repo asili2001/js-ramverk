@@ -1,48 +1,31 @@
-/*
-    RESTful API with JSON-responses
-*/
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
+import cookieParser from "cookie-parser";
 import morgan from 'morgan';
+// Load environment variables from the .env file
+import dotenv from '@dotenvx/dotenvx';
 
-import database from './mongodb/database.js';
+dotenv.config({ path: process.env.PWD + '/.env' });
+
+
+import connectDB from './config/db.js';
+import userRoutes from './routes/user.route.js';
+import documentRoutes from './routes/document.route.js';
+
 const app = express();
 
+app.use(cookieParser());
+app.use(express.json());
 app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(morgan('combined'));
 
-
-// Logs
-//app.use(logsMiddleware.Logs);
-if (process.env.NODE_ENV !== 'test') {
-
-    app.use(morgan('combined'));
-}
-
-
+// Connect to the database
+connectDB();
 
 // Routes
-import documents from './routes/documents/index.js';
-
-// Routes
-app.use('/', documents);
+app.use('/api/users', userRoutes);
+app.use('/api/documents', documentRoutes);
 
 
-
-// Errors
-import errorMiddleware from './middleware/error.js';
-app.use(errorMiddleware);
-
-
-// initialize database, create collection blueprints
-try {
-    await database.initializeDatabase();
-} catch(error) {
-    console.error('Failed to initialize database:', error);
-}
-
-const port = 1338;
 // Start up server
-app.listen(port, () => console.log(`Example API listening on port ${port}!`));
+app.listen(process.env.SERVER_PORT, () => console.log(`INKER API listening on port ${process.env.SERVER_PORT}!`));
