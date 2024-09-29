@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 
 const useAPIDocs = () => {
+	const [isLoading, setIsLoading] = useState(false);
 	const getDocs = async (type?: 'all' | 'own' | 'shared') => {
 		if (!type) {
 			type = 'all';
@@ -14,14 +16,9 @@ const useAPIDocs = () => {
 			},
 		});
 
-		toast.promise(fetchPromise, {
-			loading: 'Loading...',
-			success: 'Data fetched successfully!',
-			error: 'Error fetching data.',
-		});
-
 		try {
-			const response = await fetchPromise;
+			setIsLoading(true);
+			const response = await fetchPromise.finally(()=> setIsLoading(false));
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
 				result.messages.forEach((message) => {
@@ -35,18 +32,22 @@ const useAPIDocs = () => {
 		} catch (error: unknown) {
 			if (error instanceof TypeError) {
 				console.error('Network error or invalid JSON.');
+				toast.error("Network Error");
 			} else if (error instanceof SyntaxError) {
 				console.error('JSON parsing error.');
+				toast.error("Unknown Error");
 			} else if (error instanceof Error) {
 				// Generic error handling
 				console.error(`Error: ${error.message}`);
+				toast.error(error.message);
 			} else {
 				console.error('Unknown error occurred.');
+				toast.error("Unknown Error");
 			}
 			return [];
 		}
 	};
 
-	return { getDocs };
+	return { getDocs, isLoading };
 };
 export default useAPIDocs;

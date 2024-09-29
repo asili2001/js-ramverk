@@ -16,7 +16,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 	return requiredRoles.includes(role) ? (
 		component
 	) : (
-		<Navigate to="/unauthorized" />
+		<Navigate to="/" />
 	);
 };
 

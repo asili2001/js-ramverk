@@ -1,13 +1,14 @@
 // Router.tsx
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Home from './pages/Home';
+import Login from './pages/Auth';
 import NotFound from './pages/Other/NotFound';
 import PrivateRoute from './PrivateRoute';
 import Unauthorized from './pages/Other/Unauthorized';
 import Documents from './pages/Docs';
 import Document from './pages/Docs/Document';
 import { useShortcutsContext } from './context/ShortcutsContext';
+import Signup from './pages/Auth/Signup';
 
 const AppRouter: React.FC = () => {
 	const { registerShortcut, unregisterShortcut } = useShortcutsContext();
@@ -52,7 +53,16 @@ const AppRouter: React.FC = () => {
 					path="/"
 					element={
 						<PrivateRoute
-							component={<Home />}
+							component={<Login />}
+							requiredRoles={['guest']}
+						/>
+					}
+				/>
+				<Route
+					path="/signup"
+					element={
+						<PrivateRoute
+							component={<Signup />}
 							requiredRoles={['guest']}
 						/>
 					}
@@ -62,7 +72,7 @@ const AppRouter: React.FC = () => {
 					element={
 						<PrivateRoute
 							component={<Documents />}
-							requiredRoles={['guest']}
+							requiredRoles={['user']}
 						/>
 					}
 				/>
@@ -71,7 +81,7 @@ const AppRouter: React.FC = () => {
 					element={
 						<PrivateRoute
 							component={<Document />}
-							requiredRoles={['guest']}
+							requiredRoles={['user']}
 						/>
 					}
 				/>
