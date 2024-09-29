@@ -18,7 +18,7 @@ const Documents = () => {
 	useEffect(() => {
 		loadDocs();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+	}, []);
 
 	return (
 		<div className="documents-page">

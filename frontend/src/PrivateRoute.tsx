@@ -13,11 +13,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 }) => {
 	const { role } = useRoleContext();
 
-	return requiredRoles.includes(role) ? (
-		component
-	) : (
-		<Navigate to="/" />
-	);
+	return requiredRoles.includes(role) ? component : <Navigate to="/" />;
 };
 
 export default PrivateRoute;
