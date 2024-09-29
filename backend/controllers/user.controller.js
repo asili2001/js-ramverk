@@ -132,24 +132,13 @@ class AuthController {
     }
 
     /**
-     * Checks if a requested token is valid or not.
+     * Checks if user Authentication is valid or not.
      * @param req Request
      * @param res Response
-     * @returns If the token is valid or not
+     * @returns If the user is valid for requests or not
      */
-    validateToken = async (req, res) => {
-        const { token: inputToken } = req.body;
-
-        try {
-            const cryptoHelper = new CryptoHelper();
-            const { email, token } = JSON.parse(cryptoHelper.decrypt(inputToken));
-            let user = await User.findOne({ email, token });
-            if (!user) return returner(res, "error", statusCodes.BAD_REQUEST, false, "Invalid Token");
-            return returner(res, "success", statusCodes.BAD_REQUEST, true, "Token is valid");
-        } catch (error) {
-            errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
-            return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
-        }
+    validate = async (req, res) => {
+        return returner(res, "success", statusCodes.OK, true, "Authentication is valid");
     }
 
     /**

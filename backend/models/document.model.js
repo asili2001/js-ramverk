@@ -16,7 +16,7 @@ const documentSchema = new mongoose.Schema({
       required: true
     },
     accessLevel: {
-      type: String,
+      type: ["owner", "editor", "reader"],
       required: true
     }
   }],

@@ -5,7 +5,8 @@ import morgan from 'morgan';
 // Load environment variables from the .env file
 import dotenv from '@dotenvx/dotenvx';
 
-dotenv.config({ path: process.env.PWD + '/.env' });
+const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev';
+dotenv.config({ path: `${process.env.PWD}/${envFile}` });
 
 
 import connectDB from './config/db.js';

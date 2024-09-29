@@ -14,10 +14,7 @@ class AuthValidator {
             email: Joi.string().email().required()
         });
 
-        const { error } = schema.validate({
-            name: req.body.name,
-            email: req.body.email
-        });
+        const { error } = schema.validate(body);
     
         if (error) {
             return returner(res, "error", statusCodes.BAD_REQUEST, null, [...error.details][0].message);

@@ -9,17 +9,13 @@ class AuthMiddleware {
         
         const jwtSecret = process.env.JWT_SECRET;
         const token = req.cookies.key;
-        console.log(jwtSecret);
 
         if (!token) return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
 
         try {
             const decoded = jwt.verify(token, jwtSecret);
 
-            const currentTime = Math.floor(Date.now() / 1000); // in seconds
-
-            // Check if the token is expired
-            console.log(decoded.exp);
+            const currentTime = Math.floor(Date.now() / 1000);
             
             if (decoded.exp < currentTime) {
                 res.clearCookie('key');
@@ -32,7 +28,7 @@ class AuthMiddleware {
                 return returner(res, "error", statusCodes.UNAUTHORIZED, [], "Unauthorized");
             }
 
-            res.locals.loggedInUser = user;
+            res.locals.authenticatedUser = user;
 
             next();
         } catch (err) {
