@@ -80,10 +80,10 @@ class AuthController {
                     await user.save();
                 };
 
-                if (user.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "User Already Excists");
+                if (user.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "User with this email already excists");
 
                 await sendActivationMail(req.body.email, activationToken);
-                return returner(res, "success", statusCodes.CREATED, user, "User Has been Created");
+                return returner(res, "success", statusCodes.CREATED, user.toJSON(), "User has been created");
             } catch (error) {
                 errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
                 return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
@@ -124,7 +124,7 @@ class AuthController {
                 htmlContent: await emailService.generateAccountActivatedEmail(user.name, process.env.MAIL_SUPPORT_EMAIL)
             }
             await emailService.sendEmail(user.email, emailData);
-            return returner(res, "success", statusCodes.OK, user, "User Has been Activated");
+            return returner(res, "success", statusCodes.OK, user.toJSON(), "User Has been Activated");
         } catch (error) {
             errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
             return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
@@ -132,13 +132,22 @@ class AuthController {
     }
 
     /**
-     * Checks if user Authentication is valid or not.
+     * Checks if token is valid or not.
      * @param req Request
      * @param res Response
-     * @returns If the user is valid for requests or not
+     * @returns If token is valid
      */
-    validate = async (req, res) => {
-        return returner(res, "success", statusCodes.OK, true, "Authentication is valid");
+    validateToken = async (req, res) => {
+        const { token: encryptedToken } = req.body;
+        const cryptoHelper = new CryptoHelper();
+        const decryptedToken = cryptoHelper.decrypt(encryptedToken);
+        const excists = await User.exists({token: decryptedToken});
+
+        if (!excists) {
+            return returner(res, "error", statusCodes.FORBIDDEN, null, "Invalid Token");
+        }
+        
+        return returner(res, "success", statusCodes.OK, null, "Valid Token");
     }
 
     /**
@@ -156,11 +165,11 @@ class AuthController {
         try {
             const userData = await User.findOne({email: req.body.email});
 
-            if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect Email or Password");
+            if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
 
             const auth = await bcrypt.compare(req.body.password, userData.password);
 
-            if (!auth) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect Email or Password");
+            if (!auth) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
 
             const token = this.createToken({ userId: userData.id });
 
@@ -171,8 +180,16 @@ class AuthController {
                 maxAge: parseInt(process.env.JWT_MAX_AGE) * 1000,
                 httpOnly: true, // Cookie is accessible only on the server-side
             });
+
+            res.cookie("role", userData.role[0], {
+                sameSite: 'strict',
+                secure: true,
+                path: '/',
+                maxAge: parseInt(process.env.JWT_MAX_AGE) * 1000,
+                httpOnly: false,
+            });
             
-            return returner(res, "success", statusCodes.OK, null, "User Logged In Successfully");
+            return returner(res, "success", statusCodes.OK, userData.toJSON(), "User Logged In Successfully");
         } catch (error) {
             errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
             return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something Went Wrong :(");

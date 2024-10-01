@@ -1,5 +1,5 @@
 // Router.tsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './pages/Auth';
 import NotFound from './pages/Other/NotFound';
@@ -9,9 +9,20 @@ import Documents from './pages/Docs';
 import Document from './pages/Docs/Document';
 import { useShortcutsContext } from './context/ShortcutsContext';
 import Signup from './pages/Auth/Signup';
+import ActivateUser from './pages/Auth/ActivateUser';
+import Cookies from 'js-cookie';
+import { useRoleContext } from './context/RoleContext';
 
 const AppRouter: React.FC = () => {
 	const { registerShortcut, unregisterShortcut } = useShortcutsContext();
+	const { setRole } = useRoleContext();
+	const [loadedCookies, setLoadedCookies] = useState(false);
+
+	useEffect(()=> {
+		const roleCookie = Cookies.get('role') as Role;
+		setRole(roleCookie ?? "guest");
+		setLoadedCookies(true);
+	}, []);
 
 	useEffect(() => {
 		registerShortcut(
@@ -46,7 +57,7 @@ const AppRouter: React.FC = () => {
 		};
 	}, [registerShortcut, unregisterShortcut]);
 
-	return (
+	return loadedCookies && (
 		<Router>
 			<Routes>
 				<Route
@@ -54,7 +65,7 @@ const AppRouter: React.FC = () => {
 					element={
 						<PrivateRoute
 							component={<Login />}
-							requiredRoles={['guest']}
+							requiredRoles={['guest', 'user', 'admin']}
 						/>
 					}
 				/>
@@ -63,6 +74,15 @@ const AppRouter: React.FC = () => {
 					element={
 						<PrivateRoute
 							component={<Signup />}
+							requiredRoles={['guest']}
+						/>
+					}
+				/>
+				<Route
+					path="/activate"
+					element={
+						<PrivateRoute
+							component={<ActivateUser />}
 							requiredRoles={['guest']}
 						/>
 					}

@@ -1,13 +1,26 @@
 import Input from '../../components/Input';
 import './main.scss';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useAPIAuth from '../../hooks/useAPIAuth';
-import { VscLoading } from 'react-icons/vsc';
+import { useNavigate } from 'react-router-dom';
+import { useRoleContext } from '../../context/RoleContext';
+import LoadingSpinner from '../../components/Loading';
 
 const Login = () => {
 	const [email, setEmail] = useState<string>('');
 	const [password, setPassword] = useState<string>('');
+	const [responseMessage, setResponseMessage] = useState<string>('');
 	const { signIn, isLoading } = useAPIAuth();
+	const navigate = useNavigate();
+	const { role } = useRoleContext();
+
+	const checkRole = () => {
+		if (role !== "guest") {
+			navigate("/documents");
+		}
+	}
+
+	useEffect(()=> checkRole(), []);
 
 	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.currentTarget.value;
@@ -18,13 +31,20 @@ const Login = () => {
 		setPassword(value);
 	};
 	const handleSignIn = async () => {
-		await signIn(email, password);
+		const signInResponse = await signIn(email, password);
+		if (typeof signInResponse === "string") {
+            setResponseMessage(signInResponse);
+            return;
+        }
+
+		navigate("/documents");
+		return;
 	};
 	return (
 		<div className="auth-page">
 			<div className="auth-box">
 				<div className="header">
-					<h1>Inker {isLoading ? 'hello' : ''}</h1>
+					<h1>Inker</h1>
 					<p>Sign In</p>
 				</div>
 				<Input
@@ -34,7 +54,7 @@ const Login = () => {
 					placeholder=" "
 					value={email}
 					onChange={handleEmailChange}
-					successMsg="Hello"
+					errorMsg={responseMessage.includes("email") ? responseMessage : ""}
 					required
 				/>
 				<Input
@@ -43,13 +63,14 @@ const Login = () => {
 					title="Password"
 					placeholder=" "
 					onChange={handlePasswordChange}
+					errorMsg={responseMessage.includes("password") ? responseMessage : ""}
 					required
 				/>
 				<button
 					className="primary-button active"
 					onClick={handleSignIn}
 				>
-					Sign In {isLoading ? <VscLoading className="rotate" /> : ''}
+					Sign In {isLoading && <LoadingSpinner size={20} />}
 				</button>
 				<div className="footer">
 					<span>Not a Member?</span>

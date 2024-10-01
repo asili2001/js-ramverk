@@ -1,2 +1,1 @@
-2024-09-29T19:05:44.508Z: [at createDocument (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:14:7)] Document validation failed: title: Path `title` is required.
-2024-09-29T19:56:57.196Z: [at updateDocument (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:82:7)] updatedDocument is not defined
+2024-10-01T03:19:04.104Z: [at file:///home/ahai22/bth/js-ramverk/backend/controllers/user.controller.js:88:17] {}|| options is not defined
