@@ -1,4 +1,3 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useRoleContext } from './context/RoleContext';
 
@@ -13,7 +12,7 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({
 }) => {
 	const { role } = useRoleContext();
 
-	return requiredRoles.includes(role) ? component : <Navigate to="/" />;
+	return role && requiredRoles.includes(role) ? component : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

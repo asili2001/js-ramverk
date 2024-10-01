@@ -12,6 +12,6 @@ const authMiddleware = new AuthMiddleware();
 router.post('/', authValidator.newUser, authController.newUser);
 router.post('/activate', authValidator.activateAccount, authController.activateAccount);
 router.post('/login', authValidator.loginUser, authController.loginUser);
-router.post('/validate', authMiddleware.checkUser, authController.validate);
+router.post('/validate', authValidator.validateToken, authController.validateToken);
 
 export default router;

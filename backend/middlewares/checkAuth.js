@@ -18,13 +18,14 @@ class AuthMiddleware {
             const currentTime = Math.floor(Date.now() / 1000);
             
             if (decoded.exp < currentTime) {
-                res.clearCookie('key');
+                res.clearCookie("key");
                 return returner(res, "error", statusCodes.UNAUTHORIZED, [], "Unauthorized");
             }
 
             const user = await User.findOne({_id: decoded.userId});
 
             if (!user) {
+                res.clearCookie("key");
                 return returner(res, "error", statusCodes.UNAUTHORIZED, [], "Unauthorized");
             }
 
@@ -32,6 +33,7 @@ class AuthMiddleware {
 
             next();
         } catch (err) {
+            res.clearCookie("key");
             console.error("Error in middlewares/checkAuth/checkUser: ", err);
             return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
         }

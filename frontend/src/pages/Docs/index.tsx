@@ -4,11 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import useAPIDocs from '../../hooks/useAPIDocs';
+import LoadingSpinner from '../../components/Loading';
 
 const Documents = () => {
 	const [docs, setDocs] = useState<Doc[]>([]);
 	const navigate = useNavigate();
-	const { getDocs } = useAPIDocs();
+	const { getDocs, isLoading } = useAPIDocs();
 
 	const loadDocs = async () => {
 		const result = await getDocs();
@@ -23,6 +24,7 @@ const Documents = () => {
 	return (
 		<div className="documents-page">
 			<DocumentsNavbar />
+			{isLoading && <LoadingSpinner floating/>}
 			<div className="document-list">
 				{docs.map((document, index) => {
 					const documentOwner = document.usersWithAccess.find(
