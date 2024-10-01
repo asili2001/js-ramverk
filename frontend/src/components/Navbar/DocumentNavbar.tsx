@@ -7,7 +7,7 @@ import { FaRedo } from 'react-icons/fa';
 import Logo from '../../assets/logo.svg';
 import DropDownMenuButton from '../DropDownMenu/Button';
 import './main.scss';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { debounce } from 'arias';
 import { useNavigate } from 'react-router-dom';
 import { useShortcutsContext } from '../../context/ShortcutsContext';
@@ -22,8 +22,10 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
 	onTitleChange,
 }) => {
 	const { shortcuts } = useShortcutsContext();
-	const [title, setTitle] = useState<string>(documentTitle);
+	const [title, setTitle] = useState<string>('Untitled');
 	const navigate = useNavigate();
+
+	useEffect(() => setTitle(documentTitle), [documentTitle]);
 
 	const menuBarContent: Record<string, DropDownMenuContent[]> = {
 		File: [
@@ -77,13 +79,14 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
 			e.target.value.length === 0 ? 'Untitled' : e.target.value;
 		setTitle(newTitle);
 		// Call the throttled onTitleChange function
-		debouncedOnTitleChange(newTitle);
+		debouncedOnChange(newTitle);
 	};
 
-	const debouncedOnTitleChange = useMemo(
-		() => debounce((newTitle: string) => onTitleChange(newTitle), 1000),
-		[onTitleChange]
-	);
+	const debouncedOnChange = useRef(
+		debounce((content: string) => {
+			onTitleChange(content);
+		}, 1000)
+	).current;
 
 	return (
 		<div className="navbar">

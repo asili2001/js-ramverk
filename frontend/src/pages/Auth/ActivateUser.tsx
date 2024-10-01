@@ -8,47 +8,48 @@ import LoadingSpinner from '../../components/Loading';
 
 const ActivateUser = () => {
 	const [password, setPassword] = useState<string>('');
-    const location = useLocation();
-    const queryParams = new URLSearchParams(location.search);
+	const location = useLocation();
+	const queryParams = new URLSearchParams(location.search);
 
-    const token = queryParams.get('t');
+	const token = queryParams.get('t');
 	const [responseMessage, setResponseMessage] = useState<string>('');
-	const { signIn, activate, validateToken } = useAPIAuth();
-    const isLoading = true;
+	const { signIn, activate, validateToken, isLoading } = useAPIAuth();
 	const navigate = useNavigate();
 
 	const validToken = async () => {
-		const isValid = token !== null && await validateToken(token);
-        if (!isValid) {
-            navigate("/");
-            return false;
-        }
-        return true;
-	}
+		const isValid = token !== null && (await validateToken(token));
+		if (!isValid) {
+			navigate('/');
+			return false;
+		}
+		return true;
+	};
 
-	useEffect(()=> {validToken()}, []);
+	useEffect(() => {
+		validToken();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
 
 	const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.currentTarget.value;
 		setPassword(value);
 	};
 	const handleActivate = async () => {
-        if (!token) {
-            navigate("/");
-            return;
-        }
+		if (!token) {
+			navigate('/');
+			return;
+		}
 		const activateResponse = await activate(token, password);
-        if (typeof activateResponse === "string") {
-            setResponseMessage(activateResponse);
-            return;
-        }
-		
-        toast.success("Your account has been activated!", {duration: 5000});
-        // Try to automatically login user
-        await signIn(activateResponse.email, password);
-        navigate("/documents");
-        return;
+		if (typeof activateResponse === 'string') {
+			setResponseMessage(activateResponse);
+			return;
+		}
 
+		toast.success('Your account has been activated!', { duration: 5000 });
+		// Try to automatically login user
+		await signIn(activateResponse.email, password);
+		navigate('/documents');
+		return;
 	};
 	return (
 		<div className="auth-page">
@@ -63,7 +64,11 @@ const ActivateUser = () => {
 					title="New Password"
 					placeholder=" "
 					onChange={handlePasswordChange}
-					errorMsg={responseMessage.includes("password") ? responseMessage : ""}
+					errorMsg={
+						responseMessage.includes('password')
+							? responseMessage
+							: ''
+					}
 					required
 				/>
 				<button

@@ -72,7 +72,7 @@
     @include color-scheme(dark) {
         .document-card {
             &:hover {
-                box-shadow: $dark-box-shadow;
+                box-shadow: $dark-box-shadow !important;
             }
             
             img.preview {

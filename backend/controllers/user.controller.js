@@ -140,8 +140,8 @@ class AuthController {
     validateToken = async (req, res) => {
         const { token: encryptedToken } = req.body;
         const cryptoHelper = new CryptoHelper();
-        const decryptedToken = cryptoHelper.decrypt(encryptedToken);
-        const excists = await User.exists({token: decryptedToken});
+        const decryptedToken = JSON.parse(cryptoHelper.decrypt(encryptedToken));
+        const excists = await User.exists({token: decryptedToken.token, email: decryptedToken.email});
 
         if (!excists) {
             return returner(res, "error", statusCodes.FORBIDDEN, null, "Invalid Token");

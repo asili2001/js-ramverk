@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import './main.scss';
+import { debounce } from 'arias';
 
 export interface TextBoxProps {
 	content: string;
-	onChange?: (draftContent: string) => void;
+	onChange: (draftContent: string) => void;
 	className?: string;
 	editable?: boolean;
 	maxLines?: number;
@@ -17,7 +18,20 @@ const TextBox: React.FC<TextBoxProps> = ({
 	editable,
 	maxLines,
 }) => {
-	const allowedTags = ['a', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'span'];
+	const allowedTags = [
+		'a',
+		'h1',
+		'h2',
+		'h3',
+		'h4',
+		'h5',
+		'h6',
+		'p',
+		'span',
+		'img',
+		'br',
+		'div',
+	];
 	const sanitizeConfig = { ALLOWED_TAGS: allowedTags };
 	const sanitizedContent = DOMPurify.sanitize(content, sanitizeConfig);
 	const [draftContent, setDraftContent] = useState(sanitizedContent);
@@ -25,9 +39,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const PAGE_HEIGHT = 1056 - 32; // the 32px is the padding
 
+	const debouncedOnChange = useRef(
+		debounce((content: string) => {
+			onChange(content);
+		}, 1000)
+	).current;
+
 	useEffect(() => {
-		if (onChange) onChange(draftContent);
-	}, [draftContent, onChange]);
+		debouncedOnChange(draftContent);
+	}, [draftContent, debouncedOnChange]);
 
 	const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -49,6 +69,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 
 		if (editableRef.current) {
 			const selection = window.getSelection();
+
 			if (selection) {
 				const range = selection.getRangeAt(0);
 				range.deleteContents();
@@ -75,6 +96,8 @@ const TextBox: React.FC<TextBoxProps> = ({
 					selection.removeAllRanges();
 					selection.addRange(range);
 				}
+
+				setDraftContent(editableRef.current.innerHTML);
 			}
 		}
 	};
@@ -107,17 +130,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 				}
 			}
 
-			console.log(getTotalHeight(editableRef.current));
-
 			getTotalPages(getTotalHeight(editableRef.current));
 
 			// Sanitize the content before updating the state
-			setDraftContent(
-				DOMPurify.sanitize(
-					editableRef.current.innerHTML,
-					sanitizeConfig
-				)
+			const content = DOMPurify.sanitize(
+				editableRef.current.innerHTML,
+				sanitizeConfig
 			);
+
+			setDraftContent(content);
 		}
 	};
 

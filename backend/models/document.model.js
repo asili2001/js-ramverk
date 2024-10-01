@@ -1,32 +1,48 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 // Define Document schema
-const documentSchema = new mongoose.Schema({
-  title: {
-    type: String,
-    required: true
-  },
-  previewImage: {
-    type: mongoose.Schema.Types.String,
-    default: null
-  },
-  usersWithAccess: [{
-    _id: {
-      type: mongoose.Schema.Types.ObjectId,
-      required: true
+const documentSchema = new mongoose.Schema(
+  {
+    title: {
+      type: String,
+      required: true,
     },
-    accessLevel: {
-      type: ["owner", "editor", "reader"],
-      required: true
-    }
-  }],
-  content: {
-    type: String,
-    default: null
+    previewImage: {
+      type: String, // Corrected type definition
+      default: null,
+    },
+    usersWithAccess: [
+      {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        accessLevel: {
+          type: String, // Change to String
+          enum: ["owner", "editor", "reader"], // Use enum for validation
+          required: true,
+        },
+      },
+    ],
+    content: {
+      type: String,
+      default: null,
+    },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      transform: (doc, ret, options) => {
+        ret.id = ret._id;
+        delete ret._id;
+        delete ret.__v;
+        return ret;
+      },
+    },
   }
-}, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
+);
 
 // Create Document model
-const Document = mongoose.model('Document', documentSchema);
+const Document = mongoose.model("Document", documentSchema);
 
 export default Document;
