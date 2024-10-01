@@ -8,19 +8,20 @@ import LoadingSpinner from '../../components/Loading';
 import toast from 'react-hot-toast';
 
 const Signup = () => {
-	const [name, setName] = useState<string>("");
-	const [email, setEmail] = useState<string>("");
-	const [responseMessage, setResponseMessage] = useState<string>("");
+	const [name, setName] = useState<string>('');
+	const [email, setEmail] = useState<string>('');
+	const [responseMessage, setResponseMessage] = useState<string>('');
 	const { signUp, isLoading } = useAPIAuth();
 	const navigate = useNavigate();
 	const { role } = useRoleContext();
 
 	const checkRole = () => {
-		if (role !== "guest") {
-			navigate("/documents");
+		if (role !== 'guest') {
+			navigate('/documents');
 		}
-	}
-	useEffect(()=> checkRole(), []);
+	};
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(() => checkRole(), []);
 
 	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.currentTarget.value;
@@ -35,13 +36,15 @@ const Signup = () => {
 		const signUpResponseMessage = await signUp(name, email);
 		setResponseMessage(signUpResponseMessage);
 		console.log(signUpResponseMessage);
-		
-		if (signUpResponseMessage === "success") {
-			toast.success("We've sent an activation link to your email. Please check your inbox.", {duration: 5000})
-			navigate("/");
-		}
-	}
 
+		if (signUpResponseMessage === 'success') {
+			toast.success(
+				"We've sent an activation link to your email. Please check your inbox.",
+				{ duration: 5000 }
+			);
+			navigate('/');
+		}
+	};
 
 	return (
 		<div className="auth-page">
@@ -57,7 +60,11 @@ const Signup = () => {
 						title="Name"
 						placeholder=" "
 						onChange={handleNameChange}
-						errorMsg={responseMessage.includes("name") ? responseMessage : ""}
+						errorMsg={
+							responseMessage.includes('name')
+								? responseMessage
+								: ''
+						}
 						required
 					/>
 					<Input
@@ -66,7 +73,11 @@ const Signup = () => {
 						title="Email"
 						placeholder=" "
 						onChange={handleEmailChange}
-						errorMsg={responseMessage.includes("email") ? responseMessage : ""}
+						errorMsg={
+							responseMessage.includes('email')
+								? responseMessage
+								: ''
+						}
 						required
 					/>
 					<button

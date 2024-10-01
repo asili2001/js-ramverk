@@ -9,11 +9,20 @@ import LoadingSpinner from '../../components/Loading';
 const Documents = () => {
 	const [docs, setDocs] = useState<Doc[]>([]);
 	const navigate = useNavigate();
-	const { getDocs, isLoading } = useAPIDocs();
+	const { getDocs, newDoc, isLoading } = useAPIDocs();
 
 	const loadDocs = async () => {
 		const result = await getDocs();
 		setDocs(result);
+	};
+
+	const handleNewDocCreation = async () => {
+		const newDocument = await newDoc();
+		if (newDocument) {
+			console.log(newDocument);
+
+			navigate(`/documents/${newDocument.id}`);
+		}
 	};
 
 	useEffect(() => {
@@ -24,7 +33,7 @@ const Documents = () => {
 	return (
 		<div className="documents-page">
 			<DocumentsNavbar />
-			{isLoading && <LoadingSpinner floating/>}
+			{isLoading && <LoadingSpinner floating />}
 			<div className="document-list">
 				{docs.map((document, index) => {
 					const documentOwner = document.usersWithAccess.find(
@@ -59,7 +68,7 @@ const Documents = () => {
 				})}
 			</div>
 
-			<div className="new-document-btn">
+			<div className="new-document-btn" onClick={handleNewDocCreation}>
 				<FaPlus />
 			</div>
 		</div>

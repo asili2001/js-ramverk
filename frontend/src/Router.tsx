@@ -18,11 +18,11 @@ const AppRouter: React.FC = () => {
 	const { setRole } = useRoleContext();
 	const [loadedCookies, setLoadedCookies] = useState(false);
 
-	useEffect(()=> {
+	useEffect(() => {
 		const roleCookie = Cookies.get('role') as Role;
-		setRole(roleCookie ?? "guest");
+		setRole(roleCookie ?? 'guest');
 		setLoadedCookies(true);
-	}, []);
+	}, [setRole]);
 
 	useEffect(() => {
 		registerShortcut(
@@ -57,58 +57,60 @@ const AppRouter: React.FC = () => {
 		};
 	}, [registerShortcut, unregisterShortcut]);
 
-	return loadedCookies && (
-		<Router>
-			<Routes>
-				<Route
-					path="/"
-					element={
-						<PrivateRoute
-							component={<Login />}
-							requiredRoles={['guest', 'user', 'admin']}
-						/>
-					}
-				/>
-				<Route
-					path="/signup"
-					element={
-						<PrivateRoute
-							component={<Signup />}
-							requiredRoles={['guest']}
-						/>
-					}
-				/>
-				<Route
-					path="/activate"
-					element={
-						<PrivateRoute
-							component={<ActivateUser />}
-							requiredRoles={['guest']}
-						/>
-					}
-				/>
-				<Route
-					path="/documents"
-					element={
-						<PrivateRoute
-							component={<Documents />}
-							requiredRoles={['user']}
-						/>
-					}
-				/>
-				<Route
-					path="/documents/:documentId"
-					element={
-						<PrivateRoute
-							component={<Document />}
-							requiredRoles={['user']}
-						/>
-					}
-				/>
-				<Route path="/unauthorized" element={<Unauthorized />} />
-				<Route path="*" element={<NotFound />} />
-			</Routes>
-		</Router>
+	return (
+		loadedCookies && (
+			<Router>
+				<Routes>
+					<Route
+						path="/"
+						element={
+							<PrivateRoute
+								component={<Login />}
+								requiredRoles={['guest', 'user', 'admin']}
+							/>
+						}
+					/>
+					<Route
+						path="/signup"
+						element={
+							<PrivateRoute
+								component={<Signup />}
+								requiredRoles={['guest']}
+							/>
+						}
+					/>
+					<Route
+						path="/activate"
+						element={
+							<PrivateRoute
+								component={<ActivateUser />}
+								requiredRoles={['guest']}
+							/>
+						}
+					/>
+					<Route
+						path="/documents"
+						element={
+							<PrivateRoute
+								component={<Documents />}
+								requiredRoles={['user']}
+							/>
+						}
+					/>
+					<Route
+						path="/documents/:documentId"
+						element={
+							<PrivateRoute
+								component={<Document />}
+								requiredRoles={['user']}
+							/>
+						}
+					/>
+					<Route path="/unauthorized" element={<Unauthorized />} />
+					<Route path="*" element={<NotFound />} />
+				</Routes>
+			</Router>
+		)
 	);
 };
 

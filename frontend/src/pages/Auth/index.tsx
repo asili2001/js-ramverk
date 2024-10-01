@@ -15,12 +15,13 @@ const Login = () => {
 	const { role } = useRoleContext();
 
 	const checkRole = () => {
-		if (role !== "guest") {
-			navigate("/documents");
+		if (role !== 'guest') {
+			navigate('/documents');
 		}
-	}
+	};
 
-	useEffect(()=> checkRole(), []);
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	useEffect(() => checkRole(), []);
 
 	const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.currentTarget.value;
@@ -32,12 +33,12 @@ const Login = () => {
 	};
 	const handleSignIn = async () => {
 		const signInResponse = await signIn(email, password);
-		if (typeof signInResponse === "string") {
-            setResponseMessage(signInResponse);
-            return;
-        }
+		if (typeof signInResponse === 'string') {
+			setResponseMessage(signInResponse);
+			return;
+		}
 
-		navigate("/documents");
+		navigate('/documents');
 		return;
 	};
 	return (
@@ -54,7 +55,9 @@ const Login = () => {
 					placeholder=" "
 					value={email}
 					onChange={handleEmailChange}
-					errorMsg={responseMessage.includes("email") ? responseMessage : ""}
+					errorMsg={
+						responseMessage.includes('email') ? responseMessage : ''
+					}
 					required
 				/>
 				<Input
@@ -63,7 +66,11 @@ const Login = () => {
 					title="Password"
 					placeholder=" "
 					onChange={handlePasswordChange}
-					errorMsg={responseMessage.includes("password") ? responseMessage : ""}
+					errorMsg={
+						responseMessage.includes('password')
+							? responseMessage
+							: ''
+					}
 					required
 				/>
 				<button

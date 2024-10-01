@@ -28,8 +28,8 @@ const useAPIAuth = () => {
 			);
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
-				if (result.message === "Unauthorized") {
-					Cookies.remove("role");
+				if (result.message === 'Unauthorized') {
+					Cookies.remove('role');
 				}
 				toast.error(result.message);
 
@@ -37,12 +37,12 @@ const useAPIAuth = () => {
 			}
 
 			const roleCookie = Cookies.get('role') as Role;
-			setRole(roleCookie ?? "guest");
+			setRole(roleCookie ?? 'guest');
 			return result.data as User;
 		} catch (error) {
 			console.error('Network error or invalid JSON.', error);
 			toast.error('Something went wrong :(');
-			return "Error Signing in";
+			return 'Error Signing in';
 		}
 	};
 
@@ -68,8 +68,8 @@ const useAPIAuth = () => {
 			);
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
-				if (result.message === "Unauthorized") {
-					Cookies.remove("role");
+				if (result.message === 'Unauthorized') {
+					Cookies.remove('role');
 				}
 				toast.error(result.message);
 
@@ -77,12 +77,12 @@ const useAPIAuth = () => {
 			}
 
 			const roleCookie = Cookies.get('role') as Role;
-			setRole(roleCookie ?? "guest");
-			return "success";
+			setRole(roleCookie ?? 'guest');
+			return 'success';
 		} catch (error) {
 			console.error('Network error or invalid JSON.', error);
 			toast.error('Something went wrong :(');
-			return "Error Signing up";
+			return 'Error Signing up';
 		}
 	};
 
@@ -108,8 +108,8 @@ const useAPIAuth = () => {
 			);
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
-				if (result.message === "Unauthorized") {
-					Cookies.remove("role");
+				if (result.message === 'Unauthorized') {
+					Cookies.remove('role');
 				}
 				toast.error(result.message);
 
@@ -120,7 +120,7 @@ const useAPIAuth = () => {
 		} catch (error) {
 			console.error('Network error or invalid JSON.', error);
 			toast.error('Something went wrong :(');
-			return "Error Activating User";
+			return 'Error Activating User';
 		}
 	};
 
@@ -132,10 +132,10 @@ const useAPIAuth = () => {
 			headers: {
 				'Content-Type': 'application/json',
 			},
-			credentials: "include",
+			credentials: 'include',
 			body: JSON.stringify({
-				token
-			})
+				token,
+			}),
 		});
 
 		try {
@@ -145,8 +145,8 @@ const useAPIAuth = () => {
 			);
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
-				if (result.message === "Unauthorized") {
-					Cookies.remove("role");
+				if (result.message === 'Unauthorized') {
+					Cookies.remove('role');
 				}
 				toast.error(result.message);
 
@@ -159,7 +159,7 @@ const useAPIAuth = () => {
 			toast.error('Something went wrong :(');
 			return false;
 		}
-	}
+	};
 
 	return { signIn, signUp, activate, validateToken, isLoading };
 };

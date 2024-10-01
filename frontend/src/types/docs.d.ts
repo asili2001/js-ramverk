@@ -3,6 +3,7 @@ type Doc = {
 	title: string;
 	previewImage?: string;
 	usersWithAccess: UserWithAccess[];
+	content: string;
 };
 
 interface UserWithAccess extends User {
