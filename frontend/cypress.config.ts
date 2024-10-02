@@ -13,4 +13,5 @@ export default defineConfig({
     TEST_USER_PASSWORD: 'test'
   },
   chromeWebSecurity: false,
+  defaultCommandTimeout: 10000
 });
