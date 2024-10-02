@@ -4,40 +4,112 @@
     font-family: $font-family-base;
     font-size: $font-size-base;
     line-height: $line-height-base;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    background-color: $background-color;
+
+    @include color-scheme(dark) {
+        background-color: $dark-background-color;
+        color: $dark-text-color;
+    }
+
+    body,
+    #root {
+        height: 100vh;
+        width: 100%;
+    }
 }
 
 h1 {
     font-size: $h1-font-size;
 }
+
 h2 {
     font-size: $h2-font-size;
 }
+
 h3 {
     font-size: $h3-font-size;
 }
+
 h4 {
     font-size: $h4-font-size;
 }
+
 h5 {
     font-size: $h5-font-size;
 }
+
 h6 {
     font-size: $h6-font-size;
+}
+
+p {
+    font-size: $p-font-size;
 }
 
 a {
     color: $color-primary;
     text-decoration: none;
     transition: color 0.2s ease-in;
-  
+
     &:hover {
-      color: darken($color-primary, 10%);
-      text-decoration: underline;
+        color: darken($color-primary, 10%);
+        text-decoration: underline;
     }
-  
+
     &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba($color-primary, 0.5);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($color-primary, 0.5);
     }
-  }
-  
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    background-color: inherit;
+    color: inherit;
+}
+
+.primary-button {
+    background-color: unset;
+    border: unset;
+    color: $color-primary;
+    padding: .5rem;
+    border-radius: .3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: top 0.2s ease, background-color 0.2s ease;
+
+    &.active {
+        background-color: $color-primary;
+        color: $dark-text-color;
+
+        &:hover {
+            background-color: darken($color-primary, 5);
+        }
+    }
+
+}
+
+.rotate {
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}

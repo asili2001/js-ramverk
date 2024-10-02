@@ -1,0 +1,72 @@
+
+@import "../../styles/variables.scss";
+
+
+.dropdown-menu-btn-container {
+    position: relative;
+
+    button {
+        border: 0;
+        background-color: unset;
+    }
+
+
+}
+
+.dropdown-menu-list {
+    position: fixed;
+    background-color: $background-color;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    min-width: 10rem;
+    box-shadow: $box-shadow;
+    border-radius: 0.5rem;
+    
+    li {
+        display: flex;
+        align-items: center;
+        gap: .5rem;
+        height: 2rem;
+        padding: 0.2rem 0.4rem;
+        cursor: pointer;
+        justify-content: space-between;
+
+        &:first-child {
+            border-radius: .5rem .5rem 0 0;
+        }
+        &:last-child {
+            border-radius: 0 0 .5rem .5rem;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .right {
+            color: #a7a7a7;
+            font-weight: 500;
+            width: 3.5rem;
+        }
+
+        svg {
+            fill: $color-primary;
+        }
+
+        &:hover {
+            background-color: lighten($color-secondary, 40%);
+        }
+    }
+
+    @include color-scheme(dark) {
+        background-color: $dark-background-color;
+        box-shadow: $dark-box-shadow;
+        color: $dark-text-color;
+
+        li:hover {
+            background-color: $color-secondary;
+        }
+    }
+}

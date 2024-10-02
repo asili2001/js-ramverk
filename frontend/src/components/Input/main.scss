@@ -1,0 +1,87 @@
+@import "../../styles/variables.scss";
+
+.custom-input {
+    display: flex;
+    flex-direction: column;
+    .input {
+        display: flex;
+        align-items: center;
+        position: relative;
+        label {
+            background-color: $background-color;
+            color: gray;
+            padding: .2rem;
+            margin-left: 1rem;
+            position: absolute;
+            top: 0.5rem;
+            transition: top 0.2s ease, font-size 0.2s ease;
+            cursor: text;
+        }
+        
+        input {
+            height: 2.7rem;
+            width: 100%;
+            padding-left: 1rem;
+            padding-right: 1rem;
+            border: 1px solid #cbcbcb;
+            border-radius: .3rem;
+            background-color: $background-color;
+            color: $text-color;
+            
+            &:focus, &:not(:placeholder-shown) {
+                outline: unset;
+                border: 2px solid $color-primary !important;
+                &.error ~ label {
+                    color: $color-error;
+                }
+                &.success ~ label {
+                    color: $color-success;
+                }
+            }
+            &.error {
+                outline: unset;
+                border: 2px solid $color-error !important;
+    
+                ~ label {
+                    color: $color-error;
+                }
+            }
+            &.success {
+                outline: unset;
+                border: 2px solid $color-success !important;
+    
+                ~ label {
+                    color: $color-success;
+                }
+            }
+        }
+    
+        /* Move label when input is focused or has text */
+        input:focus ~ label,
+        input:not(:placeholder-shown) ~ label,
+        input:valid ~ label {
+            top: -.7rem;
+            font-size: 0.8rem;
+            color: $color-primary;
+        }
+    
+        @include color-scheme(dark) {
+            label, input {
+                background-color: $dark-background-color;
+                color: $dark-text-color;
+            }
+        }
+    }
+
+    .message {
+        font-size: .8em;
+        .error-message {
+            color: $color-error;
+            font-size: inherit;
+        }
+        .success-message {
+            color: $color-success;
+            font-size: inherit;
+        }
+    }
+}
