@@ -64,14 +64,14 @@ jobs:
 
       # Step 5: Wait for Vite and API to be ready
       - name: Wait for Vite to be ready
-        run: npx wait-on http://localhost:5173 --timeout 60000
+        run: npx wait-on http://localhost:5173/ --timeout 60000
 
       - name: Wait for API to be ready
-        run: npx wait-on http://localhost:1337 --timeout 60000
+        run: npx wait-on http://localhost:1337/ --timeout 60000
 
       # Step 6: Run Cypress tests
       - name: Run Cypress tests
         run: |
           cd frontend
-          npx cypress run --browser chrome --headless
+          npx cypress run
 
