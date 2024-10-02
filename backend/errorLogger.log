@@ -1,0 +1,2 @@
+2024-10-01T23:17:31.728Z: [at getDocumentById (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:56:7)] Cast to ObjectId failed for value "1" (type string) at path "_id" for model "Document"
+2024-10-01T23:17:31.738Z: [at getDocumentById (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:56:7)] Cast to ObjectId failed for value "1" (type string) at path "_id" for model "Document"

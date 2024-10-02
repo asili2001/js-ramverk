@@ -7,4 +7,8 @@ export default defineConfig({
       // implement node event listeners here
     },
   },
+  env: {
+    MAIN_API_URL: 'http://localhost:1337/api',
+  },
+  chromeWebSecurity: false,
 });
