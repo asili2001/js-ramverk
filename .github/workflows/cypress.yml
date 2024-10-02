@@ -45,15 +45,11 @@ jobs:
           echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> backend/.env.dev
 
 
-      - name: Install dependencies for frontend
-        run: |
-          cd frontend
-          npm install
-
       - name: Start backend server
         run: |
           cd backend
-          npm run dev &
+          npm install
+          npm start &
         env:
           NODE_ENV: development
 
@@ -62,7 +58,7 @@ jobs:
         uses: cypress-io/github-action@v6
         with:
           build: cd frontend && npm run build
-          start: cd frontend && npm start
+          start: cd frontend && npm run dev
 
       # - name: Upload Cypress videos
       #   uses: actions/upload-artifact@v3
