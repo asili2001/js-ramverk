@@ -23,8 +23,6 @@ class AuthValidator {
     }
 
     activateAccount = async (req, res, next) => {
-        const body = req.body;
-
         const schema = Joi.object({
             password: Joi.string().required(),
             token: Joi.string().required()

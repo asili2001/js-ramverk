@@ -2,7 +2,6 @@
 import * as nodemailer from 'nodemailer';
 import { readFile } from 'fs/promises';
 import errorLogger from './errorLogger.js';
-import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -111,12 +110,7 @@ export class EmailService {
      * @returns {Promise<string>} A Promise that resolves with the file's content as a string.
      */
     async readFile(filePath) {
-        try {
-            return await readFile(filePath, 'utf-8');
-        } catch (error) {
-            // Handle file read errors
-            throw error;
-        }
+        return await readFile(filePath, 'utf-8');
     }
 }
 

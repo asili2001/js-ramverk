@@ -1,2 +1,2 @@
-2024-09-29T19:05:44.508Z: [at createDocument (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:14:7)] Document validation failed: title: Path `title` is required.
-2024-09-29T19:56:57.196Z: [at updateDocument (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:82:7)] updatedDocument is not defined
+2024-10-01T23:17:31.728Z: [at getDocumentById (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:56:7)] Cast to ObjectId failed for value "1" (type string) at path "_id" for model "Document"
+2024-10-01T23:17:31.738Z: [at getDocumentById (file:///home/ahai22/bth/js-ramverk/backend/controllers/document.controller.js:56:7)] Cast to ObjectId failed for value "1" (type string) at path "_id" for model "Document"

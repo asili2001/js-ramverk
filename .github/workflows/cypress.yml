@@ -25,6 +25,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+<<<<<<< HEAD
+=======
+      - name: Install dependencies
+        run: npm install
+
+>>>>>>> 2cd912b2471a1368122568a28329287740f2fe37
       # Backend setup
       - name: Setup environment variables for backend
         run: |
@@ -58,10 +64,14 @@ jobs:
         run: |
           echo "VITE_MAIN_API_URL=${{secrets.BACKEND_URL}}" >> backend/.env
       - name: Start frontend (Vite)
+<<<<<<< HEAD
         run: |
           cd frontend
           npm install
           npm run dev &
+=======
+        run: npm run dev &
+>>>>>>> 2cd912b2471a1368122568a28329287740f2fe37
         env:
           CI: true
 
