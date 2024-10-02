@@ -45,11 +45,15 @@ jobs:
           echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> backend/.env.dev
 
 
+      - name: Install dependencies for frontend
+        run: |
+          cd frontend
+          npm install
+
       - name: Start backend server
         run: |
           cd backend
-          npm install
-          npm start &
+          npm run dev &
         env:
           NODE_ENV: development
 
