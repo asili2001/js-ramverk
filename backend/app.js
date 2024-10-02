@@ -12,6 +12,7 @@ dotenv.config({ path: `${process.env.PWD}/${envFile}` });
 import connectDB from './config/db.js';
 import userRoutes from './routes/user.route.js';
 import documentRoutes from './routes/document.route.js';
+import returner from './utils/returner.js';
 
 const app = express();
 
@@ -35,6 +36,9 @@ app.use(morgan('combined'));
 connectDB();
 
 // Routes
+app.use('/', (req, res)=> {
+    return returner(res, "success", 200, null, "Server is Active!");
+});
 app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 
