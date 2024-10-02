@@ -9,6 +9,8 @@ export default defineConfig({
   },
   env: {
     MAIN_API_URL: 'http://localhost:1337/api',
+    TEST_USER_EMAIL: 'test@test.com',
+    TEST_USER_PASSWORD: 'test'
   },
   chromeWebSecurity: false,
 });

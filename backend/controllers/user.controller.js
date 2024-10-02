@@ -35,8 +35,6 @@ class AuthController {
      * @param {Response} res Response
      */
     newUser = async (req, res) => {
-        const body = req.body;
-
         /**
          * Sends an activation email with a token to the user.
          * @param {string} email The receiver's email
@@ -46,7 +44,7 @@ class AuthController {
             const emailService = new EmailService();
             // Send email activation link
             if (!token) {
-                const token = await User.findOne({ email }).token;
+                token = await User.findOne({ email }).token;
             }
 
             if (!token) throw new Error("token is undefined");
@@ -156,8 +154,6 @@ class AuthController {
      * @param res Response
      */
     loginUser = async (req, res) => {
-        const body = req.body;
-
         if (!process.env.JWT_MAX_AGE) {
             throw new Error("Missing required environment variables for JWT.");
         }

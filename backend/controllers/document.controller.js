@@ -88,6 +88,7 @@ class DocumentController {
 
   // Method for deleting a document by ID
   async deleteDocument(req, res) {
+    const userId = res.locals.authenticatedUser;
     try {
       const document = await Document.findOneAndDelete({
         _id: req.params.id,
