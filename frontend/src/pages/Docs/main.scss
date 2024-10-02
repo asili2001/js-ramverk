@@ -23,6 +23,8 @@
         gap: 1rem;
         flex-direction: row;
         margin: auto;
+        flex-wrap: wrap;
+        justify-content: center;
 
         .document-card {
             width: 10rem;
