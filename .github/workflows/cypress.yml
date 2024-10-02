@@ -53,23 +53,22 @@ jobs:
         env:
           NODE_ENV: development
 
-      # Frontend setup
-      - name: Cypress run
-        uses: cypress-io/github-action@v6
+      # Step 4: Start Vite application from the frontend folder
+      - name: Start Vite application
+        run: |
+          cd frontend
+          npm install
+          npm run dev -- --host 0.0.0.0 &
+
+      # Step 5: Wait for Vite to be ready
+      - name: Wait for Vite to be ready
+        run: npx wait-on http://localhost:5173
+
+      # Step 6: Run Cypress tests
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
         with:
-          build: cd frontend && npm run build
-          start: cd frontend && npm run dev
+          browser: chrome
+          headless: true
+        working-directory: frontend
 
-      # - name: Upload Cypress videos
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: cypress-videos
-      #     path: cypress/videos
-
-      # - name: Upload Cypress screenshots
-      #   uses: actions/upload-artifact@v3
-      #   if: always()
-      #   with:
-      #     name: cypress-screenshots
-      #     path: cypress/screenshots
