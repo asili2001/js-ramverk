@@ -9,10 +9,10 @@ const authMiddleware = new AuthMiddleware();
 const documentValidator = new DocumentValidator();
 
 // Define routes for documents
-router.post('/', authMiddleware.checkUser, documentValidator.newDocument, DocumentController.createDocument);
-router.get('/', authMiddleware.checkUser, DocumentController.getDocuments);
-router.get('/:id', authMiddleware.checkUser, DocumentController.getDocumentById);
-router.put('/:id', authMiddleware.checkUser, documentValidator.updateDocument, DocumentController.updateDocument);
-router.delete('/:id', authMiddleware.checkUser, DocumentController.deleteDocument);
+router.post('/', documentValidator.newDocument, DocumentController.createDocument);
+router.get('/', DocumentController.getDocuments);
+router.get('/:id', DocumentController.getDocumentById);
+router.put('/:id', documentValidator.updateDocument, DocumentController.updateDocument);
+router.delete('/:id', DocumentController.deleteDocument);
 
 export default router;
