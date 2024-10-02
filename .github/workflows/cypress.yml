@@ -29,7 +29,7 @@ jobs:
       - name: Setup environment variables for backend
         run: |
           echo "NODE_ENV=development" >> backend/.env.dev
-          echo "SERVER_PORT=${{secrets.SERVER_PORT}}" >> backend/.env.dev
+          echo "SERVER_PORT=1337" >> backend/.env.dev
           echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> backend/.env.dev
           echo "FRONTEND_DOMAIN=${{secrets.FRONTEND_URL}}" >> backend/.env.dev
           echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> backend/.env.dev
