@@ -63,6 +63,8 @@ jobs:
       # Step 5: Wait for Vite to be ready
       - name: Wait for Vite to be ready
         run: npx wait-on http://localhost:5173
+      - name: Wait for API to be ready
+        run: npx wait-on http://localhost:1337
 
       # Step 6: Run Cypress tests
       - name: Run Cypress tests
