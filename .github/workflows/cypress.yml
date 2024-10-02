@@ -50,6 +50,8 @@ jobs:
           cd backend
           npm install
           node app.js -- --host 0.0.0.0 &
+          sleep 10 # Wait for backend to start up
+          curl http://localhost:1337/ # Check if backend is up
         env:
           NODE_ENV: development
 
@@ -60,11 +62,12 @@ jobs:
           npm install
           npm run dev -- --host 0.0.0.0 &
 
-      # Step 5: Wait for Vite to be ready
+      # Step 5: Wait for Vite and API to be ready
       - name: Wait for Vite to be ready
-        run: npx wait-on http://localhost:5173
+        run: npx wait-on http://localhost:5173 --timeout 60000
+
       - name: Wait for API to be ready
-        run: npx wait-on http://localhost:1337
+        run: npx wait-on http://localhost:1337 --timeout 60000
 
       # Step 6: Run Cypress tests
       - name: Run Cypress tests
