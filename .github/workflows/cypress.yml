@@ -56,7 +56,7 @@ jobs:
       # Frontend setup
       - name: Setup environment variables for backend
         run: |
-          echo "VITE_MAIN_API_URL=${{secrets.BACKEND_URL}}" >> backend/.env
+          echo "VITE_MAIN_API_URL=${{secrets.BACKEND_URL}}" >> frontend/.env
       - name: Start frontend (Vite)
         run: |
           cd frontend
@@ -65,11 +65,11 @@ jobs:
         env:
           CI: true
 
-      # - name: Wait for backend to be ready
-      #   run: npx wait-on http://localhost:1337
+      - name: Wait for backend to be ready
+        run: npx wait-on http://localhost:${{secrets.SERVER_PORT}}
 
-      # - name: Wait for frontend to be ready
-      #   run: npx wait-on http://localhost:5173
+      - name: Wait for frontend to be ready
+        run: npx wait-on http://localhost:5173
 
       - name: Run Cypress tests
         run: |
