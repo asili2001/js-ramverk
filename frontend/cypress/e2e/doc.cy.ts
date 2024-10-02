@@ -2,7 +2,7 @@ let docId;
 
 describe('Document Tests', () => {
     beforeEach(() => {
-        cy.login('ahmadasili1928@gmail.com', 'ahmad');
+        cy.login(Cypress.env()['TEST_USER_EMAIL'], Cypress.env()['TEST_USER_PASSWORD']);
         cy.visit('http://localhost:5173/documents');
     });
 
