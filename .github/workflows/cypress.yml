@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
 
@@ -54,40 +54,22 @@ jobs:
           NODE_ENV: development
 
       # Frontend setup
-      - name: Setup environment variables for backend
-        run: |
-          echo "VITE_MAIN_API_URL=${{secrets.BACKEND_URL}}" >> frontend/.env
-      - name: Start frontend (Vite)
-        run: |
-          cd frontend
-          npm install
-          npm run dev &
-        env:
-          CI: true
-
-      # - name: Wait for backend to be ready
-      #   run: npx wait-on http://localhost:${{secrets.SERVER_PORT}}
-
-      # - name: Wait for frontend to be ready
-      #   run: npx wait-on http://localhost:5173
-
-      - name: Run Cypress tests
-        run: |
-          cd frontend
-          npx cypress run
-        env:
-          CI: true
-
-      - name: Upload Cypress videos
-        uses: actions/upload-artifact@v3
-        if: always()
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
         with:
-          name: cypress-videos
-          path: cypress/videos
+          build: npm run build
+          start: npm start
 
-      - name: Upload Cypress screenshots
-        uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: cypress-screenshots
-          path: cypress/screenshots
+      # - name: Upload Cypress videos
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: cypress-videos
+      #     path: cypress/videos
+
+      # - name: Upload Cypress screenshots
+      #   uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: cypress-screenshots
+      #     path: cypress/screenshots
