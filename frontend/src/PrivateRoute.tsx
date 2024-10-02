@@ -1,23 +1,22 @@
-import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useRole } from './context/RoleContext';
+import { useRoleContext } from './context/RoleContext';
 
 interface PrivateRouteProps {
-  component: JSX.Element;
-  requiredRoles: Role[];
+	component: JSX.Element;
+	requiredRoles: Role[];
 }
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({
-  component,
-  requiredRoles,
+	component,
+	requiredRoles,
 }) => {
-  const { role } = useRole();
+	const { role } = useRoleContext();
 
-  return requiredRoles.includes(role) ? (
-    component
-  ) : (
-    <Navigate to="/unauthorized" />
-  );
+	return role && requiredRoles.includes(role) ? (
+		component
+	) : (
+		<Navigate to="/" />
+	);
 };
 
 export default PrivateRoute;

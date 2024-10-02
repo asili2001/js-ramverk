@@ -31,8 +31,9 @@ class DocumentController {
 
     try {
       const userDocs = await Document.find({ "usersWithAccess._id": userId });
+      const jsonDocs = userDocs.map(doc => doc.toJSON());
 
-      return returner(res, "success", statusCodes.OK, userDocs, "");
+      return returner(res, "success", statusCodes.OK, jsonDocs, "");
     } catch (error) {
       errorLogger(error.message);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
@@ -41,13 +42,14 @@ class DocumentController {
 
   // Method for fetching a single document by ID
   async getDocumentById(req, res) {
-    const userId = res.locals.authenticatedUser;
+    const userId = res.locals.authenticatedUser._id;
     try {
       const document = await Document.findById(req.params.id);
       if (!document) {
         return returner(res, "error", statusCodes.NOT_FOUND, null, "Document not found");
       }
-      const hasAccess = document.usersWithAccess.find(access => access._id === userId);
+      const hasAccess = document.usersWithAccess.find(access => access._id.equals(userId));
+      
       if (!hasAccess) return returner(res, "error", statusCodes.FORBIDDEN, null, "You don't have access to this document");
       return returner(res, "success", statusCodes.OK, document, "");
     } catch (error) {
@@ -86,6 +88,7 @@ class DocumentController {
 
   // Method for deleting a document by ID
   async deleteDocument(req, res) {
+    const userId = res.locals.authenticatedUser;
     try {
       const document = await Document.findOneAndDelete({
         _id: req.params.id,
