@@ -7,6 +7,9 @@ describe('Document Tests', () => {
     });
 
     it('Creates a New Document', () => {
+        cy.get('body').invoke('prop', 'innerHTML').then((html) => {
+            cy.log('Body HTML:', html);
+        });
         cy.disableCache();
         cy.intercept('POST', `${Cypress.env().MAIN_API_URL}/documents`).as('createDocument');
 
