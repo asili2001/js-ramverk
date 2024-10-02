@@ -81,7 +81,7 @@ const Login = () => {
 				</button>
 				<div className="footer">
 					<span>Not a Member?</span>
-					<a href="/signup">Sign Up</a>
+					<button onClick={()=>navigate("/signup")}>Signup</button>
 				</div>
 			</div>
 		</div>

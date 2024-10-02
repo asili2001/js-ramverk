@@ -2,13 +2,15 @@
   "name": "frontend",
   "private": true,
   "version": "0.0.0",
+  "homepage": ".",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "format": "prettier --write 'src/**/*.{ts,tsx}'",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && rsync -av --delete dist/. axjo21@ssh.student.bth.se:www/editor"
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",

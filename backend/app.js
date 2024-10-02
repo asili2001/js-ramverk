@@ -15,7 +15,7 @@ import documentRoutes from './routes/document.route.js';
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173', 'https://www.student.bth.se'];
 
 const corsOptions = {
     origin: allowedOrigins,

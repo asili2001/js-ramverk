@@ -1,7 +1,7 @@
 // Router.tsx
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './pages/Auth';
+//import Login from './pages/Auth';
 import NotFound from './pages/Other/NotFound';
 import PrivateRoute from './PrivateRoute';
 import Unauthorized from './pages/Other/Unauthorized';
@@ -59,13 +59,13 @@ const AppRouter: React.FC = () => {
 
 	return (
 		loadedCookies && (
-			<Router>
+			<Router basename="/~axjo21/editor">
 				<Routes>
 					<Route
 						path="/"
 						element={
 							<PrivateRoute
-								component={<Login />}
+								component={<Documents />}
 								requiredRoles={['guest', 'user', 'admin']}
 							/>
 						}
@@ -93,7 +93,7 @@ const AppRouter: React.FC = () => {
 						element={
 							<PrivateRoute
 								component={<Documents />}
-								requiredRoles={['user']}
+								requiredRoles={['guest']}
 							/>
 						}
 					/>
@@ -102,7 +102,7 @@ const AppRouter: React.FC = () => {
 						element={
 							<PrivateRoute
 								component={<Document />}
-								requiredRoles={['user']}
+								requiredRoles={['guest']}
 							/>
 						}
 					/>
