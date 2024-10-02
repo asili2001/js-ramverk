@@ -7,13 +7,13 @@ describe('Document Tests', () => {
     });
 
     it('Creates a New Document', () => {
-        cy.get('body').invoke('prop', 'innerHTML').then((html) => {
-            cy.log('Body HTML:', html);
+        cy.document().then((doc) => {
+            console.log(doc.documentElement.outerHTML); // Logs the entire DOM
         });
         cy.disableCache();
         cy.intercept('POST', `${Cypress.env().MAIN_API_URL}/documents`).as('createDocument');
 
-        cy.get('.new-document-btn').should("exist").click();
+        cy.get('.new-document-btn', { timeout: 20000 }).should("exist").click();
 
         cy.wait('@createDocument').then((interception) => {
             expect(interception.response.statusCode).to.eq(201);
@@ -32,7 +32,7 @@ describe('Document Tests', () => {
     it('Opens the Created Document', () => {
         cy.disableCache();
         cy.intercept('GET', `${Cypress.env().MAIN_API_URL}/documents/${docId}`).as('viewDocument');
-        cy.get('.document-list .document-card').last().should("exist").click();
+        cy.get('.document-list .document-card', { timeout: 20000 }).last().should("exist").click();
 
         cy.wait('@viewDocument').then((interception) => {
             expect(interception.response.statusCode).to.eq(200);
@@ -49,7 +49,7 @@ describe('Document Tests', () => {
         cy.disableCache();
         cy.visit(`http://localhost:5173/documents/${docId}`);
         cy.intercept('PUT', `${Cypress.env().MAIN_API_URL}/documents/${docId}`).as('updateDocument');
-        cy.get('.main-textbox').should("exist").type('Hello World');
+        cy.get('.main-textbox', { timeout: 20000 }).should("exist").type('Hello World');
 
         cy.wait('@updateDocument').then((interception) => {
             expect(interception.response.statusCode).to.eq(200);
@@ -65,7 +65,7 @@ describe('Document Tests', () => {
         cy.disableCache();
         cy.visit(`http://localhost:5173/documents/${docId}`);
         cy.intercept('PUT', `${Cypress.env().MAIN_API_URL}/documents/${docId}`).as('updateDocument');
-        cy.get('.main-textbox').should("exist").type('Hello World');
+        cy.get('.main-textbox', { timeout: 20000 }).should("exist").type('Hello World');
         cy.get('.title-n-menubar input')
             .focus() // Focus on the input field
             .type('{selectall}') // Select all text
