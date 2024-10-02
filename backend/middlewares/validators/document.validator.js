@@ -22,8 +22,8 @@ class DocumentValidator {
         const body = req.body;
 
         const schema = Joi.object({
-            title: Joi.string().required(),
-            content: Joi.string().required() // for now, we will have it like that. In future we will not have content in the http request. we will instead update the content in data chunks
+            title: Joi.string().optional(),
+            content: Joi.string().allow('').optional() // for now, we will have it like that. In future we will not have content in the http request. we will instead update the content in data chunks
         });
 
         const { error } = schema.validate(body);

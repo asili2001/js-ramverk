@@ -15,9 +15,20 @@ import documentRoutes from './routes/document.route.js';
 
 const app = express();
 
-app.use(cookieParser());
+const allowedOrigins = ['http://localhost:5173', 'http://127.0.0.1:5173'];
+
+const corsOptions = {
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+};
+
+
+
+
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser());
+app.use(cors(corsOptions));
 app.use(morgan('combined'));
 
 // Connect to the database

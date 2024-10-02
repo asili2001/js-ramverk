@@ -1,0 +1,30 @@
+@import "../../styles/variables.scss";
+
+.loading-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem;
+    &.floating {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+    font-size: inherit;
+    color: inherit;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
