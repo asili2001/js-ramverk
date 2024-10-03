@@ -36,9 +36,9 @@ app.use(morgan('combined'));
 connectDB();
 
 // Routes
-app.use('/', (req, res)=> {
-    return returner(res, "success", 200, null, "Server is Active!");
-});
+// app.use('/', (req, res)=> {
+//     return returner(res, "success", 200, null, "Server is Active!");
+// });
 app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 

@@ -74,4 +74,3 @@ jobs:
         run: |
           cd frontend
           npx cypress run
-
