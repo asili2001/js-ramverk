@@ -15,29 +15,31 @@ jobs:
           node-version: '18.x'
 
       # Backend setup
-      - name: Setup environment variables for backend
+      - name: Install backend dependencies
         working-directory: backend
+        run: npm install
+
+      - name: Setup environment variables for backend
         run: |
-          echo "NODE_ENV=development" >> .env.dev
-          echo "SERVER_PORT=1337" >> .env.dev
-          echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> .env.dev
-          echo "FRONTEND_DOMAIN=${{secrets.FRONTEND_URL}}" >> .env.dev
-          echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env.dev
-          echo "JWT_MAX_AGE=${{secrets.JWT_MAX_AGE}}" >> .env.dev
-          echo "BCRYPT_SALT_ROUNDS=${{secrets.BCRYPT_SALT_ROUNDS}}" >> .env.dev
-          echo "MAIL_SERVICE=${{secrets.MAIL_SERVICE}}" >> .env.dev
-          echo "MAIL_HOST=${{secrets.MAIL_HOST}}" >> .env.dev
-          echo "MAIL_PORT=${{secrets.MAIL_PORT}}" >> .env.dev
-          echo "MAIL_SECURE=${{secrets.MAIL_SECURE}}" >> .env.dev
-          echo "MAIL_PASS=${{secrets.MAIL_PASS}}" >> .env.dev
-          echo "MAIL_USER=${{secrets.MAIL_USER}}" >> .env.dev
-          echo "CRYPTO_SECRET=${{secrets.CRYPTO_SECRET}}" >> .env.dev
-          echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> .env.dev
+          echo "NODE_ENV=development" >> backend/.env.dev
+          echo "SERVER_PORT=1337" >> backend/.env.dev
+          echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> backend/.env.dev
+          echo "FRONTEND_DOMAIN=${{secrets.FRONTEND_URL}}" >> backend/.env.dev
+          echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> backend/.env.dev
+          echo "JWT_MAX_AGE=${{secrets.JWT_MAX_AGE}}" >> backend/.env.dev
+          echo "BCRYPT_SALT_ROUNDS=${{secrets.BCRYPT_SALT_ROUNDS}}" >> backend/.env.dev
+          echo "MAIL_SERVICE=${{secrets.MAIL_SERVICE}}" >> backend/.env.dev
+          echo "MAIL_HOST=${{secrets.MAIL_HOST}}" >> backend/.env.dev
+          echo "MAIL_PORT=${{secrets.MAIL_PORT}}" >> backend/.env.dev
+          echo "MAIL_SECURE=${{secrets.MAIL_SECURE}}" >> backend/.env.dev
+          echo "MAIL_PASS=${{secrets.MAIL_PASS}}" >> backend/.env.dev
+          echo "MAIL_USER=${{secrets.MAIL_USER}}" >> backend/.env.dev
+          echo "CRYPTO_SECRET=${{secrets.CRYPTO_SECRET}}" >> backend/.env.dev
+          echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> backend/.env.dev
 
       - name: Start backend server
-        working-directory: backend
         run: |
-          npm install
+          cd backend
           node app.js -- --host 0.0.0.0 &
           sleep 10 # Wait for backend to start up
           curl http://localhost:1337/ # Check if backend is up
@@ -50,9 +52,5 @@ jobs:
 
       - name: Cypress run
         working-directory: frontend  # Set working directory to frontend
-        uses: cypress-io/github-action@v3
-        with:
-          browser: chrome
-          build: npm run build
-          start: npm run dev
-          wait-on: "http://localhost:5173"
+        run: |
+          npx cypress run --browser chrome
