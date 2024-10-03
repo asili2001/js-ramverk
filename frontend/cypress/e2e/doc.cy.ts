@@ -7,6 +7,7 @@ describe('Document Tests', () => {
     });
 
     it('Creates a New Document', () => {
+        cy.visit('http://localhost:5173/documents');
         cy.document().then((doc) => {
             console.log(doc.documentElement.outerHTML); // Logs the entire DOM
         });
