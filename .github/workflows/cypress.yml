@@ -74,3 +74,9 @@ jobs:
         run: |
           cd frontend
           npx cypress run
+
+      - name: Upload Cypress Videos
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-videos
+          path: cypress/videos
