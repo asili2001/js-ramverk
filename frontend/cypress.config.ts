@@ -6,6 +6,7 @@ export default defineConfig({
     setupNodeEvents(on, config) {
       // implement node event listeners here
     },
+    baseUrl: 'http://localhost:5173',
   },
   env: {
     MAIN_API_URL: 'http://localhost:1337/api',
