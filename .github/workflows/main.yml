@@ -49,9 +49,9 @@ jobs:
         run: npm install
 
       - name: Cypress run
+        working-directory: frontend  # Set working directory to frontend
         uses: cypress-io/github-action@v3
         with:
-          project: ./frontend
           browser: chrome
           build: npm run build
           start: npm run dev
