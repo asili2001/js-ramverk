@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16]
+        node-version: [18]
 
     steps:
       - name: Checkout repository
@@ -48,7 +48,7 @@ jobs:
       - name: Start backend server
         run: |
           cd backend
-          npm install
+          npm ci
           node app.js -- --host 0.0.0.0 &
           sleep 10 # Wait for backend to start up
           curl http://localhost:1337/ # Check if backend is up
@@ -59,7 +59,7 @@ jobs:
       - name: Start Vite application
         run: |
           cd frontend
-          npm install
+          npm ci
           npm run dev -- --host 0.0.0.0 &
 
       # Step 5: Wait for Vite and API to be ready
