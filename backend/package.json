@@ -5,10 +5,11 @@
     "main": "app.js",
     "type": "module",
     "scripts": {
+        "start": "npm run prod",
         "test": "echo \"Error: no test specified\" && exit 1",
         "lint": "eslint .",
-        "start": "NODE_ENV='development' nodemon app.js",
-        "production": "NODE_ENV='production' node app.js"
+        "dev": "NODE_ENV='development' nodemon app.js",
+        "prod": "NODE_ENV='production' nodemon app.js"
     },
     "author": "",
     "license": "ISC",
@@ -32,6 +33,7 @@
         "@types/jsonwebtoken": "^9.0.7",
         "@types/nodemailer": "^6.4.16",
         "eslint": "^9.11.1",
-        "globals": "^15.10.0"
+        "globals": "^15.10.0",
+        "mocha": "^10.7.3"
     }
 }
