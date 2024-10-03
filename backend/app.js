@@ -40,4 +40,4 @@ app.use('/api/documents', documentRoutes);
 
 
 // Start up server
-app.listen(process.env.SERVER_PORT, () => console.log(`INKER API listening on port ${process.env.SERVER_PORT}!`));
+app.listen(process.env.PORT, () => console.log(`INKER API listening on port ${process.env.PORT}!`));
