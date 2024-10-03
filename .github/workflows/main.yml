@@ -1,0 +1,56 @@
+name: E2E on Chrome
+
+on: [push]
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      # Backend setup
+      - name: Setup environment variables for backend
+        run: |
+          echo "NODE_ENV=development" >> backend/.env.dev
+          echo "SERVER_PORT=1337" >> backend/.env.dev
+          echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> backend/.env.dev
+          echo "FRONTEND_DOMAIN=${{secrets.FRONTEND_URL}}" >> backend/.env.dev
+          echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> backend/.env.dev
+          echo "JWT_MAX_AGE=${{secrets.JWT_MAX_AGE}}" >> backend/.env.dev
+          echo "BCRYPT_SALT_ROUNDS=${{secrets.BCRYPT_SALT_ROUNDS}}" >> backend/.env.dev
+          echo "MAIL_SERVICE=${{secrets.MAIL_SERVICE}}" >> backend/.env.dev
+          echo "MAIL_HOST=${{secrets.MAIL_HOST}}" >> backend/.env.dev
+          echo "MAIL_PORT=${{secrets.MAIL_PORT}}" >> backend/.env.dev
+          echo "MAIL_SECURE=${{secrets.MAIL_SECURE}}" >> backend/.env.dev
+          echo "MAIL_PASS=${{secrets.MAIL_PASS}}" >> backend/.env.dev
+          echo "MAIL_USER=${{secrets.MAIL_USER}}" >> backend/.env.dev
+          echo "CRYPTO_SECRET=${{secrets.CRYPTO_SECRET}}" >> backend/.env.dev
+          echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> backend/.env.dev
+
+      - name: Start backend server
+        run: |
+          cd backend
+          npm install
+          node app.js -- --host 0.0.0.0 &
+          sleep 10 # Wait for backend to start up
+          curl http://localhost:1337/ # Check if backend is up
+        env:
+          NODE_ENV: development
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v3
+        with:
+          project: ./frontend
+          browser: chrome
+          build: npm build
+          start: npm run dev
+          wait-on: "http://localhost:5173"
