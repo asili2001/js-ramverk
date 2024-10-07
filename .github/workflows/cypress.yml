@@ -50,7 +50,7 @@ jobs:
         working-directory: backend
         run: |
           npm install
-          node app.js -- --host 0.0.0.0 &
+          node src/app.js -- --host 0.0.0.0 &
           sleep 10 # Wait for backend to start up
         env:
           NODE_ENV: development
