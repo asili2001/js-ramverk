@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import User from "../models/user.model.js";
+const mongoose = require("mongoose");
+const User = require("../models/user.model.js");
 
 const connectDB = async () => {
   try {
@@ -40,4 +40,4 @@ const connectDB = async () => {
   }
 };
 
-export default connectDB;
+module.exports = connectDB;
