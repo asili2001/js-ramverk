@@ -59,6 +59,7 @@ jobs:
       - name: Start Vite application
         working-directory: frontend
         run: |
+          echo "VITE_MAIN_API_URL = 'http://localhost:1337/api'" >> .env
           npm install
           npm run dev -- --host 0.0.0.0 &
 
