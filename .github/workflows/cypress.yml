@@ -32,7 +32,7 @@ jobs:
           echo "NODE_ENV=development" >> .env.dev
           echo "SERVER_PORT=1337" >> .env.dev
           echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> .env.dev
-          echo "FRONTEND_DOMAIN=${{secrets.FRONTEND_URL}}" >> .env.dev
+          echo "FRONTEND_DOMAIN='http://localhost:5173'" >> .env.dev
           echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env.dev
           echo "JWT_MAX_AGE=${{secrets.JWT_MAX_AGE}}" >> .env.dev
           echo "BCRYPT_SALT_ROUNDS=${{secrets.BCRYPT_SALT_ROUNDS}}" >> .env.dev
