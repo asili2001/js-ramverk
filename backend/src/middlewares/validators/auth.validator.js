@@ -1,7 +1,6 @@
-import Joi from "joi";
-import returner from "../../utils/returner.js";
-import statusCodes from "../../utils/HttpStatusCodes.js";
-
+const Joi = require("joi");
+const returner = require("../../utils/returner.js");
+const statusCodes = require("../../utils/HttpStatusCodes.js");
 /**
  * A validator class for the auth controller
  */
@@ -69,4 +68,4 @@ class AuthValidator {
     }
 }
 
-export default AuthValidator;
+module.exports = AuthValidator;

@@ -1,30 +1,24 @@
-// Import necessary modules
-import * as nodemailer from 'nodemailer';
-import { readFile } from 'fs/promises';
-import errorLogger from './errorLogger.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-// Define the path to the log file
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const nodemailer = require('nodemailer');
+const { readFile } = require('fs').promises;
+const errorLogger = require('./errorLogger.js');
+const path = require('path');
 
 /**
  * EmailService class for sending emails using Nodemailer.
  */
-export class EmailService {
+class EmailService {
     /**
      * Nodemailer transporter instance.
      * @private
      */
     transporter;
 
-
     /**
      * Creates an instance of EmailService.
      * Initializes the Nodemailer transporter with email service and authentication.
      */
     constructor() {
+        this.MAIL_USER = process.env.MAIL_USER;
         this.transporter = nodemailer.createTransport({
             host: process.env.MAIL_HOST,
             port: process.env.MAIL_PORT,
@@ -86,7 +80,7 @@ export class EmailService {
      */
     async sendMail(transporter, to, data) {
         const mailOptions = {
-            from: process.env.MAIL_USER,
+            from: this.MAIL_USER,
             to: to,
             subject: data.subject,
             text: data.text,
@@ -114,4 +108,4 @@ export class EmailService {
     }
 }
 
-export default EmailService;
+module.exports = EmailService;

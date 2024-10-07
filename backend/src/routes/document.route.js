@@ -1,8 +1,9 @@
-import express from 'express';
-import DocumentController from '../controllers/document.controller.js';
+const express = require('express');
+const DocumentController = require('../controllers/document.controller.js');
 
-import AuthMiddleware from '../middlewares/checkAuth.js';
-import DocumentValidator from '../middlewares/validators/document.validator.js';
+const AuthMiddleware = require('../middlewares/checkAuth.js');
+const DocumentValidator = require('../middlewares/validators/document.validator.js');
+
 
 const router = express.Router();
 const authMiddleware = new AuthMiddleware();
@@ -15,4 +16,4 @@ router.get('/:id', authMiddleware.checkUser, DocumentController.getDocumentById)
 router.put('/:id', authMiddleware.checkUser, documentValidator.updateDocument, DocumentController.updateDocument);
 router.delete('/:id', authMiddleware.checkUser, DocumentController.deleteDocument);
 
-export default router;
+module.exports = router;

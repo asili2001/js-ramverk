@@ -1,7 +1,7 @@
-import Document from '../models/document.model.js';
-import errorLogger from '../utils/errorLogger.js';
-import statusCodes from "../utils/HttpStatusCodes.js";
-import returner from '../utils/returner.js';
+const Document = require('../models/document.model.js');
+const errorLogger = require('../utils/errorLogger.js');
+const statusCodes = require("../utils/HttpStatusCodes.js");
+const returner = require('../utils/returner.js');
 
 class DocumentController {
   // Method for creating a new document
@@ -109,4 +109,4 @@ class DocumentController {
 }
 
 // Export an instance of the DocumentController class
-export default new DocumentController();
+module.exports = new DocumentController();

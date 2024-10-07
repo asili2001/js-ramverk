@@ -1,14 +1,12 @@
-import User from "../models/user.model.js";
-import jwt from "jsonwebtoken";
-import CryptoHelper from "../utils/CryptoHelper.js";
-import EmailService from "../utils/EmailService.js";
-import bcrypt from 'bcrypt';
-import statusCodes from "../utils/HttpStatusCodes.js";
-import errorLogger from "../utils/errorLogger.js";
-import returner from '../utils/returner.js';
-import { generateUUID } from "arias";
-
-
+const User = require("../models/user.model.js");
+const jwt = require("jsonwebtoken");
+const CryptoHelper = require("../utils/CryptoHelper.js");
+const EmailService = require("../utils/EmailService.js");
+const bcrypt = require('bcrypt');
+const statusCodes = require("../utils/HttpStatusCodes.js");
+const errorLogger = require("../utils/errorLogger.js");
+const returner = require('../utils/returner.js');
+const { generateUUID } = require("arias");
 
 /**
  * Controller for users and authentication
@@ -20,12 +18,20 @@ class AuthController {
      * @param data Data to be included in the token
      * @returns JWT token
     */
+
+    constructor() {
+        this.JWT_SECRET = process.env.JWT_SECRET;
+        this.JWT_MAX_AGE = process.env.JWT_MAX_AGE;
+        this.FRONTEND_DOMAIN = process.env.FRONTEND_DOMAIN;
+        this.MAIL_SUPPORT_EMAIL = process.env.MAIL_SUPPORT_EMAIL;
+    }
+
     createToken = (data) => {
-        if (!process.env.JWT_SECRET || !process.env.JWT_MAX_AGE) {
+        if (!this.JWT_SECRET || !this.JWT_MAX_AGE) {
             throw new Error("Missing required environment variables for JWT.");
         }
-        return jwt.sign(data, process.env.JWT_SECRET, {
-            expiresIn: parseInt(process.env.JWT_MAX_AGE)
+        return jwt.sign(data, this.JWT_SECRET, {
+            expiresIn: parseInt(this.JWT_MAX_AGE)
         });
     }
 
@@ -50,7 +56,7 @@ class AuthController {
             if (!token) throw new Error("token is undefined");
             const ctyptoHelper = new CryptoHelper();
             const encryptedToken = ctyptoHelper.encrypt(JSON.stringify({ token, email }));
-            const activationLink = `${process.env.FRONTEND_DOMAIN}/activate?t=${encryptedToken}`;
+            const activationLink = `${this.FRONTEND_DOMAIN}/activate?t=${encryptedToken}`;
 
             const emailData = {
                 subject: "Inker | Account Activation",
@@ -119,7 +125,7 @@ class AuthController {
             const emailData = {
                 subject: "Inker | Account Has Been Activated",
                 text: `Account Has Been Activated`,
-                htmlContent: await emailService.generateAccountActivatedEmail(user.name, process.env.MAIL_SUPPORT_EMAIL)
+                htmlContent: await emailService.generateAccountActivatedEmail(user.name, this.MAIL_SUPPORT_EMAIL)
             }
             await emailService.sendEmail(user.email, emailData);
             return returner(res, "success", statusCodes.OK, user.toJSON(), "User Has been Activated");
@@ -139,12 +145,12 @@ class AuthController {
         const { token: encryptedToken } = req.body;
         const cryptoHelper = new CryptoHelper();
         const decryptedToken = JSON.parse(cryptoHelper.decrypt(encryptedToken));
-        const excists = await User.exists({token: decryptedToken.token, email: decryptedToken.email});
+        const excists = await User.exists({ token: decryptedToken.token, email: decryptedToken.email });
 
         if (!excists) {
             return returner(res, "error", statusCodes.FORBIDDEN, null, "Invalid Token");
         }
-        
+
         return returner(res, "success", statusCodes.OK, null, "Valid Token");
     }
 
@@ -154,12 +160,12 @@ class AuthController {
      * @param res Response
      */
     loginUser = async (req, res) => {
-        if (!process.env.JWT_MAX_AGE) {
+        if (!this.JWT_MAX_AGE) {
             throw new Error("Missing required environment variables for JWT.");
         }
 
         try {
-            const userData = await User.findOne({email: req.body.email});
+            const userData = await User.findOne({ email: req.body.email });
 
             if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
 
@@ -173,18 +179,23 @@ class AuthController {
                 sameSite: 'strict',
                 secure: true,
                 path: '/',
-                maxAge: parseInt(process.env.JWT_MAX_AGE) * 1000,
-                httpOnly: true, // Cookie is accessible only on the server-side
+                domain: new URL(this.FRONTEND_DOMAIN).hostname,
+                maxAge: parseInt(this.JWT_MAX_AGE) * 1000,
+                httpOnly: true,
             });
+
+            console.log(this.FRONTEND_DOMAIN);
+            
 
             res.cookie("role", userData.role[0], {
                 sameSite: 'strict',
                 secure: true,
                 path: '/',
-                maxAge: parseInt(process.env.JWT_MAX_AGE) * 1000,
+                domain: new URL(this.FRONTEND_DOMAIN).hostname,
+                maxAge: parseInt(this.JWT_MAX_AGE) * 1000,
                 httpOnly: false,
             });
-            
+
             return returner(res, "success", statusCodes.OK, userData.toJSON(), "User Logged In Successfully");
         } catch (error) {
             errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
@@ -193,4 +204,4 @@ class AuthController {
     }
 }
 
-export default AuthController;
+module.exports = AuthController;

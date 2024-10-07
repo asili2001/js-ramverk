@@ -9,4 +9,4 @@ const HttpStatusCodes = {
     INTERNAL_SERVER_ERROR: 500,
 };
 
-export default HttpStatusCodes;
+module.exports = HttpStatusCodes;

@@ -1,6 +1,6 @@
-import Joi from "joi";
-import returner from "../../utils/returner.js";
-import statusCodes from "../../utils/HttpStatusCodes.js";
+const Joi = require("joi");
+const returner = require("../../utils/returner.js");
+const statusCodes = require("../../utils/HttpStatusCodes.js");
 
 class DocumentValidator {
     newDocument = async (req, res, next) => {
@@ -35,4 +35,4 @@ class DocumentValidator {
     }
 }
 
-export default DocumentValidator;
+module.exports = DocumentValidator;

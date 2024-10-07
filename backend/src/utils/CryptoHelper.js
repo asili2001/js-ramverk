@@ -1,21 +1,23 @@
-import * as crypto from 'crypto';
-import errorLogger from './errorLogger.js';
+const crypto = require('crypto');
+const errorLogger = require('./errorLogger.js');
+
 
 class CryptoHelper {
-    key;
-    encryptionIV;
 
     constructor() {
+        this.CRYPTO_SECRET = process.env.CRYPTO_SECRET;
+        this.CRYPTO_SECRET_IV = process.env.CRYPTO_SECRET_IV;
+        this.key;
+        this.encryptionIV;
         // Check if the required environment variables are defined.
-
-        if (!process.env.CRYPTO_SECRET || !process.env.CRYPTO_SECRET_IV) {
+        if (!this.CRYPTO_SECRET || !this.CRYPTO_SECRET_IV) {
             errorLogger("Missing required environment variables for CryptoHelper.");
             throw new Error("Missing required environment variables for CryptoHelper.");
         }
 
         // Derive a 32-character key from the CRYPTO_SECRET using SHA-512 and an IV from CRYPTO_SECRET_IV.
-        this.key = crypto.createHash('sha512').update(process.env.CRYPTO_SECRET).digest('hex').substring(0, 32);
-        this.encryptionIV = crypto.createHash('sha512').update(process.env.CRYPTO_SECRET_IV).digest('hex').substring(0, 16);
+        this.key = crypto.createHash('sha512').update(this.CRYPTO_SECRET).digest('hex').substring(0, 32);
+        this.encryptionIV = crypto.createHash('sha512').update(this.CRYPTO_SECRET_IV).digest('hex').substring(0, 16);
     }
 
     /**
@@ -53,4 +55,4 @@ class CryptoHelper {
     }
 }
 
-export default CryptoHelper;
+module.exports = CryptoHelper;

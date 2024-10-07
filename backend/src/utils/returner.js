@@ -22,4 +22,4 @@ const returner = (
     });
 };
 
-export default returner;
+module.exports = returner;

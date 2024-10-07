@@ -1,13 +1,17 @@
-import jwt from "jsonwebtoken";
-import returner from "../utils/returner.js";
-import statusCodes from "../utils/HttpStatusCodes.js";
-import User from "../models/user.model.js";
+const jwt = require("jsonwebtoken");
+const returner = require("../utils/returner.js");
+const statusCodes = require("../utils/HttpStatusCodes.js");
+const User = require("../models/user.model.js");
 
 class AuthMiddleware {
 
+    constructor() {
+        this.JWT_SECRET = process.env.JWT_SECRET;
+      }
+
     checkUser = async (req, res, next) => {
         
-        const jwtSecret = process.env.JWT_SECRET;
+        const jwtSecret = this.JWT_SECRET;
         const token = req.cookies.key;
 
         if (!token) return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
@@ -40,4 +44,4 @@ class AuthMiddleware {
     };
 }
 
-export default AuthMiddleware;
+module.exports = AuthMiddleware;
