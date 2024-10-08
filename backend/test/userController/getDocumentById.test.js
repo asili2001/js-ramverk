@@ -1,14 +1,12 @@
-const assert = require('assert');
+//const assert = require('assert');
 const sinon = require('sinon');
 
 const DocumentController = require('../../src/controllers/document.controller.js');
 const Document = require('../../src/models/document.model.js');
-const returner = require('../../src/utils/returner.js');
-const User = require('../../src/models/user.model.js');
 
 
 describe('DocumentController getDocumentById tests', () => {
-    let req, res, stubUser;
+    let req, res;
 
     beforeEach(function () {
         req = {
@@ -20,24 +18,6 @@ describe('DocumentController getDocumentById tests', () => {
             status: sinon.stub().returnsThis(),
             json: sinon.stub().returnsThis()
         };
-
-        stubUser = sinon.stub(User, 'findOne').resolves({
-            id: 'testUser1234',
-            email: 'test@test.com',
-            username: 'John Doe'
-        });
-
-        const mockDocument = {
-            title: 'Test Document',
-            usersWithAccess: [
-                {
-                    _id: 'testUser1234',
-                    accessLevel: 'owner'
-                }
-            ],
-            _id: 'mockedObjectId'
-        };
-        
 
 
         sinon.stub(Document, 'findById').returnsThis(); 

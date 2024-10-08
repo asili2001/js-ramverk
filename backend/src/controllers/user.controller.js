@@ -129,6 +129,7 @@ class AuthController {
             await emailService.sendEmail(user.email, emailData);
             return returner(res, "success", statusCodes.OK, user.toJSON(), "User Has been Activated");
         } catch (error) {
+            console.error("error: ", error);
             return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
         }
     }

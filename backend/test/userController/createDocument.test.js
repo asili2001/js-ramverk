@@ -3,12 +3,10 @@ const sinon = require('sinon');
 
 const DocumentController = require('../../src/controllers/document.controller.js');
 const Document = require('../../src/models/document.model.js');
-const returner = require('../../src/utils/returner.js');
-const User = require('../../src/models/user.model.js');
 
 
 describe('DocumentController create tests', () => {
-    let req, res, stubUser, mockSave;
+    let req, res, mockSave;
     beforeEach(function () {
         req = {
             body: { title: 'Test Document' }
@@ -18,12 +16,6 @@ describe('DocumentController create tests', () => {
             status: sinon.stub().returnsThis(),
             json: sinon.stub().returnsThis()
         };
-        // Stub User.findOne
-        stubUser = sinon.stub(User, 'findOne').resolves({
-            id: 'testUser1234',
-            email: 'test@test.com',
-            username: 'John Doe'
-        });
 
         const mockDocument = {
             title: 'Test Document',
