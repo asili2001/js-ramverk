@@ -3,8 +3,6 @@ const sinon = require('sinon');
 
 const DocumentController = require('../../src/controllers/document.controller.js');
 const Document = require('../../src/models/document.model.js');
-const returner = require('../../src/utils/returner.js');
-const User = require('../../src/models/user.model.js');
 
 
 describe('DocumentController getDocumentById tests', () => {
@@ -83,12 +81,6 @@ describe('DocumentController getDocumentById tests', () => {
             status: sinon.stub().returnsThis(),
             json: sinon.stub().returnsThis()
         };
-
-        stubUser = sinon.stub(User, 'find').resolves({
-            id: 'testUser1234',
-            email: 'test@test.com',
-            username: 'John Doe'
-        });
 
         sinon.stub(Document, 'find').resolves(mockDocuments); 
         //sinon.stub(Document, 'find').returnsThis(); 
