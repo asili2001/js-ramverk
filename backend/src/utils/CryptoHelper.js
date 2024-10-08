@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const errorLogger = require('./errorLogger.js');
 
 
 class CryptoHelper {
@@ -11,7 +10,6 @@ class CryptoHelper {
         this.encryptionIV;
         // Check if the required environment variables are defined.
         if (!this.CRYPTO_SECRET || !this.CRYPTO_SECRET_IV) {
-            errorLogger("Missing required environment variables for CryptoHelper.");
             throw new Error("Missing required environment variables for CryptoHelper.");
         }
 
@@ -49,7 +47,7 @@ class CryptoHelper {
                 decipher.final('utf8')
             ); // Decrypts data and converts to utf8
         } catch (error) {
-            errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
+            console.error(error);
             throw new Error("Could not decrypt this data");
         }
     }

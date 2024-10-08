@@ -1,5 +1,26 @@
 #!/bin/bash
 
+
+# Function to install sshpass based on the OS
+install_sshpass() {
+    if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # For Debian/Ubuntu
+        sudo apt-get update
+        sudo apt-get install -y sshpass
+    elif [[ "$OSTYPE" == "darwin"* ]]; then
+        # For macOS (using Homebrew)
+        if ! command -v brew &> /dev/null; then
+            echo "Homebrew not found. Please install Homebrew first."
+            exit 1
+        fi
+        brew install hudochenkov/sshpass/sshpass
+    else
+        echo "Unsupported OS. Please install sshpass manually."
+        exit 1
+    fi
+}
+
+
 gitConflicts() {
     git ls-files -u | grep . > /dev/null 2>&1
 }
@@ -20,31 +41,33 @@ checker() {
         echo "Vulnerabilities detected! Exiting..."
         exit 1
     fi
+
+    # Lint
+    npm run lint || exit
 }
 
-frontend() {
+run-frontend() {
     cd frontend || exit 1
-    npm i
+    npm install
     checker
     npm run dev
 }
 
-backend() {
+run-backend() {
     cd backend || exit 1
-    npm i
+    npm install
     checker
     npm start
 }
 
 run() {
-    if [ -z "$1" ]; then
-        frontend
-        backend
-    else
-        if [ "$1" == "frontend" ]; then
-            frontend
-        elif [ "$1" == "backend" ]; then
-            backend
+    if [ -n "$1" ] && [ "$1" == "run" ]; then
+        if [ "$2" == "frontend" ]; then
+            echo "Running Frontend"
+            run-frontend
+        elif [ "$2" == "backend" ]; then
+            echo "Running Backend"
+            run-backend
         else
             echo "Invalid argument. Expected 'frontend' or 'backend'."
             exit 1
@@ -52,4 +75,56 @@ run() {
     fi
 }
 
-run "$1"
+deploy() {
+    if [ -n "$1" ] && [ "$1" == "deploy" ]; then
+        install_sshpass  # Ensure sshpass is installed
+
+        echo $INKER_USERNAME;
+
+        # Prompt for username and password
+        if [ -z "$INKER_USERNAME" ]; then
+            read -p "Enter username: " username
+            export INKER_USERNAME="$username"
+        fi
+        if [ -z "$INKER_PASSWORD" ]; then
+            read -sp "Enter password: " password
+            export INKER_PASSWORD="$password"
+        fi
+        echo  # Move to a new line after the password input
+
+        # Deploying Frontend
+        if [ "$2" == "frontend" ]; then
+            echo "Deploying Frontend..."
+            # Build app
+            cd frontend && npm run build && cd ../
+            # Copy .htaccess to dist
+            cp frontend/.htaccess.sample frontend/dist/.htaccess
+            sshpass -p "$INKER_PASSWORD" rsync -av frontend/dist "$INKER_USERNAME@ahmadasi.li:inker/web"
+            echo "Frontend deployed successfully."
+
+        # Deploying Backend
+        elif [ "$2" == "backend" ]; then
+            echo "Deploying Backend..."
+            sshpass -p "$INKER_PASSWORD" rsync -av --delete --exclude='node_modules/' backend/. "$INKER_USERNAME@ahmadasi.li:inker_api"
+
+            # Use sshpass to run npm install on the server
+            sshpass -p "$INKER_PASSWORD" ssh "$INKER_USERNAME@ahmadasi.li" 'cd inker_api && npm install'
+            echo "Backend deployed successfully."
+
+        else
+            echo "Invalid argument. Expected 'frontend' or 'backend'."
+            exit 1
+        fi
+    else
+        echo "Invalid command. Please specify 'deploy' as the first argument."
+        exit 1
+    fi
+}
+
+
+action() {
+    run "$1" "$2"
+    deploy "$1" "$2"
+}
+
+action "$1" "$2"

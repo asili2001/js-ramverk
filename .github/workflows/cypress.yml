@@ -30,7 +30,7 @@ jobs:
         working-directory: backend
         run: |
           echo "NODE_ENV=development" >> .env.dev
-          echo "SERVER_PORT=1337" >> .env.dev
+          echo "PORT=1337" >> .env.dev
           echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> .env.dev
           echo "FRONTEND_DOMAIN='http://localhost:5173'" >> .env.dev
           echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env.dev
@@ -74,9 +74,3 @@ jobs:
       - name: Run Cypress tests
         working-directory: frontend
         run: npx cypress run
-
-      # - name: Upload Cypress Videos
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: cypress-videos
-      #     path: cypress/videos

@@ -1,6 +1,5 @@
 const nodemailer = require('nodemailer');
 const { readFile } = require('fs').promises;
-const errorLogger = require('./errorLogger.js');
 const path = require('path');
 
 /**
@@ -92,7 +91,7 @@ class EmailService {
             await transporter.sendMail(mailOptions);
         } catch (error) {
             // Handle errors and throw an exception
-            errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
+            console.error(error);
             throw new Error("Error sending email");
         }
     }

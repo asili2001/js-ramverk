@@ -81,7 +81,7 @@ const Login = () => {
 				</button>
 				<div className="footer">
 					<span>Not a Member?</span>
-					<a href="/signup">Sign Up</a>
+					<a href={`${import.meta.env.VITE_BASENAME}/signup`}>Sign Up</a>
 				</div>
 			</div>
 		</div>
