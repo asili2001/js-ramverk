@@ -164,10 +164,12 @@ class AuthController {
         }
 
         try {
-            const origin = req.headers.origin;
-            console.error(origin);
+            const origin = req.headers.origin || process.env.FRONTEND_DOMAIN;
             let cookieDomain = new URL(origin).hostname;
             cookieDomain = cookieDomain.startsWith('www.') ? cookieDomain.slice(4) : cookieDomain;
+
+            console.log(cookieDomain);
+            
 
             const userData = await User.findOne({ email: req.body.email });
 
@@ -188,8 +190,6 @@ class AuthController {
                 httpOnly: true,
             });
 
-            console.log(this.FRONTEND_DOMAIN);
-            
 
             res.cookie("role", userData.role[0], {
                 sameSite: 'strict',
