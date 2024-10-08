@@ -1,5 +1,4 @@
 const Document = require('../models/document.model.js');
-const errorLogger = require('../utils/errorLogger.js');
 const statusCodes = require("../utils/HttpStatusCodes.js");
 const returner = require('../utils/returner.js');
 
@@ -20,7 +19,7 @@ class DocumentController {
       await document.save();
       return returner(res, "success", statusCodes.CREATED, document, "");
     } catch (error) {
-      errorLogger(error.message);
+      console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
     }
   }
@@ -35,7 +34,7 @@ class DocumentController {
 
       return returner(res, "success", statusCodes.OK, jsonDocs, "");
     } catch (error) {
-      errorLogger(error.message);
+      console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
     }
   }
@@ -53,7 +52,7 @@ class DocumentController {
       if (!hasAccess) return returner(res, "error", statusCodes.FORBIDDEN, null, "You don't have access to this document");
       return returner(res, "success", statusCodes.OK, document, "");
     } catch (error) {
-      errorLogger(error.message);
+      console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
     }
   }
@@ -81,7 +80,7 @@ class DocumentController {
       // Return the updated document
       return returner(res, "success", statusCodes.OK, document, "");
     } catch (error) {
-      errorLogger(error.message);
+      console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
     }
   }
@@ -102,7 +101,7 @@ class DocumentController {
       }
       return returner(res, "success", statusCodes.OK, null, "");
     } catch (error) {
-      errorLogger(error.message);
+      console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
     }
   }

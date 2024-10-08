@@ -4,7 +4,6 @@ const CryptoHelper = require("../utils/CryptoHelper.js");
 const EmailService = require("../utils/EmailService.js");
 const bcrypt = require('bcrypt');
 const statusCodes = require("../utils/HttpStatusCodes.js");
-const errorLogger = require("../utils/errorLogger.js");
 const returner = require('../utils/returner.js');
 const { generateUUID } = require("arias");
 
@@ -89,7 +88,7 @@ class AuthController {
                 await sendActivationMail(req.body.email, activationToken);
                 return returner(res, "success", statusCodes.CREATED, user.toJSON(), "User has been created");
             } catch (error) {
-                errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
+                console.error(error);
                 return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
             }
         })();
@@ -130,7 +129,6 @@ class AuthController {
             await emailService.sendEmail(user.email, emailData);
             return returner(res, "success", statusCodes.OK, user.toJSON(), "User Has been Activated");
         } catch (error) {
-            errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
             return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something went wrong :(");
         }
     }
@@ -165,6 +163,11 @@ class AuthController {
         }
 
         try {
+            const origin = req.headers.origin;
+            console.error(origin);
+            let cookieDomain = new URL(origin).hostname;
+            cookieDomain = cookieDomain.startsWith('www.') ? cookieDomain.slice(4) : cookieDomain;
+
             const userData = await User.findOne({ email: req.body.email });
 
             if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
@@ -179,7 +182,7 @@ class AuthController {
                 sameSite: 'strict',
                 secure: true,
                 path: '/',
-                domain: new URL(this.FRONTEND_DOMAIN).hostname,
+                domain: cookieDomain,
                 maxAge: parseInt(this.JWT_MAX_AGE) * 1000,
                 httpOnly: true,
             });
@@ -191,14 +194,14 @@ class AuthController {
                 sameSite: 'strict',
                 secure: true,
                 path: '/',
-                domain: new URL(this.FRONTEND_DOMAIN).hostname,
+                domain: cookieDomain,
                 maxAge: parseInt(this.JWT_MAX_AGE) * 1000,
                 httpOnly: false,
             });
 
             return returner(res, "success", statusCodes.OK, userData.toJSON(), "User Logged In Successfully");
         } catch (error) {
-            errorLogger(`${JSON.stringify(error)}|| ${error.message}`);
+            console.error(error);
             return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Something Went Wrong :(");
         }
     }

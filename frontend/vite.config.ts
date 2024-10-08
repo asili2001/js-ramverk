@@ -5,6 +5,7 @@ import sass from 'sass'
 
 export default defineConfig({
   plugins: [react()],
+  // base: '/~ahai22/editor/',
   css: {
     preprocessorOptions: {
       scss: {

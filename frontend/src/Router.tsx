@@ -59,7 +59,7 @@ const AppRouter: React.FC = () => {
 
 	return (
 		loadedCookies && (
-			<Router>
+			<Router basename={import.meta.env.VITE_BASENAME}>
 				<Routes>
 					<Route
 						path="/"

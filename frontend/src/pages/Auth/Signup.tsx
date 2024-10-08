@@ -91,7 +91,7 @@ const Signup = () => {
 
 				<div className="footer">
 					<span>Already a Member?</span>
-					<a href="/">Sign In</a>
+					<a href={`${import.meta.env.VITE_BASENAME}/`}>Sign In</a>
 				</div>
 			</div>
 		</div>

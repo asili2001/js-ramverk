@@ -12,7 +12,7 @@ const documentRoutes = require('./routes/document.route.js');
 
 const app = express();
 
-const allowedOrigins = ['http://localhost:5173', 'https://api.inker.ahmadasi.li'];
+const allowedOrigins = ['http://localhost:5173', 'https://inker.ahmadasi.li'];
 
 const corsOptions = {
     origin: allowedOrigins,
@@ -33,4 +33,4 @@ app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 
 // Start up server
-app.listen(process.env.SERVER_PORT, () => console.log(`INKER API listening on port ${process.env.SERVER_PORT}!`));
+app.listen(process.env.PORT || process.env.PORT, () => console.log(`INKER API listening on port ${process.env.PORT}!`));
