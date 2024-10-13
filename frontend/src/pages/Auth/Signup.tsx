@@ -35,8 +35,6 @@ const Signup = () => {
 	const handleUserRegisteration = async () => {
 		const signUpResponseMessage = await signUp(name, email);
 		setResponseMessage(signUpResponseMessage);
-		console.log(signUpResponseMessage);
-
 		if (signUpResponseMessage === 'success') {
 			toast.success(
 				"We've sent an activation link to your email. Please check your inbox.",

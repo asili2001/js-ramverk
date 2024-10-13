@@ -99,16 +99,16 @@ deploy() {
             cd frontend && npm run build && cd ../
             # Copy .htaccess to dist
             cp frontend/.htaccess.sample frontend/dist/.htaccess
-            sshpass -p "$INKER_PASSWORD" rsync -av frontend/dist "$INKER_USERNAME@ahmadasi.li:inker/web"
+            sshpass -p "$INKER_PASSWORD" rsync -av -e "ssh -p 2303" frontend/dist/. "$INKER_USERNAME@ahmadasi.li:inker/client"
             echo "Frontend deployed successfully."
 
         # Deploying Backend
         elif [ "$2" == "backend" ]; then
             echo "Deploying Backend..."
-            sshpass -p "$INKER_PASSWORD" rsync -av --delete --exclude='node_modules/' backend/. "$INKER_USERNAME@ahmadasi.li:inker_api"
+            sshpass -p "$INKER_PASSWORD" rsync -av --delete --exclude='node_modules/' -e "ssh -p 2303" backend/. "$INKER_USERNAME@ahmadasi.li:inker/api"
 
             # Use sshpass to run npm install on the server
-            sshpass -p "$INKER_PASSWORD" ssh "$INKER_USERNAME@ahmadasi.li" 'cd inker_api && npm install'
+            sshpass -p "$INKER_PASSWORD" ssh -p 2303 "$INKER_USERNAME@ahmadasi.li" 'cd inker/api && npm install'
             echo "Backend deployed successfully."
 
         else

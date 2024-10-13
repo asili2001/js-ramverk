@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import DOMPurify from 'dompurify';
 import './main.scss';
+import { TextDelete, TextInsert, TextReplace, TextUpdateGeneral } from '../../hooks/useDocSocket';
 import { debounce } from 'arias';
 
 export interface TextBoxProps {
 	content: string;
-	onChange: (draftContent: string) => void;
+	onChange: (data: TextUpdateGeneral) => void;
 	className?: string;
 	editable?: boolean;
-	maxLines?: number;
+	recivedUpdate: TextUpdateGeneral | null;
 }
 
 const TextBox: React.FC<TextBoxProps> = ({
@@ -16,7 +17,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 	onChange,
 	className,
 	editable,
-	maxLines,
+	recivedUpdate
 }) => {
 	const allowedTags = [
 		'a',
@@ -28,26 +29,80 @@ const TextBox: React.FC<TextBoxProps> = ({
 		'h6',
 		'p',
 		'span',
-		'img',
 		'br',
 		'div',
+		'img',
 	];
 	const sanitizeConfig = { ALLOWED_TAGS: allowedTags };
 	const sanitizedContent = DOMPurify.sanitize(content, sanitizeConfig);
-	const [draftContent, setDraftContent] = useState(sanitizedContent);
 	const editableRef = useRef<HTMLDivElement>(null);
 	const [totalPages, setTotalPages] = useState<number>(1);
 	const PAGE_HEIGHT = 1056 - 32; // the 32px is the padding
+	const [prevContent, setPrevContent] = useState(sanitizedContent);
 
-	const debouncedOnChange = useRef(
-		debounce((content: string) => {
-			onChange(content);
-		}, 1000)
-	).current;
+	// Helper function to normalize content (e.g., handle &nbsp;)
+	const normalizeContent = (content: string) => content.replace(/&nbsp;/g, ' ');
 
-	useEffect(() => {
-		debouncedOnChange(draftContent);
-	}, [draftContent, debouncedOnChange]);
+	// Function to compare content and detect the exact change
+	const detectChanges = (oldContent: string, newContent: string): TextUpdateGeneral | null => {
+		let startIndex = 0;
+		const normalizedOld = normalizeContent(oldContent);
+		const normalizedNew = normalizeContent(newContent);
+
+		// Find where the content starts to differ
+		while (
+			startIndex < normalizedOld.length &&
+			startIndex < normalizedNew.length &&
+			normalizedOld[startIndex] === normalizedNew[startIndex]
+		) {
+			startIndex++;
+		}
+
+		// Now check how much of the trailing text is the same from the end
+		let endOld = normalizedOld.length - 1;
+		let endNew = normalizedNew.length - 1;
+
+		while (
+			endOld >= startIndex &&
+			endNew >= startIndex &&
+			normalizedOld[endOld] === normalizedNew[endNew]
+		) {
+			endOld--;
+			endNew--;
+		}
+
+		const changedOld = normalizedOld.slice(startIndex, endOld + 1);
+		const changedNew = normalizedNew.slice(startIndex, endNew + 1);
+
+		if (changedNew.length !== 0 && changedOld.length !== 0) {
+			// replace detected
+			const highestEndIndex = changedNew.length > changedOld.length ? changedNew.length : changedOld.length;
+			return {
+				changeType: 'replace',
+				changedText: changedNew,
+				startIndex,
+				endIndex: startIndex + highestEndIndex,
+			} as TextReplace;
+		} else if (changedNew.length > changedOld.length) {
+			// Insertion detected
+			return {
+				changeType: 'insert',
+				changedText: changedNew,
+				startIndex,
+				endIndex: startIndex + changedNew.length,
+			} as TextInsert;
+		} else if (changedNew.length < changedOld.length) {
+			// Deletion detected
+			return {
+				changeType: 'delete',
+				changedText: changedOld,
+				startIndex,
+				endIndex: startIndex + changedOld.length,
+			} as TextDelete;
+		}
+
+		return null;
+	};
 
 	const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
 		e.preventDefault();
@@ -97,7 +152,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 					selection.addRange(range);
 				}
 
-				setDraftContent(editableRef.current.innerHTML);
+				handleInput();
 			}
 		}
 	};
@@ -116,31 +171,22 @@ const TextBox: React.FC<TextBoxProps> = ({
 		return totalHeight; // Return the total height
 	}
 
-	const handleInput = () => {
-		if (editableRef.current) {
-			if (maxLines) {
-				const lineHeight = parseFloat(
-					getComputedStyle(editableRef.current).lineHeight || '0'
-				);
-				const maxAllowedHeight = lineHeight * maxLines;
+	const handleInput = useCallback(debounce(() => {
+        if (editableRef.current) {
+            const newDraftContent = DOMPurify.sanitize(editableRef.current.innerHTML, sanitizeConfig);
 
-				if (editableRef.current.scrollHeight > maxAllowedHeight) {
-					editableRef.current.innerHTML = draftContent;
-					return;
-				}
-			}
+            // Detect changes between previous and new content
+            const changes = detectChanges(prevContent, newDraftContent);
 
-			getTotalPages(getTotalHeight(editableRef.current));
+            if (changes && onChange) {
+                onChange(changes);
+            }
 
-			// Sanitize the content before updating the state
-			const content = DOMPurify.sanitize(
-				editableRef.current.innerHTML,
-				sanitizeConfig
-			);
-
-			setDraftContent(content);
-		}
-	};
+            // Update the previous content state
+            setPrevContent(newDraftContent);
+            getTotalPages(getTotalHeight(editableRef.current));
+        }
+    }, 200), [prevContent, onChange]);
 
 	const getTotalPages = (height: number) => {
 		if (height <= 0) {
@@ -152,12 +198,42 @@ const TextBox: React.FC<TextBoxProps> = ({
 		setTotalPages(pages);
 	};
 
+	const applyUpdate = (currentContent: string, update: TextUpdateGeneral) => {
+		let normalizedContent = normalizeContent(currentContent);
+		let newContent = normalizedContent;
+
+		if (update.changeType === 'insert') {
+			const insertChange = update as TextInsert;
+			// Insert the new text at the specified start index
+			newContent = normalizedContent.slice(0, insertChange.startIndex) + insertChange.content + normalizedContent.slice(insertChange.startIndex);
+		} else if (update.changeType === 'delete') {
+			const deleteChange = update as TextDelete;
+			// Remove text from startIndex to endIndex
+			newContent = normalizedContent.slice(0, deleteChange.startIndex) + normalizedContent.slice(deleteChange.endIndex);
+		} else if (update.changeType === 'replace') {
+			const replaceChange = update as TextReplace;
+			// Replace text from startIndex to endIndex
+			newContent = normalizedContent.slice(0, replaceChange.startIndex) + replaceChange.content + normalizedContent.slice(replaceChange.endIndex);
+		}
+
+		setPrevContent(normalizeContent(newContent));
+		if (editableRef.current) editableRef.current.innerHTML = normalizeContent(newContent);
+	};
+
+	useEffect(() => {
+
+		if (editableRef.current && recivedUpdate) {
+			const newDraftContent = DOMPurify.sanitize(editableRef.current.innerHTML, sanitizeConfig);
+			applyUpdate(newDraftContent, recivedUpdate);
+		}
+	}, [JSON.stringify(recivedUpdate)]);
+
 	return (
 		<div
 			ref={editableRef}
 			style={{ minHeight: `${PAGE_HEIGHT * totalPages}px` }}
 			contentEditable={editable}
-			onInput={handleInput}
+			onInput={()=>handleInput()}
 			dangerouslySetInnerHTML={{ __html: sanitizedContent }}
 			className={`page ${className}`}
 			onPaste={handlePaste}
