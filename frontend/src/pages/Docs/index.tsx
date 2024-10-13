@@ -19,8 +19,6 @@ const Documents = () => {
 	const handleNewDocCreation = async () => {
 		const newDocument = await newDoc();
 		if (newDocument) {
-			console.log(newDocument);
-
 			navigate(`/documents/${newDocument.id}`);
 		}
 	};
