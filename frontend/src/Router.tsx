@@ -12,6 +12,7 @@ import Signup from './pages/Auth/Signup';
 import ActivateUser from './pages/Auth/ActivateUser';
 import Cookies from 'js-cookie';
 import { useRoleContext } from './context/RoleContext';
+import CodeBox from './components/CodeBox';
 
 const AppRouter: React.FC = () => {
 	const { registerShortcut, unregisterShortcut } = useShortcutsContext();
@@ -102,6 +103,15 @@ const AppRouter: React.FC = () => {
 						element={
 							<PrivateRoute
 								component={<Document />}
+								requiredRoles={['user']}
+							/>
+						}
+					/>
+					<Route
+						path="/code/"
+						element={
+							<PrivateRoute
+								component={<CodeBox />}
 								requiredRoles={['user']}
 							/>
 						}

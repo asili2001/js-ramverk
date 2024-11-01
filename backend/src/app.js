@@ -36,7 +36,7 @@ app.use('/api/documents', documentRoutes);
 
 // Socket imports
 const httpServer = require("http").createServer(app);
-const socketioJwt = require('socketio-jwt');
+//const socketioJwt = require('socketio-jwt');
 const createRoom = require("./socket/socket.io.js");
 const handleDoc = require("./socket/socket.io.js");
 
@@ -50,6 +50,7 @@ const io = require("socket.io")(httpServer, {
 });
 
 
+/*
 // Socket events
 io.sockets.on('connection', socketioJwt.authorize({
         secret: 'SECRET_KEY',
@@ -65,7 +66,7 @@ io.sockets.on('connection', socketioJwt.authorize({
             console.log(`Client disconnected: ${socket.id}`);
         });
 });
-
+*/
 
 
 // Start up server

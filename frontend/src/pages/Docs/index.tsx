@@ -2,6 +2,7 @@ import './main.scss';
 import DocumentsNavbar from '../../components/Navbar/DocumentsNavbar';
 import { useNavigate } from 'react-router-dom';
 import { FaPlus } from 'react-icons/fa';
+import { FaCode } from "react-icons/fa";
 import { useEffect, useState } from 'react';
 import useAPIDocs from '../../hooks/useAPIDocs';
 import LoadingSpinner from '../../components/Loading';
@@ -17,6 +18,13 @@ const Documents = () => {
 	};
 
 	const handleNewDocCreation = async () => {
+		const newDocument = await newDoc();
+		if (newDocument) {
+			navigate(`/documents/${newDocument.id}`);
+		}
+	};
+	
+	const handleNewCodeDocCreation = async () => {
 		const newDocument = await newDoc();
 		if (newDocument) {
 			navigate(`/documents/${newDocument.id}`);
@@ -68,6 +76,9 @@ const Documents = () => {
 
 			<div className="new-document-btn" onClick={handleNewDocCreation}>
 				<FaPlus />
+			</div>
+			<div className="new-document-btn" onClick={handleNewCodeDocCreation}>
+				<FaCode />
 			</div>
 		</div>
 	);

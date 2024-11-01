@@ -75,6 +75,7 @@ const useAPIDocs = () => {
 			return null;
 		}
 	};
+	// skicka med parameter för vilket typ av document det ska vara
 	const newDoc = async (title: string = 'Untitled') => {
 		const endPoint = `${import.meta.env.VITE_MAIN_API_URL}/documents`;
 
