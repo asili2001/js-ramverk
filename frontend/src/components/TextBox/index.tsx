@@ -1,167 +1,178 @@
-import React, { useState, useRef, useEffect } from 'react';
-import DOMPurify from 'dompurify';
 import './main.scss';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from 'draft-js';
+import 'draft-js/dist/Draft.css';
+import Toolbar from './Toolbar';
 import { debounce } from 'arias';
 
 export interface TextBoxProps {
-	content: string;
-	onChange: (draftContent: string) => void;
-	className?: string;
-	editable?: boolean;
-	maxLines?: number;
+	initialContent: RawDraftContentState;
+	onChange: (changes: RawDraftContentState, currentBlockKeys: string[]) => void;
+	recivedChanges: {changes: RawDraftContentState[], currentBlockKeys: string[]}|null;
+	editable: boolean;
 }
 
 const TextBox: React.FC<TextBoxProps> = ({
-	content,
+	initialContent,
 	onChange,
-	className,
+	recivedChanges,
 	editable,
-	maxLines,
 }) => {
-	const allowedTags = [
-		'a',
-		'h1',
-		'h2',
-		'h3',
-		'h4',
-		'h5',
-		'h6',
-		'p',
-		'span',
-		'img',
-		'br',
-		'div',
-	];
-	const sanitizeConfig = { ALLOWED_TAGS: allowedTags };
-	const sanitizedContent = DOMPurify.sanitize(content, sanitizeConfig);
-	const [draftContent, setDraftContent] = useState(sanitizedContent);
-	const editableRef = useRef<HTMLDivElement>(null);
-	const [totalPages, setTotalPages] = useState<number>(1);
-	const PAGE_HEIGHT = 1056 - 32; // the 32px is the padding
+	const contentState = convertFromRaw(initialContent);
+	const [editorState, setEditorState] = useState<EditorState>(EditorState.createWithContent(contentState));
 
-	const debouncedOnChange = useRef(
-		debounce((content: string) => {
-			onChange(content);
-		}, 1000)
-	).current;
+	const [previousRecivedChanges, setPreviousRecivedChanges] = useState<RawDraftContentState[]>(
+		[]
+	);
+	const [prevContent, setPrevContent] = useState<RawDraftContentState | null>(initialContent);
 
 	useEffect(() => {
-		debouncedOnChange(draftContent);
-	}, [draftContent, debouncedOnChange]);
+        if (recivedChanges && JSON.stringify(recivedChanges) !== JSON.stringify(previousRecivedChanges)) {
+            // Store current selection before applying changes
+            const currentSelection = editorState.getSelection();
+            const currentContent = convertToRaw(editorState.getCurrentContent());
 
-	const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
-		e.preventDefault();
+			const recivedBlockKeys = recivedChanges.currentBlockKeys;
+			
+			const receivedBlockChanges = recivedChanges.changes;
 
-		// Access clipboard data using the ClipboardEvent interface
-		const clipboardData = e.clipboardData;
-		const htmlContent = clipboardData.getData('text/html');
-		const textContent = clipboardData.getData('text/plain');
+			const updatedContent: RawDraftContentState = {
+				blocks: [],
+				entityMap: {}
+			};
 
-		let sanitizedContent;
+			receivedBlockChanges.forEach(change => {
+				recivedBlockKeys.forEach(rBlockKey => {
+					const foundBlockInCurrent = currentContent.blocks.find(cblock => cblock.key === rBlockKey);
+					const foundBlockInRecived = change.blocks.find(fblock => fblock.key === rBlockKey);
+	
+					if (foundBlockInRecived) {
+						updatedContent.blocks.push(foundBlockInRecived);
+					} else if (foundBlockInCurrent) {
+						updatedContent.blocks.push(foundBlockInCurrent);
+					}
+				})
+			});
 
-		if (htmlContent) {
-			// Sanitize the HTML content to allow only specified tags
-			sanitizedContent = DOMPurify.sanitize(htmlContent, sanitizeConfig);
-		} else {
-			// Fallback to sanitizing plain text
-			sanitizedContent = DOMPurify.sanitize(textContent, sanitizeConfig);
-		}
+			updatedContent.entityMap = receivedBlockChanges[receivedBlockChanges.length - 1].entityMap;
 
-		if (editableRef.current) {
-			const selection = window.getSelection();
+			const newContentState = convertFromRaw(updatedContent);
+			const newEditorState = EditorState.createWithContent(newContentState);
+			setPreviousRecivedChanges(recivedChanges.changes);
+			setEditorState(EditorState.forceSelection(newEditorState, currentSelection));
 
-			if (selection) {
-				const range = selection.getRangeAt(0);
-				range.deleteContents();
+        }
+    }, [recivedChanges]);
 
-				// Create a temporary div to convert sanitized HTML back to DOM elements
-				const tempDiv = document.createElement('div');
-				tempDiv.innerHTML = sanitizedContent;
 
-				// Use a document fragment to insert sanitized content
-				const fragment = document.createDocumentFragment();
-				let child;
-				while ((child = tempDiv.firstChild)) {
-					fragment.appendChild(child);
-				}
-
-				const lastChild = fragment.lastChild; // Get the last child of the fragment
-
-				range.insertNode(fragment);
-
-				// Move the caret to the end of the inserted content
-				if (lastChild) {
-					range.setStartAfter(lastChild);
-					range.setEndAfter(lastChild);
-					selection.removeAllRanges();
-					selection.addRange(range);
-				}
-
-				setDraftContent(editableRef.current.innerHTML);
+	const debounceHandleEditorStateChange = debounce(
+		(currentRawContent: RawDraftContentState, prevContent: any, onChange: (changedContentState: any, currentBlockKeys: string[]) => void) => {
+	
+			// Compare with the previous content if it exists
+			if (prevContent) {
+				const changedContentState = getChangedContentState(currentRawContent, prevContent);
+				const currentBlockKeys = currentRawContent.blocks.map((block) => block.key);
+	
+				onChange(changedContentState, currentBlockKeys);
 			}
+		},
+		200
+	);
+	
+	const handleEditorStateChange = useCallback((state: EditorState) => {
+		setEditorState(state);
+		
+		const currentContent = state.getCurrentContent();
+		const currentRawContent = convertToRaw(currentContent);
+	
+		if (prevContent) {
+			debounceHandleEditorStateChange(currentRawContent, prevContent, onChange);
 		}
-	};
+	
+		// Update previous content directly here if necessary
+		setPrevContent(currentRawContent);
+	}, [onChange, setEditorState, setPrevContent]);
 
-	function getTotalHeight(element: HTMLElement | null): number {
-		if (!element) return 0; // Return 0 if the element is not provided
 
-		const children = element.children; // Get all child elements
-		let totalHeight = 0;
+	const getChangedContentState = (
+		currentRaw: RawDraftContentState,
+		prevRaw: RawDraftContentState
+	): RawDraftContentState => {
+		const changedBlocks: RawDraftContentState['blocks'] = [];
 
-		// Loop through each child element and accumulate their heights
-		for (let i = 0; i < children.length; i++) {
-			totalHeight += (children[i] as HTMLElement).offsetHeight; // Add the offsetHeight of each child
-		}
+		currentRaw.blocks.forEach((currentBlock) => {
+			const prevBlock = prevRaw.blocks.find((prev) => prev.key === currentBlock.key);
 
-		return totalHeight; // Return the total height
-	}
-
-	const handleInput = () => {
-		if (editableRef.current) {
-			if (maxLines) {
-				const lineHeight = parseFloat(
-					getComputedStyle(editableRef.current).lineHeight || '0'
-				);
-				const maxAllowedHeight = lineHeight * maxLines;
-
-				if (editableRef.current.scrollHeight > maxAllowedHeight) {
-					editableRef.current.innerHTML = draftContent;
-					return;
-				}
+			if (!prevBlock || JSON.stringify(currentBlock) !== JSON.stringify(prevBlock)) {
+				changedBlocks.push(currentBlock);
 			}
+		});
 
-			getTotalPages(getTotalHeight(editableRef.current));
-
-			// Sanitize the content before updating the state
-			const content = DOMPurify.sanitize(
-				editableRef.current.innerHTML,
-				sanitizeConfig
-			);
-
-			setDraftContent(content);
-		}
+		return {
+			blocks: changedBlocks,
+			entityMap:
+				JSON.stringify(currentRaw.entityMap) !== JSON.stringify(prevRaw.entityMap)
+					? currentRaw.entityMap
+					: {},
+		};
 	};
 
-	const getTotalPages = (height: number) => {
-		if (height <= 0) {
-			setTotalPages(1);
-			return;
-		}
+	// These functions will be used for comment positions
+	// function getCurrentBlock(editorState: EditorState) {
+	// 	// Get the selection state
+	// 	const selectionState = editorState.getSelection();
 
-		const pages = Math.ceil(height / PAGE_HEIGHT);
-		setTotalPages(pages);
-	};
+	// 	// Get the block key where the selection starts (caret is positioned)
+	// 	const anchorKey = selectionState.getAnchorKey();
+
+	// 	// Retrieve the content state
+	// 	const contentState = editorState.getCurrentContent();
+
+	// 	// Use the block key to get the actual content block
+	// 	const currentBlock = contentState.getBlockForKey(anchorKey);
+
+	// 	getBlockPosition(currentBlock.getKey());
+	// }
+
+	// function getBlockPosition(blockKey: string) {
+	// 	// Construct the selector using the block key
+	// 	const offsetKey = `${blockKey}-0-0`;
+
+	// 	// Use querySelector to find the block's DOM element
+	// 	const blockElement = document.querySelector(`[data-offset-key="${offsetKey}"]`);
+
+	// 	if (blockElement) {
+	// 		// Get the bounding client rectangle of the element
+	// 		const rect = blockElement.getBoundingClientRect();
+
+	// 		// Position in pixels relative to the viewport
+	// 		console.log({
+	// 			top: rect.top,
+	// 			left: rect.left,
+	// 			width: rect.width,
+	// 			height: rect.height,
+	// 		});
+	// 	}
+
+	// 	return null; // Block not found
+	// }
 
 	return (
-		<div
-			ref={editableRef}
-			style={{ minHeight: `${PAGE_HEIGHT * totalPages}px` }}
-			contentEditable={editable}
-			onInput={handleInput}
-			dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-			className={`page ${className}`}
-			onPaste={handlePaste}
-		/>
+		<div className="editor-container page">
+			<Toolbar
+				editableState={editorState}
+				setEditableState={setEditorState}
+				onEditorStateChange={handleEditorStateChange}
+			/>
+
+			<Editor
+				editorState={editorState}
+				onChange={handleEditorStateChange}
+				placeholder="Start typing here..."
+				readOnly={!editable}
+			// onUpArrow={() => getCurrentBlock(editorState)}
+			/>
+		</div>
 	);
 };
 

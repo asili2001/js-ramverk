@@ -55,9 +55,7 @@ const Login = () => {
 					placeholder=" "
 					value={email}
 					onChange={handleEmailChange}
-					errorMsg={
-						responseMessage.includes('email') ? responseMessage : ''
-					}
+					errorMsg={responseMessage.includes('email') ? responseMessage : ''}
 					required
 				/>
 				<Input
@@ -66,17 +64,10 @@ const Login = () => {
 					title="Password"
 					placeholder=" "
 					onChange={handlePasswordChange}
-					errorMsg={
-						responseMessage.includes('password')
-							? responseMessage
-							: ''
-					}
+					errorMsg={responseMessage.includes('password') ? responseMessage : ''}
 					required
 				/>
-				<button
-					className="primary-button active"
-					onClick={handleSignIn}
-				>
+				<button className="primary-button active" onClick={handleSignIn}>
 					Sign In {isLoading && <LoadingSpinner size={20} />}
 				</button>
 				<div className="footer">

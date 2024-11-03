@@ -17,10 +17,7 @@ export interface DocumentNavbarProps {
 	onTitleChange: (newTitle: string) => void;
 }
 
-const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
-	documentTitle,
-	onTitleChange,
-}) => {
+const DocumentNavbar: React.FC<DocumentNavbarProps> = ({ documentTitle, onTitleChange }) => {
 	const { shortcuts } = useShortcutsContext();
 	const [title, setTitle] = useState<string>('Untitled');
 	const navigate = useNavigate();
@@ -75,8 +72,7 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
 	};
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const newTitle =
-			e.target.value.length === 0 ? 'Untitled' : e.target.value;
+		const newTitle = e.target.value.length === 0 ? 'Untitled' : e.target.value;
 		setTitle(newTitle);
 		// Call the throttled onTitleChange function
 		debouncedOnChange(newTitle);
@@ -101,14 +97,8 @@ const DocumentNavbar: React.FC<DocumentNavbarProps> = ({
 					onChange={(e) => handleTitleChange(e)}
 				/>
 				<ul className="document-menubar">
-					<DropDownMenuButton
-						title="File"
-						items={menuBarContent['File']}
-					/>
-					<DropDownMenuButton
-						title="Edit"
-						items={menuBarContent['Edit']}
-					/>
+					<DropDownMenuButton title="File" items={menuBarContent['File']} />
+					<DropDownMenuButton title="Edit" items={menuBarContent['Edit']} />
 				</ul>
 			</div>
 			<div className="document-toolbar"></div>

@@ -23,9 +23,7 @@ const useAPIAuth = () => {
 
 		try {
 			setIsLoading(true);
-			const response = await fetchPromise.finally(() =>
-				setIsLoading(false)
-			);
+			const response = await fetchPromise.finally(() => setIsLoading(false));
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
 				if (result.message === 'Unauthorized') {
@@ -63,9 +61,7 @@ const useAPIAuth = () => {
 
 		try {
 			setIsLoading(true);
-			const response = await fetchPromise.finally(() =>
-				setIsLoading(false)
-			);
+			const response = await fetchPromise.finally(() => setIsLoading(false));
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
 				if (result.message === 'Unauthorized') {
@@ -103,9 +99,7 @@ const useAPIAuth = () => {
 
 		try {
 			setIsLoading(true);
-			const response = await fetchPromise.finally(() =>
-				setIsLoading(false)
-			);
+			const response = await fetchPromise.finally(() => setIsLoading(false));
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
 				if (result.message === 'Unauthorized') {
@@ -140,9 +134,7 @@ const useAPIAuth = () => {
 
 		try {
 			setIsLoading(true);
-			const response = await fetchPromise.finally(() =>
-				setIsLoading(false)
-			);
+			const response = await fetchPromise.finally(() => setIsLoading(false));
 			const result: APIResponse = await response.json();
 			if (!response.ok) {
 				if (result.message === 'Unauthorized') {

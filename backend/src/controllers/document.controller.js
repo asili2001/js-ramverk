@@ -1,6 +1,11 @@
 const Document = require('../models/document.model.js');
 const statusCodes = require("../utils/HttpStatusCodes.js");
 const returner = require('../utils/returner.js');
+const { dirname } = require('path');
+const LZString = require('lz-string');
+var fs = require('fs');
+const appRoot = require('app-root-path');
+
 
 class DocumentController {
   // Method for creating a new document
@@ -43,14 +48,31 @@ class DocumentController {
   async getDocumentById(req, res) {
     const userId = res.locals.authenticatedUser._id;
     try {
+      // get document from files
       const document = await Document.findById(req.params.id);
       if (!document) {
         return returner(res, "error", statusCodes.NOT_FOUND, null, "Document not found");
       }
       const hasAccess = document.usersWithAccess.find(access => access._id.equals(userId));
-      
+
       if (!hasAccess) return returner(res, "error", statusCodes.FORBIDDEN, null, "You don't have access to this document");
-      return returner(res, "success", statusCodes.OK, document, "");
+
+      const dir = `${appRoot.path}/drafts/${userId}/${req.params.id}`;
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      const filePath = `${dir}/document`;
+      const emptyRawDraftContentState = {
+        blocks: [],
+        entityMap: {}
+      };
+      if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, LZString.compress(JSON.stringify(emptyRawDraftContentState)));
+      }
+
+      let fileContent = fs.readFileSync(filePath, 'utf8');
+      const compressedFileContent = LZString.compress(fileContent);
+      return returner(res, "success", statusCodes.OK, { ...document._doc, content: compressedFileContent }, "");
     } catch (error) {
       console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
@@ -70,7 +92,7 @@ class DocumentController {
           { "usersWithAccess.accessLevel": "owner" },
           { "usersWithAccess.accessLevel": "editor" }
         ]
-      }, req.body, {new: true});
+      }, req.body, { new: true });
 
       // If no document is found or the user doesn't have the required access
       if (!document) {

@@ -35,13 +35,10 @@ const Signup = () => {
 	const handleUserRegisteration = async () => {
 		const signUpResponseMessage = await signUp(name, email);
 		setResponseMessage(signUpResponseMessage);
-		console.log(signUpResponseMessage);
-
 		if (signUpResponseMessage === 'success') {
-			toast.success(
-				"We've sent an activation link to your email. Please check your inbox.",
-				{ duration: 5000 }
-			);
+			toast.success("We've sent an activation link to your email. Please check your inbox.", {
+				duration: 5000,
+			});
 			navigate('/');
 		}
 	};
@@ -60,11 +57,7 @@ const Signup = () => {
 						title="Name"
 						placeholder=" "
 						onChange={handleNameChange}
-						errorMsg={
-							responseMessage.includes('name')
-								? responseMessage
-								: ''
-						}
+						errorMsg={responseMessage.includes('name') ? responseMessage : ''}
 						required
 					/>
 					<Input
@@ -73,11 +66,7 @@ const Signup = () => {
 						title="Email"
 						placeholder=" "
 						onChange={handleEmailChange}
-						errorMsg={
-							responseMessage.includes('email')
-								? responseMessage
-								: ''
-						}
+						errorMsg={responseMessage.includes('email') ? responseMessage : ''}
 						required
 					/>
 					<button
