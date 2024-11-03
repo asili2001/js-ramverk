@@ -19,8 +19,6 @@ const Documents = () => {
 	const handleNewDocCreation = async () => {
 		const newDocument = await newDoc();
 		if (newDocument) {
-			console.log(newDocument);
-
 			navigate(`/documents/${newDocument.id}`);
 		}
 	};
@@ -39,21 +37,14 @@ const Documents = () => {
 					const documentOwner = document.usersWithAccess.find(
 						(user) => user.accessLevel === 'owner'
 					);
-					const totalUsersWithAccess =
-						document.usersWithAccess.length - 1;
+					const totalUsersWithAccess = document.usersWithAccess.length - 1;
 					return (
 						<div
 							key={index}
 							className="document-card"
-							onClick={() =>
-								navigate(`/documents/${document.id}`)
-							}
+							onClick={() => navigate(`/documents/${document.id}`)}
 						>
-							<img
-								className="preview"
-								src={document.previewImage}
-								alt=""
-							/>
+							<img className="preview" src={document.previewImage} alt="" />
 							<div className="detailes">
 								<h3>{document.title}</h3>
 								<p>

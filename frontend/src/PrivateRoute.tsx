@@ -6,17 +6,10 @@ interface PrivateRouteProps {
 	requiredRoles: Role[];
 }
 
-const PrivateRoute: React.FC<PrivateRouteProps> = ({
-	component,
-	requiredRoles,
-}) => {
+const PrivateRoute: React.FC<PrivateRouteProps> = ({ component, requiredRoles }) => {
 	const { role } = useRoleContext();
 
-	return role && requiredRoles.includes(role) ? (
-		component
-	) : (
-		<Navigate to="/" />
-	);
+	return role && requiredRoles.includes(role) ? component : <Navigate to="/" />;
 };
 
 export default PrivateRoute;

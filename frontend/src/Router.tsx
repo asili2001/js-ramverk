@@ -25,31 +25,11 @@ const AppRouter: React.FC = () => {
 	}, [setRole]);
 
 	useEffect(() => {
-		registerShortcut(
-			['Ctrl', 'o'],
-			() => alert('Open action triggered!'),
-			'Open'
-		);
-		registerShortcut(
-			['Ctrl', 'f'],
-			() => alert('New action triggered!'),
-			'New'
-		);
-		registerShortcut(
-			['Ctrl', '<'],
-			() => alert('Share action triggered!'),
-			'Share'
-		);
-		registerShortcut(
-			['Ctrl', 'z'],
-			() => alert('Undo action triggered!'),
-			'Undo'
-		);
-		registerShortcut(
-			['Ctrl', 'y'],
-			() => alert('Redo action triggered!'),
-			'Redo'
-		);
+		registerShortcut(['Ctrl', 'o'], () => alert('Open action triggered!'), 'Open');
+		registerShortcut(['Ctrl', 'f'], () => alert('New action triggered!'), 'New');
+		registerShortcut(['Ctrl', '<'], () => alert('Share action triggered!'), 'Share');
+		registerShortcut(['Ctrl', 'z'], () => alert('Undo action triggered!'), 'Undo');
+		registerShortcut(['Ctrl', 'y'], () => alert('Redo action triggered!'), 'Redo');
 
 		return () => {
 			unregisterShortcut(['Ctrl', 's']);
@@ -72,39 +52,23 @@ const AppRouter: React.FC = () => {
 					/>
 					<Route
 						path="/signup"
-						element={
-							<PrivateRoute
-								component={<Signup />}
-								requiredRoles={['guest']}
-							/>
-						}
+						element={<PrivateRoute component={<Signup />} requiredRoles={['guest']} />}
 					/>
 					<Route
 						path="/activate"
 						element={
-							<PrivateRoute
-								component={<ActivateUser />}
-								requiredRoles={['guest']}
-							/>
+							<PrivateRoute component={<ActivateUser />} requiredRoles={['guest']} />
 						}
 					/>
 					<Route
 						path="/documents"
 						element={
-							<PrivateRoute
-								component={<Documents />}
-								requiredRoles={['user']}
-							/>
+							<PrivateRoute component={<Documents />} requiredRoles={['user']} />
 						}
 					/>
 					<Route
 						path="/documents/:documentId"
-						element={
-							<PrivateRoute
-								component={<Document />}
-								requiredRoles={['user']}
-							/>
-						}
+						element={<PrivateRoute component={<Document />} requiredRoles={['user']} />}
 					/>
 					<Route path="/unauthorized" element={<Unauthorized />} />
 					<Route path="*" element={<NotFound />} />

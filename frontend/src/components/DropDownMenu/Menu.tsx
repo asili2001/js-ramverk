@@ -41,9 +41,7 @@ export const MenuItem: React.FC<{ item: DropDownMenuContent }> = ({ item }) => {
 		<>
 			<li
 				ref={itemRef}
-				onClick={() =>
-					item.children ? setChildManuActive(true) : undefined
-				}
+				onClick={() => (item.children ? setChildManuActive(true) : undefined)}
 			>
 				<div className="left">
 					<item.icon />

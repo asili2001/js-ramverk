@@ -64,17 +64,10 @@ const ActivateUser = () => {
 					title="New Password"
 					placeholder=" "
 					onChange={handlePasswordChange}
-					errorMsg={
-						responseMessage.includes('password')
-							? responseMessage
-							: ''
-					}
+					errorMsg={responseMessage.includes('password') ? responseMessage : ''}
 					required
 				/>
-				<button
-					className="primary-button active"
-					onClick={handleActivate}
-				>
+				<button className="primary-button active" onClick={handleActivate}>
 					Activate {isLoading && <LoadingSpinner size={20} />}
 				</button>
 			</div>

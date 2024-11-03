@@ -2,6 +2,8 @@ const jwt = require("jsonwebtoken");
 const returner = require("../utils/returner.js");
 const statusCodes = require("../utils/HttpStatusCodes.js");
 const User = require("../models/user.model.js");
+const cookie = require('cookie');
+
 
 class AuthMiddleware {
 
@@ -40,6 +42,40 @@ class AuthMiddleware {
             res.clearCookie("key");
             console.error("Error in middlewares/checkAuth/checkUser: ", err);
             return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
+        }
+    };
+
+    checkSocketUser = async (socket, next) => {
+        console.log("checking user auth");
+        
+        const cookies = cookie.parse(socket.request.headers.cookie || '');
+        const token = cookies.key; 
+        
+        if (!token) {
+            const err = new Error('Unauthorized: No token provided');
+            err.data = { content: "Please retry later" };
+            return next(err);
+        }
+        
+        try {
+            const decoded = jwt.verify(token, this.JWT_SECRET);
+            const currentTime = Math.floor(Date.now() / 1000);
+
+            if (decoded.exp < currentTime) {
+                return next(new Error('Unauthorized: Token expired'));
+            }
+
+            const user = await User.findOne({ _id: decoded.userId });
+            if (!user) {
+                return next(new Error('Unauthorized: User not found'));
+            }
+
+            // Attach user information to socket for future use
+            socket.user = user;
+            next();
+        } catch (err) {
+            console.error("Error in socket authentication: ", err);
+            return next(new Error('Unauthorized: Invalid token'));
         }
     };
 }

@@ -13,19 +13,14 @@ const useShortCuts = () => {
 
 	// Unregister a shortcut by key combination
 	const unregisterShortcut = useCallback((keys: string[]) => {
-		setShortcuts((prevShortcuts) =>
-			prevShortcuts.filter((s) => !arraysEqual(s.keys, keys))
-		);
+		setShortcuts((prevShortcuts) => prevShortcuts.filter((s) => !arraysEqual(s.keys, keys)));
 	}, []);
 
 	// Register a new shortcut
 	const registerShortcut = useCallback(
 		(keys: string[], action: () => void, label: string) => {
 			unregisterShortcut(keys);
-			setShortcuts((prevShortcuts) => [
-				...prevShortcuts,
-				{ keys, action, label },
-			]);
+			setShortcuts((prevShortcuts) => [...prevShortcuts, { keys, action, label }]);
 		},
 		[unregisterShortcut]
 	);
@@ -46,9 +41,7 @@ const useShortCuts = () => {
 				event.key,
 			].filter(Boolean);
 
-			const shortcut = shortcuts.find((s) =>
-				arraysEqual(s.keys, pressedKeys)
-			);
+			const shortcut = shortcuts.find((s) => arraysEqual(s.keys, pressedKeys));
 			if (shortcut) {
 				event.preventDefault();
 				shortcut.action();
