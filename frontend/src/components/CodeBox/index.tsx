@@ -10,6 +10,7 @@ import { javascript } from "@codemirror/lang-javascript";
 
 export interface TextBoxProps {
 	editable?: boolean;
+    className?: string;
 }
 
 // keybinds
@@ -34,17 +35,23 @@ const CodeBox: React.FC<TextBoxProps> = ({
                 //lineNumbers(), // Add this line
             ]
         });
+
+        const codeMirrorDiv: HTMLElement | null = document.getElementById('code-mirror');
+        if (codeMirrorDiv) {
+            let view = new EditorView({
+                state: startState,
+                parent: codeMirrorDiv
+            });
     
-        let view = new EditorView({
-            state: startState,
-            parent: document.body
-        });
-
-        codeEditorRef.current = view;
-
-        return () => {
-            view.destroy();
-        };
+            codeEditorRef.current = view;
+    
+            return () => {
+                view.destroy();
+            };
+        }else {
+            console.log("code-setup-fail");
+        }
+        
     }, []);
 
 
@@ -97,14 +104,12 @@ const CodeBox: React.FC<TextBoxProps> = ({
             <div className="execute-code-btn" onClick={sendCode}>Run</div>
             <div
                 ref={codeEditorRef}
-                style={{ minHeight: `${1 * 1000}px` }}
+                // style={{ minHeight: `${1 * 1000}px` }}
                 contentEditable={editable}
                 onInput={()=>handleInput()}
-                className={`code-mirror`}
+                id={`code-mirror`}
             />
-            <div className="code-output">
-
-            </div>
+            <div className="code-output"></div>
         </div>
 	);
 };

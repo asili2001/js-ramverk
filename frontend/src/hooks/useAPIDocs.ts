@@ -76,7 +76,7 @@ const useAPIDocs = () => {
 		}
 	};
 	// skicka med parameter för vilket typ av document det ska vara
-	const newDoc = async (title: string = 'Untitled') => {
+	const newDoc = async (title: string = 'Untitled', docType: string) => {
 		const endPoint = `${import.meta.env.VITE_MAIN_API_URL}/documents`;
 
 		const fetchPromise = fetch(endPoint, {
@@ -87,6 +87,7 @@ const useAPIDocs = () => {
 			},
 			body: JSON.stringify({
 				title,
+				docType
 			}),
 		});
 

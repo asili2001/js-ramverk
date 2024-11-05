@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import useAPIDocs from '../../hooks/useAPIDocs';
 import LoadingSpinner from '../../components/Loading';
 import useDocSocket, { RTextUpdateGeneral, TextDelete, TextInsert, TextReplace, TextUpdateGeneral } from '../../hooks/useDocSocket';
+import CodeBox from '../../components/CodeBox';
 
 const Document = () => {
 	const { documentId } = useParams();
 	const [title, setTitle] = useState('');
 	const [content, setContent] = useState('');
+	const [docType, setDocType] = useState('');
 	const [recivedUpdate, setRecivedUpdate] = useState<RTextUpdateGeneral|null>(null);
 	const [loadedDoc, setLoadedDoc] = useState(false);
 	const { getDoc, updateDoc, isLoading } = useAPIDocs();
@@ -25,6 +27,8 @@ const Document = () => {
 		}
 		setContent(data.content);
 		setTitle(data.title);
+		setDocType(data.docType);
+
 	};
 
 	useEffect(() => {
@@ -84,13 +88,18 @@ const Document = () => {
 					documentTitle={title}
 					onTitleChange={handleTitleChange}
 				/>
-				<TextBox
-					content={content}
-					className="main-textbox"
-					onChange={handleDocumentChange}
-					recivedUpdate={recivedUpdate}
-					editable
-				/>
+				{docType === "code" ? (
+					<CodeBox
+					/>
+				) : (
+					<TextBox
+						content={content}
+						className="main-textbox"
+						onChange={handleDocumentChange}
+						recivedUpdate={recivedUpdate}
+						editable
+					/>
+				)}
 				{isLoading && <LoadingSpinner floating />}
 			</div>
 		)

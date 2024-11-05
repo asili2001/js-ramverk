@@ -7,13 +7,14 @@ class DocumentController {
   async createDocument(req, res) {
     const userId = res.locals.authenticatedUser;
     try {
-      const { title } = req.body;
+      const { title, docType } = req.body;
       const docData = {
         title,
         usersWithAccess: [{
           _id: userId,
           accessLevel: "owner"
-        }]
+        }],
+        docType: docType
       }
       const document = new Document(docData);
       await document.save();

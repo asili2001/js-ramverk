@@ -4,6 +4,7 @@ type Doc = {
 	previewImage?: string;
 	usersWithAccess: UserWithAccess[];
 	content: string;
+	docType: string;
 };
 
 interface UserWithAccess extends User {

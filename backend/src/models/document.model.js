@@ -28,6 +28,12 @@ const documentSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    docType: {
+      type: String,
+      enum: ["text", "code"],
+      default: "text",
+      required: true,
+    },
   },
   {
     timestamps: true,
