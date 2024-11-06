@@ -24,6 +24,22 @@ const documentSchema = new mongoose.Schema(
         },
       },
     ],
+    comments: [
+      {
+        _id: {
+          type: mongoose.Schema.Types.ObjectId,
+          required: true,
+        },
+        content: {
+            type: String,
+            required: true,
+        },
+        placement: {
+          type: Number,
+          required: true,
+        }
+      },
+    ],
   },
   {
     timestamps: true,

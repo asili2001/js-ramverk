@@ -31,6 +31,8 @@ const Document = () => {
 	};
 	const [content, setContent] = useState<RawDraftContentState>(emptyRawContentState);
 	const [recivedUpdate, setRecivedUpdate] = useState<{changes: RawDraftContentState[], currentBlockKeys: string[]}|null>(null);
+	const [user, setUser] = useState<any>('');
+	const [recivedCommentUpdate, setRecivedCommentUpdate] = useState<any>(null);
 	const [loadedDoc, setLoadedDoc] = useState(false);
 	const { getDoc, updateDoc, isLoading } = useAPIDocs();
 	const navigate = useNavigate();
@@ -52,6 +54,8 @@ const Document = () => {
 		}
 
 		setTitle(data.title);
+		setUser(data.usersWithAccess);
+		console.log("DATA USERRS WITH ACCESS NAME: ", user)
 	};
 
 	useEffect(() => {
@@ -74,8 +78,18 @@ const Document = () => {
 	};
 
 	
-	const { socket, submitChange } = useDocSocket(documentId, handleSocketUpdate);
-	
+	const handleCommentUpdate = (recived: any) => {
+		// if (recived.owner !== socket.current.id) {
+		// 	setRecivedCommentUpdate(recived);
+		// }
+		console.log("updating comment. Document.tsx");
+		setRecivedCommentUpdate(recived);
+
+	};
+
+	// Use the WebSocket hook for handling document updates
+	if (!documentId) return;
+	const { socket, submitChange } = useDocSocket(documentId, handleSocketUpdate, handleCommentUpdate);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
@@ -94,6 +108,7 @@ const Document = () => {
 					onChange={submitChange}
 					recivedChanges={recivedUpdate}
 					editable={true}
+					socketCommentUpdate={recivedCommentUpdate}
 				/>
 				{isLoading && <LoadingSpinner floating />}
 			</div>

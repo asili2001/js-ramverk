@@ -67,7 +67,7 @@ class DocumentController {
         entityMap: {}
       };
       if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, LZString.compress(JSON.stringify(emptyRawDraftContentState)));
+        fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
       }
 
       let fileContent = fs.readFileSync(filePath, 'utf8');

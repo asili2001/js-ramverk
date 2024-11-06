@@ -1,15 +1,18 @@
 import './main.scss';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from 'draft-js';
+import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw, SelectionState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Toolbar from './Toolbar';
 import { debounce } from 'arias';
+import CommentBox from '../Comment';
+import CommentIcon from '../../assets/comment.png';
 
 export interface TextBoxProps {
 	initialContent: RawDraftContentState;
 	onChange: (changes: RawDraftContentState, currentBlockKeys: string[]) => void;
 	recivedChanges: {changes: RawDraftContentState[], currentBlockKeys: string[]}|null;
 	editable: boolean;
+	socketCommentUpdate: any;
 }
 
 const TextBox: React.FC<TextBoxProps> = ({
@@ -17,6 +20,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 	onChange,
 	recivedChanges,
 	editable,
+	socketCommentUpdate
 }) => {
 	const contentState = convertFromRaw(initialContent);
 	const [editorState, setEditorState] = useState<EditorState>(EditorState.createWithContent(contentState));
@@ -118,60 +122,146 @@ const TextBox: React.FC<TextBoxProps> = ({
 	};
 
 	// These functions will be used for comment positions
-	// function getCurrentBlock(editorState: EditorState) {
-	// 	// Get the selection state
-	// 	const selectionState = editorState.getSelection();
+	const getCurrentBlock = function getCurrentBlock(editorState: EditorState) {
+		// Get the selection state
+		const selectionState = editorState.getSelection();
 
-	// 	// Get the block key where the selection starts (caret is positioned)
-	// 	const anchorKey = selectionState.getAnchorKey();
+		// Get the block key where the selection starts (caret is positioned)
+		const anchorKey = selectionState.getAnchorKey();
 
-	// 	// Retrieve the content state
-	// 	const contentState = editorState.getCurrentContent();
+		// Retrieve the content state
+		const contentState = editorState.getCurrentContent();
 
-	// 	// Use the block key to get the actual content block
-	// 	const currentBlock = contentState.getBlockForKey(anchorKey);
+		// Use the block key to get the actual content block
+		const currentBlock = contentState.getBlockForKey(anchorKey);
 
-	// 	getBlockPosition(currentBlock.getKey());
-	// }
+		getBlockPosition(currentBlock.getKey());
+	}
 
-	// function getBlockPosition(blockKey: string) {
-	// 	// Construct the selector using the block key
-	// 	const offsetKey = `${blockKey}-0-0`;
+	const getBlockPosition = function getBlockPosition(blockKey: string) {
+		// Construct the selector using the block key
+		const offsetKey = `${blockKey}-0-0`;
 
-	// 	// Use querySelector to find the block's DOM element
-	// 	const blockElement = document.querySelector(`[data-offset-key="${offsetKey}"]`);
+		// Use querySelector to find the block's DOM element
+		const blockElement = document.querySelector(`[data-offset-key="${offsetKey}"]`);
 
-	// 	if (blockElement) {
-	// 		// Get the bounding client rectangle of the element
-	// 		const rect = blockElement.getBoundingClientRect();
+		if (blockElement) {
+			// Get the bounding client rectangle of the element
+			const rect = blockElement.getBoundingClientRect();
 
-	// 		// Position in pixels relative to the viewport
-	// 		console.log({
-	// 			top: rect.top,
-	// 			left: rect.left,
-	// 			width: rect.width,
-	// 			height: rect.height,
-	// 		});
-	// 	}
+			// Position in pixels relative to the viewport
+			console.log({
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height,
+			});
+			return {
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height,
+			};
+		}
 
-	// 	return null; // Block not found
-	// }
+		return null; // Block not found
+	}
+
+	const [showCommentBtn, setShowCommentBtn] = useState(false);
+	const [showCommentBox, setShowCommentBox] = useState(false);
+	const [selectionPosition, setSelectionPosition] = useState(100);
+	const [selectedText, setSelectedText] = useState('');
+
+	const toggleCommentBox = () => {
+		console.log("show comment box");
+		setShowCommentBox(true);
+		setShowCommentBtn(false);
+		// const currSelection = editorState.getSelection();
+	};
+
+	const hideCommentBox = () => {
+		console.log("hide comment box");
+		setShowCommentBox(false);
+		setShowCommentBtn(false);
+
+	};
+
+	const handleMouseUp = () => {
+		// const contentState = editorState.getCurrentContent();
+		// const selectionState: SelectionState = editorState.getSelection();
+		const selectionState: Selection | any = window.getSelection();
+		// Check if there is a non-collapsed selection (i.e., actual selected text)
+		if (!selectionState.isCollapsed && showCommentBox == false) {
+			const selectionState: SelectionState = editorState.getSelection();
+
+			const position = getBlockPosition(selectionState.getStartKey());
+			position != null && setSelectionPosition(position.top);
+			// const startKey = selectionState.getStartKey();
+			// const endKey = selectionState.getEndKey();
+			// const startOffset = selectionState.getStartOffset();
+			// const endOffset = selectionState.getEndOffset();
+		
+			// console.log("Selected Text Information:");
+			// console.log("Start Key:", startKey);
+			// console.log("End Key:", endKey);
+			// console.log("Start Offset:", startOffset);
+			// console.log("End Offset:", endOffset);
+			
+			setShowCommentBtn(true);
+			// setShowCommentBox(true);
+			// You can use this information to identify and handle the selected text
+			
+		} else {
+			setShowCommentBtn(false);
+		}
+	};
+	
 
 	return (
-		<div className="editor-container page">
-			<Toolbar
-				editableState={editorState}
-				setEditableState={setEditorState}
-				onEditorStateChange={handleEditorStateChange}
-			/>
 
-			<Editor
-				editorState={editorState}
-				onChange={handleEditorStateChange}
-				placeholder="Start typing here..."
-				readOnly={!editable}
-			// onUpArrow={() => getCurrentBlock(editorState)}
-			/>
+		// <div id="page-body">
+		// 	<div
+		// 		id="text-box"
+		// 		ref={editableRef}
+		// 		style={{ minHeight: `${PAGE_HEIGHT * totalPages}px` }}
+		// 		contentEditable={editable}
+		// 		onInput={()=>handleInput()}
+		// 		dangerouslySetInnerHTML={{ __html: sanitizedContent }}
+		// 		className={`page ${className}`}
+		// 		onPaste={handlePaste}
+		// 	/>
+		// </div>
+		<div>
+			<div className="editor-container page" onMouseUp={handleMouseUp}>
+				<Toolbar
+					editableState={editorState}
+					setEditableState={setEditorState}
+					onEditorStateChange={handleEditorStateChange}
+				/>
+
+				<Editor
+					editorState={editorState}
+					onChange={handleEditorStateChange}
+					placeholder="Start typing here..."
+					readOnly={!editable}
+					// onUpArrow={() => getCurrentBlock(editorState)}
+				/>
+			</div>
+			{showCommentBtn && (
+				<div className="comment-button"
+					onClick={toggleCommentBox}
+					style={{ margin: `${selectionPosition}px 50px 0` }}
+				>
+					<img src={CommentIcon} alt="comment logo"/>
+				</div>
+			)}
+			{showCommentBox && (
+				<CommentBox
+					position={`${selectionPosition}`}
+					selection={selectedText}
+					onClick={hideCommentBox}
+				/>
+			)}
 		</div>
 	);
 };

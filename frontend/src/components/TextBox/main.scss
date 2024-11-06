@@ -208,3 +208,33 @@
     font-size: 1em;
   }
 }
+
+
+#page-body {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: center;
+}
+
+.comment-button {
+  position: absolute;
+  //right: 20%;
+  align-content: center;
+  //justify-content: start;
+  //justify-self: center;
+  margin: 25px;
+  padding: 8px;
+  border-radius: 25%;
+  line-height: 0;
+  color: black;
+  z-index: 10000;
+  //justify-self: start;
+  //right: 8%;
+  top: 0;
+  right: 0;
+}
+
+.comment-button:hover {
+  background-color: rgb(70, 69, 69);
+}

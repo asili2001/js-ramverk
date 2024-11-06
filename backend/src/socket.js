@@ -171,6 +171,7 @@ io.on('connection', async (socket) => {
 
     // Handle document insert text event
     socket.on('doc change', async (data) => {
+        console.log("backend socket data: ", data);
         const update = { owner: socket.id, data };
         addToQueue(documentId, socket.user.id, update);
     });
