@@ -1,30 +1,41 @@
 import './main.scss';
 
 import React, { useState, useEffect } from 'react';
-import createComment from '../../hooks/useDocSocket';
+import { CommentData } from '../../hooks/useDocSocket';
 
 export interface CommentProps {
-    position?: string;
-    selection?: string;
+    position: string;
+    selection: string;
     onClick: () => void;
+    onComment: (data: CommentData) => void;
 }
 
 
 const CommentBox: React.FC<CommentProps> = ({
     position,
     selection,
-    onClick
+    onClick,
+    onComment
 }) => {
-	const [comment, setComment] = useState('');
+	const [commentContent, setCommentContent] = useState('');
 
 
-    // submit comment
+    // Create Comment
     const sendComment = () => {
-        console.log("create comment");
-        console.log("selection: ", selection);
-        console.log("position: ", position);
-        console.log("comment: ", comment);
+        console.log("sending socket comment!");
+        // console.log("selection: ", selection);
+        // console.log("position: ", position);
+        // console.log("comment: ", commentContent);
         //createComment(selection, )
+        const data = {
+            "commentContent": commentContent,
+            "selectedText": selection,
+            "position": position
+        };
+
+        if(commentContent && selection && position){
+            onComment(data);
+        }
 	};
 
     useEffect(() => {
@@ -33,7 +44,7 @@ const CommentBox: React.FC<CommentProps> = ({
         const textArea: HTMLDivElement | any = document.getElementById("comment-textarea");
         textArea.addEventListener('input', function() {
             textArea.style.height = `${textArea.scrollHeight}px`;
-            setComment(textArea.value);
+            setCommentContent(textArea.value);
         });
     }, []);
 

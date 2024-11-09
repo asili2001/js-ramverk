@@ -6,10 +6,12 @@ import Toolbar from './Toolbar';
 import { debounce } from 'arias';
 import CommentBox from '../Comment';
 import CommentIcon from '../../assets/comment.png';
+import { CommentData } from '../../hooks/useDocSocket';
 
 export interface TextBoxProps {
 	initialContent: RawDraftContentState;
 	onChange: (changes: RawDraftContentState, currentBlockKeys: string[]) => void;
+	onComment: (data: CommentData) => void;
 	recivedChanges: {changes: RawDraftContentState[], currentBlockKeys: string[]}|null;
 	editable: boolean;
 	socketCommentUpdate: any;
@@ -18,9 +20,9 @@ export interface TextBoxProps {
 const TextBox: React.FC<TextBoxProps> = ({
 	initialContent,
 	onChange,
+	onComment,
 	recivedChanges,
-	editable,
-	socketCommentUpdate
+	editable
 }) => {
 	const contentState = convertFromRaw(initialContent);
 	const [editorState, setEditorState] = useState<EditorState>(EditorState.createWithContent(contentState));
@@ -189,11 +191,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const handleMouseUp = () => {
 		// const contentState = editorState.getCurrentContent();
 		// const selectionState: SelectionState = editorState.getSelection();
-		const selectionState: Selection | any = window.getSelection();
-		// Check if there is a non-collapsed selection (i.e., actual selected text)
-		if (!selectionState.isCollapsed && showCommentBox == false) {
-			const selectionState: SelectionState = editorState.getSelection();
+		const selection: Selection | any = window.getSelection();
 
+		// Check if there is a non-collapsed selection (i.e., actual selected text)
+		if (!selection.isCollapsed && showCommentBox == false) {
+			console.log(selection.anchorNode.data);
+			setSelectedText(selection.anchorNode.data);
+
+			const selectionState: SelectionState = editorState.getSelection();
+			console.log(selectionState);
 			const position = getBlockPosition(selectionState.getStartKey());
 			position != null && setSelectionPosition(position.top);
 			// const startKey = selectionState.getStartKey();
@@ -207,6 +213,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 			// console.log("Start Offset:", startOffset);
 			// console.log("End Offset:", endOffset);
 			
+			// setSelectionPosition(selectionState);
 			setShowCommentBtn(true);
 			// setShowCommentBox(true);
 			// You can use this information to identify and handle the selected text
@@ -260,6 +267,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 					position={`${selectionPosition}`}
 					selection={selectedText}
 					onClick={hideCommentBox}
+					onComment={onComment}
 				/>
 			)}
 		</div>

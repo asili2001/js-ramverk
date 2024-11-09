@@ -19,9 +19,10 @@ export type RChangeData = {
     currentBlockKeys?: string[];
 };
 
-export type CommentCreate = {
-    content: string;
+export type CommentData = {
+    commentContent: string;
     selectedText: string;
+    position: string;
 };
 
 
@@ -31,7 +32,7 @@ export type TextUpdate = {
     owner: string;
 };
 
-const useDocSocket = (docId: string|undefined, handleSocketUpdate: (updatedText: RChange[]) => void, handleCommentUpdate: any) => {
+const useDocSocket = (docId: string|undefined, handleSocketUpdate: (updatedText: RChange[]) => void) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const socket = useRef<null | Socket>(null);
 
@@ -57,19 +58,14 @@ const useDocSocket = (docId: string|undefined, handleSocketUpdate: (updatedText:
 		socket.current.on('connect', () => setIsConnected(true));
 		socket.current.on('disconnect', () => setIsConnected(false));
 		socket.current.on('updateDocument', handleSocketUpdate);
-        socket.current.on('updateComment', handleCommentUpdate);
+        socket.current.on('updateComment', submitComment);
+        // Connection Error
         socket.current.on("connect_error", (err:any) => {
             console.log(`connect_error due to ${err.message}`);
-            // some additional description, for example the status code of the initial HTTP response
             console.log(err.description);
-            // some additional context, for example the XMLHttpRequest object
             console.log(err.context);
         });
 
-        // socket.current.on("updateComment", (updatedContent: any) => {
-        //     console.log("socket updateComment");
-        //     socketCommentUpdate(updatedContent);
-        // });
 	};
 
 	// Function to clean up the socket connection
@@ -94,6 +90,12 @@ const useDocSocket = (docId: string|undefined, handleSocketUpdate: (updatedText:
 
 
 
+	const submitComment = (data: CommentData) => {
+        console.log("DATA FROM useDocSocket: ", data)
+
+		socket.current?.emit('doc comment', data);
+	};
+
 	const submitChange = (changes: RawDraftContentState, currentBlockKeys: string[]) => {
 		const data = LZString.compress(
 			JSON.stringify({ content: changes, currentBlockKeys, docId })
@@ -102,7 +104,7 @@ const useDocSocket = (docId: string|undefined, handleSocketUpdate: (updatedText:
 		socket.current?.emit('doc change', data);
 	};
 
-	return { isConnected, submitChange, socket: socket };
+	return { isConnected, submitChange, submitComment, socket: socket };
 
 
     // const insertText = ({ content, startIndex, endIndex }: TextInsert) => {

@@ -46,7 +46,7 @@ const Document = () => {
 		}
 		// let docContent = emptyRawContentState;
 		const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
-
+		console.log("LOADED DOC: ", receivedDoc);
 		if (isRawDraftContentState(receivedDoc)) {
 			setContent(receivedDoc);
 		} else {
@@ -78,18 +78,18 @@ const Document = () => {
 	};
 
 	
-	const handleCommentUpdate = (recived: any) => {
-		// if (recived.owner !== socket.current.id) {
-		// 	setRecivedCommentUpdate(recived);
-		// }
-		console.log("updating comment. Document.tsx");
-		setRecivedCommentUpdate(recived);
+	// const handleCommentUpdate = (recived: any) => {
+	// 	// if (recived.owner !== socket.current.id) {
+	// 	// 	setRecivedCommentUpdate(recived);
+	// 	// }
+	// 	console.log("updating comment. Document.tsx");
+	// 	setRecivedCommentUpdate(recived);
 
-	};
+	// };
 
 	// Use the WebSocket hook for handling document updates
 	if (!documentId) return;
-	const { socket, submitChange } = useDocSocket(documentId, handleSocketUpdate, handleCommentUpdate);
+	const { socket, submitChange, submitComment } = useDocSocket(documentId, handleSocketUpdate);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
@@ -106,6 +106,7 @@ const Document = () => {
 				<TextBox
 					initialContent={content}
 					onChange={submitChange}
+					onComment={submitComment}
 					recivedChanges={recivedUpdate}
 					editable={true}
 					socketCommentUpdate={recivedCommentUpdate}

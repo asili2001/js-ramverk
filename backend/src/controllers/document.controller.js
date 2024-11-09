@@ -107,6 +107,38 @@ class DocumentController {
     }
   }
 
+  // Method for updating a documents comments
+  async updateDocumentComments(data, documentID) {
+    // const userId = res.locals.authenticatedUser;
+    console.log("UPDATING COMMENT IN CONTROLLER")
+    try {
+      const newComment = {
+        commentContent: data.commentContent,
+        selectedText: data.selectedText,
+        position: data.position
+      };
+      
+      // Find the document and check if the user has 'owner' or 'editor' access
+      const document = await Document.findOneAndUpdate({
+        _id: documentID,
+      }, { $push: { comments: newComment } }, { new: true });
+
+      // If no document is found or the user doesn't have the required access
+      if (!document) {
+        console.log("NO DOCUMENT FOUND!");
+        return "doc not found";
+      }
+      console.log("SHOULD BE OK!");
+
+      // Return the updated document
+      return "success";
+    } catch (error) {
+      console.log("ERROR OCCURRED!");
+      console.error(error);
+      return "error";
+    }
+  }
+
   // Method for deleting a document by ID
   async deleteDocument(req, res) {
     const userId = res.locals.authenticatedUser;

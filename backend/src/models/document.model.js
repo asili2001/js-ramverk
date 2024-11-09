@@ -26,16 +26,16 @@ const documentSchema = new mongoose.Schema(
     ],
     comments: [
       {
-        _id: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: true,
-        },
-        content: {
+        commentContent: {
             type: String,
             required: true,
         },
-        placement: {
-          type: Number,
+        selectedText: {
+          type: String,
+          required: true,
+        },
+        position: {
+          type: String,
           required: true,
         }
       },

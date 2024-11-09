@@ -172,12 +172,12 @@ class AuthController {
             
 
             const userData = await User.findOne({ email: req.body.email });
-
-            if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
+            console.log("userData: ", userData);
+            if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "1: Incorrect email or password");
 
             const auth = await bcrypt.compare(req.body.password, userData.password);
 
-            if (!auth) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");
+            if (!auth) return returner(res, "error", statusCodes.FORBIDDEN, null, "2: Incorrect email or password");
 
             const token = this.createToken({ userId: userData.id });
 

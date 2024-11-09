@@ -5,7 +5,7 @@ const connectDB = require('./config/db.js');
 var fs = require('fs');
 const LZString = require('lz-string');
 const appRoot = require('app-root-path');
-
+const DocumentController = require('../src/controllers/document.controller.js')
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev';
 require('dotenv').config({ path: `${__dirname}/../${envFile}` });
@@ -174,6 +174,15 @@ io.on('connection', async (socket) => {
         console.log("backend socket data: ", data);
         const update = { owner: socket.id, data };
         addToQueue(documentId, socket.user.id, update);
+    });
+
+    // Handle new comments on document
+    socket.on('doc comment', async (data) => {
+        console.log("COMMENT CREATE -> backend socket data: ", data);
+        console.log("document id: ", documentId);
+        // const update = { owner: socket.id, data };
+        //addToQueue(documentId, socket.user.id, update);
+        await DocumentController.updateDocumentComments(data, documentId);
     });
 
     socket.on('disconnect', () => {
