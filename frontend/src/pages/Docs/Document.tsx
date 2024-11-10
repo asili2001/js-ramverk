@@ -8,6 +8,8 @@ import useDocSocket, { RChange, RChangeData } from '../../hooks/useDocSocket';
 import TextBox from '../../components/TextBox';
 import { RawDraftContentState } from 'draft-js';
 import LZString from 'lz-string';
+import CodeBox from '../../components/CodeBox';
+import { Comment } from '../../components/TextBox';
 
 function isRawDraftContentState(data: unknown): data is RawDraftContentState {
 	// Check if data is an object and has 'blocks' and 'entityMap' properties
@@ -36,6 +38,8 @@ const Document = () => {
 	const [loadedDoc, setLoadedDoc] = useState(false);
 	const { getDoc, updateDoc, isLoading } = useAPIDocs();
 	const navigate = useNavigate();
+	const [docType, setDocType] = useState('');
+	const [comments, setComments] = useState<Comment[]>([]);
 
 	const loadDoc = async () => {
 		if (!documentId) return;
@@ -44,9 +48,11 @@ const Document = () => {
 			navigate('/documents');
 			return;
 		}
+		console.log("comments: ", data.comments);
+		// @ts-ignore
+		setComments(data.comments);
 		// let docContent = emptyRawContentState;
 		const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
-		console.log("LOADED DOC: ", receivedDoc);
 		if (isRawDraftContentState(receivedDoc)) {
 			setContent(receivedDoc);
 		} else {
@@ -55,6 +61,7 @@ const Document = () => {
 
 		setTitle(data.title);
 		setUser(data.usersWithAccess);
+		setDocType(data.docType);
 		console.log("DATA USERRS WITH ACCESS NAME: ", user)
 	};
 
@@ -103,6 +110,9 @@ const Document = () => {
 		documentId && (
 			<div className="document-page">
 				<DocumentNavbar documentTitle={title} onTitleChange={handleTitleChange} />
+				{docType === "code" ? (
+					<CodeBox/>
+				) : (
 				<TextBox
 					initialContent={content}
 					onChange={submitChange}
@@ -110,7 +120,10 @@ const Document = () => {
 					recivedChanges={recivedUpdate}
 					editable={true}
 					socketCommentUpdate={recivedCommentUpdate}
+					comments={comments}
+					setComments={setComments}
 				/>
+				)}
 				{isLoading && <LoadingSpinner floating />}
 			</div>
 		)

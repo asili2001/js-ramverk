@@ -71,7 +71,7 @@ const useAPIDocs = () => {
 			return null;
 		}
 	};
-	const newDoc = async (title: string = 'Untitled') => {
+	const newDoc = async (title: string = 'Untitled', docType: string = "text") => {
 		const endPoint = `${import.meta.env.VITE_MAIN_API_URL}/documents`;
 
 		const fetchPromise = fetch(endPoint, {
@@ -82,6 +82,7 @@ const useAPIDocs = () => {
 			},
 			body: JSON.stringify({
 				title,
+				docType
 			}),
 		});
 

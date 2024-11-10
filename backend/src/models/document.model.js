@@ -24,6 +24,12 @@ const documentSchema = new mongoose.Schema(
         },
       },
     ],
+    docType: {
+      type: String,
+      enum: ["text", "code"],
+      default: "text",
+      required: true,
+    },      
     comments: [
       {
         commentContent: {

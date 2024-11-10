@@ -2,12 +2,17 @@ import './main.scss';
 
 import React, { useState, useEffect } from 'react';
 import { CommentData } from '../../hooks/useDocSocket';
+import { Comment } from '../TextBox';
+
 
 export interface CommentProps {
     position: string;
     selection: string;
     onClick: () => void;
     onComment: (data: CommentData) => void;
+    comments: Comment[];
+    setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+    setShowCommentBox: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 
@@ -15,7 +20,10 @@ const CommentBox: React.FC<CommentProps> = ({
     position,
     selection,
     onClick,
-    onComment
+    onComment,
+    comments,
+    setComments,
+    setShowCommentBox
 }) => {
 	const [commentContent, setCommentContent] = useState('');
 
@@ -23,19 +31,24 @@ const CommentBox: React.FC<CommentProps> = ({
     // Create Comment
     const sendComment = () => {
         console.log("sending socket comment!");
+        console.log("fields: ", commentContent, selection, position);
+
         // console.log("selection: ", selection);
         // console.log("position: ", position);
         // console.log("comment: ", commentContent);
         //createComment(selection, )
-        const data = {
-            "commentContent": commentContent,
-            "selectedText": selection,
-            "position": position
+        const data: Comment = {
+            commentContent: commentContent,
+            selectedText: selection,
+            position: position
         };
 
-        if(commentContent && selection && position){
+        if(commentContent && selection && position) {
             onComment(data);
+            const updatedComments = [...comments, data];
+            setComments(updatedComments);
         }
+        setShowCommentBox(false);
 	};
 
     useEffect(() => {

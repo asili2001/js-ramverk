@@ -15,14 +15,26 @@ export interface TextBoxProps {
 	recivedChanges: {changes: RawDraftContentState[], currentBlockKeys: string[]}|null;
 	editable: boolean;
 	socketCommentUpdate: any;
+	comments: Comment[];
+	setComments:  React.Dispatch<React.SetStateAction<Comment[]>>;
 }
+
+export interface Comment {
+	_id?: string;
+	commentContent: string;
+	selectedText: string;
+	position: string;
+}
+
 
 const TextBox: React.FC<TextBoxProps> = ({
 	initialContent,
 	onChange,
 	onComment,
 	recivedChanges,
-	editable
+	editable,
+	comments,
+	setComments
 }) => {
 	const contentState = convertFromRaw(initialContent);
 	const [editorState, setEditorState] = useState<EditorState>(EditorState.createWithContent(contentState));
@@ -127,31 +139,20 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const getCurrentBlock = function getCurrentBlock(editorState: EditorState) {
 		// Get the selection state
 		const selectionState = editorState.getSelection();
-
-		// Get the block key where the selection starts (caret is positioned)
 		const anchorKey = selectionState.getAnchorKey();
-
-		// Retrieve the content state
 		const contentState = editorState.getCurrentContent();
-
-		// Use the block key to get the actual content block
 		const currentBlock = contentState.getBlockForKey(anchorKey);
 
 		getBlockPosition(currentBlock.getKey());
 	}
 
 	const getBlockPosition = function getBlockPosition(blockKey: string) {
-		// Construct the selector using the block key
 		const offsetKey = `${blockKey}-0-0`;
-
-		// Use querySelector to find the block's DOM element
 		const blockElement = document.querySelector(`[data-offset-key="${offsetKey}"]`);
 
 		if (blockElement) {
-			// Get the bounding client rectangle of the element
 			const rect = blockElement.getBoundingClientRect();
 
-			// Position in pixels relative to the viewport
 			console.log({
 				top: rect.top,
 				left: rect.left,
@@ -166,7 +167,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 			};
 		}
 
-		return null; // Block not found
+		return null;
 	}
 
 	const [showCommentBtn, setShowCommentBtn] = useState(false);
@@ -175,17 +176,13 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const [selectedText, setSelectedText] = useState('');
 
 	const toggleCommentBox = () => {
-		console.log("show comment box");
 		setShowCommentBox(true);
 		setShowCommentBtn(false);
-		// const currSelection = editorState.getSelection();
 	};
 
 	const hideCommentBox = () => {
-		console.log("hide comment box");
 		setShowCommentBox(false);
 		setShowCommentBtn(false);
-
 	};
 
 	const handleMouseUp = () => {
@@ -193,31 +190,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 		// const selectionState: SelectionState = editorState.getSelection();
 		const selection: Selection | any = window.getSelection();
 
-		// Check if there is a non-collapsed selection (i.e., actual selected text)
+		// selection == undefined && setSelectedText(selection.anchorNode.data);
 		if (!selection.isCollapsed && showCommentBox == false) {
 			console.log(selection.anchorNode.data);
 			setSelectedText(selection.anchorNode.data);
-
 			const selectionState: SelectionState = editorState.getSelection();
-			console.log(selectionState);
 			const position = getBlockPosition(selectionState.getStartKey());
+
 			position != null && setSelectionPosition(position.top);
-			// const startKey = selectionState.getStartKey();
-			// const endKey = selectionState.getEndKey();
-			// const startOffset = selectionState.getStartOffset();
-			// const endOffset = selectionState.getEndOffset();
-		
-			// console.log("Selected Text Information:");
-			// console.log("Start Key:", startKey);
-			// console.log("End Key:", endKey);
-			// console.log("Start Offset:", startOffset);
-			// console.log("End Offset:", endOffset);
-			
-			// setSelectionPosition(selectionState);
-			setShowCommentBtn(true);
-			// setShowCommentBox(true);
-			// You can use this information to identify and handle the selected text
-			
+			setShowCommentBtn(true);			
 		} else {
 			setShowCommentBtn(false);
 		}
@@ -225,19 +206,6 @@ const TextBox: React.FC<TextBoxProps> = ({
 	
 
 	return (
-
-		// <div id="page-body">
-		// 	<div
-		// 		id="text-box"
-		// 		ref={editableRef}
-		// 		style={{ minHeight: `${PAGE_HEIGHT * totalPages}px` }}
-		// 		contentEditable={editable}
-		// 		onInput={()=>handleInput()}
-		// 		dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-		// 		className={`page ${className}`}
-		// 		onPaste={handlePaste}
-		// 	/>
-		// </div>
 		<div>
 			<div className="editor-container page" onMouseUp={handleMouseUp}>
 				<Toolbar
@@ -254,6 +222,11 @@ const TextBox: React.FC<TextBoxProps> = ({
 					// onUpArrow={() => getCurrentBlock(editorState)}
 				/>
 			</div>
+			{comments.map((comment, index) => (
+				<div className="comment-indicator" key={index} style={{margin: `${comment.position}px 50px 0`}}>
+					{comment.commentContent}
+				</div>
+			))}
 			{showCommentBtn && (
 				<div className="comment-button"
 					onClick={toggleCommentBox}
@@ -268,6 +241,9 @@ const TextBox: React.FC<TextBoxProps> = ({
 					selection={selectedText}
 					onClick={hideCommentBox}
 					onComment={onComment}
+					comments={comments}
+					setComments={setComments}
+					setShowCommentBox={setShowCommentBox}
 				/>
 			)}
 		</div>
