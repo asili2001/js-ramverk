@@ -44,6 +44,7 @@ jobs:
           echo "MAIL_USER=${{secrets.MAIL_USER}}" >> .env.dev
           echo "CRYPTO_SECRET=${{secrets.CRYPTO_SECRET}}" >> .env.dev
           echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> .env.dev
+          echo "ALLOWED_ORIGINS=${{secrets.ALLOWED_ORIGINS}}" >> .env.dev
 
 
       - name: Start backend server
