@@ -49,10 +49,7 @@ describe('DocumentController create tests', () => {
             assert.equal(res.status.calledOnceWith(201), true);
 
             // Access the response body from res.json
-            const responseBody = res.json.getCall(0).args[0];
-
-            //console.log("BODY: ", responseBody);
-            //console.log("BODY, users: ", responseBody.data.usersWithAccess[0]);
+            const responseBody = res.json.getCall(0).args[0];                                                                    
 
             assert.strictEqual(res.status.getCall(0).args[0], 201, 'Assert#1: Status code should be CREATED');
             assert.strictEqual(responseBody.type, 'success', `Assert#2: Expected response type to be "success", but got ${responseBody.type}`);

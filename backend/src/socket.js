@@ -5,13 +5,15 @@ const connectDB = require('./config/db.js');
 var fs = require('fs');
 const LZString = require('lz-string');
 const appRoot = require('app-root-path');
+const mongoose = require('mongoose');
+
+const { ObjectId } = mongoose.Types;
 
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev';
 require('dotenv').config({ path: `${__dirname}/../${envFile}` });
 
 const Document = require('./models/document.model.js');
-const { createFileIfNotExists } = require('./utils/createFileIfNotExists.js');
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 const socketServer = http.createServer();
@@ -58,25 +60,30 @@ const saveToFile = (documentId, userId, updates) => {
         entityMap: {}
     };
     if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, LZString.compress(JSON.stringify(emptyRawDraftContentState)));
+        fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
     }
 
     let fileContent = fs.readFileSync(filePath, 'utf8');
-
-    let fileContentObj = fileContent.length > 0 ? JSON.parse(fileContent) : emptyRawDraftContentState;
+    let fileContentObj = null;
+    try {
+        fileContentObj = fileContent.length > 0 ? JSON.parse(fileContent) : null;
+    } catch (error) {
+        console.error(error);
+        fileContentObj = null;
+    }
     if (!fileContentObj) {
         fileContentObj = emptyRawDraftContentState;
     }
-    
+
 
     const newFileBlocks = [];
 
     currentBlockKeys.forEach(blockKey => {
         const foundFileBlock = fileContentObj.blocks.find(fblock => fblock.key === blockKey);
         const foundNewBlock = newBlocks.find(fblock => fblock.key === blockKey);
-        
-    
-        if (foundNewBlock) {            
+
+
+        if (foundNewBlock) {
             newFileBlocks.push(foundNewBlock);
         } else if (foundFileBlock) {
             newFileBlocks.push(foundFileBlock);
@@ -88,6 +95,7 @@ const saveToFile = (documentId, userId, updates) => {
 
     fileContentObj.entityMap = JSON.stringify(fileContentObj.entityMap) !== JSON.stringify(newEntityMap) ? newEntityMap : fileContentObj.entityMap;
     fileContentObj.blocks = newFileBlocks;
+
 
     fs.writeFile(filePath, JSON.stringify(fileContentObj), err => {
         if (err) {
@@ -117,7 +125,7 @@ const processQueue = async (documentId, userId) => {
             const clients = await io.in(documentId).fetchSockets();
             if (clients.length > 0) {
                 saveToFile(documentId, userId, updates);
-                
+
                 io.to(documentId).emit('updateDocument', updates);
             } else {
                 console.warn(`No clients connected for document: ${documentId}`);
@@ -135,7 +143,17 @@ const processQueue = async (documentId, userId) => {
 };
 
 // Function to add updates to the queue
-const addToQueue = (documentId, userId, update) => {
+const addToQueue = async (documentId, userId, update) => {
+    const dbDocument = await Document.findById(documentId);
+    if (!dbDocument) {
+        io.to(documentId).emit('documentNotFound');
+        return io.in(documentId).disconnectSockets(true);
+    };
+    const documentOwner = dbDocument.usersWithAccess.find(access => access.accessLevel === "owner");
+    if (!documentOwner) return;
+    const hasAccess = dbDocument.usersWithAccess.find(access => access.user._id.equals(userId) && ["owner", "editor"].includes(access.accessLevel));
+
+    if (!hasAccess) return;
     if (!documentQueues[documentId]) {
         documentQueues[documentId] = [];
     }
@@ -143,7 +161,7 @@ const addToQueue = (documentId, userId, update) => {
 
     // Start processing if not already processing
     if (!processingFlags[documentId]) {
-        processQueue(documentId, userId);
+        processQueue(documentId, documentOwner.user._id);
     }
 };
 
@@ -152,6 +170,10 @@ io.on('connection', async (socket) => {
     console.log("New client connected:", socket.id);
 
     const documentId = socket.handshake.query.documentId;
+    if (!ObjectId.isValid(documentId)) {
+        io.to(documentId).emit('documentNotFound');
+        return io.in(documentId).disconnectSockets(true);
+    }
     io.to(documentId).emit('new client', socket.id);
 
     const document = await Document.findById(documentId);
@@ -160,7 +182,7 @@ io.on('connection', async (socket) => {
         return socket.disconnect();
     }
 
-    const hasAccess = document.usersWithAccess.find(access => access._id.equals(socket.user.id));
+    const hasAccess = document.usersWithAccess.find(access => access.user._id.equals(socket.user.id));
     if (!hasAccess) {
         console.log(`Access denied for user ${socket.user.id}. Disconnecting client ${socket.id}.`);
         return socket.disconnect();

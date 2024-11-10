@@ -13,9 +13,10 @@ const documentSchema = new mongoose.Schema(
     },
     usersWithAccess: [
       {
-        _id: {
+        user: {
           type: mongoose.Schema.Types.ObjectId,
           required: true,
+          ref: 'User'
         },
         accessLevel: {
           type: String, // Change to String
