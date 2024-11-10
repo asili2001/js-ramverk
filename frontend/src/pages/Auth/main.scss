@@ -51,7 +51,9 @@
         gap: .3rem;
     }
 
-    @include color-scheme(dark) {
+}
+body[data-theme='dark'] {
+    .auth-page {
         .auth-box {
             background-color: $dark-background-color;
         }

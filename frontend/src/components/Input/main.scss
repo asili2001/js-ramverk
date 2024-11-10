@@ -3,10 +3,12 @@
 .custom-input {
     display: flex;
     flex-direction: column;
+
     .input {
         display: flex;
         align-items: center;
         position: relative;
+
         label {
             background-color: $background-color;
             color: gray;
@@ -17,7 +19,7 @@
             transition: top 0.2s ease, font-size 0.2s ease;
             cursor: text;
         }
-        
+
         input {
             height: 2.7rem;
             width: 100%;
@@ -27,61 +29,105 @@
             border-radius: .3rem;
             background-color: $background-color;
             color: $text-color;
-            
-            &:focus, &:not(:placeholder-shown) {
+
+            &:focus,
+            &:not(:placeholder-shown) {
                 outline: unset;
                 border: 2px solid $color-primary !important;
-                &.error ~ label {
+
+                &.error~label {
                     color: $color-error;
                 }
-                &.success ~ label {
+
+                &.success~label {
                     color: $color-success;
                 }
             }
+
             &.error {
                 outline: unset;
                 border: 2px solid $color-error !important;
-    
-                ~ label {
+
+                ~label {
                     color: $color-error;
                 }
             }
+
             &.success {
                 outline: unset;
                 border: 2px solid $color-success !important;
-    
-                ~ label {
+
+                ~label {
                     color: $color-success;
                 }
             }
         }
-    
+
         /* Move label when input is focused or has text */
-        input:focus ~ label,
-        input:not(:placeholder-shown) ~ label,
-        input:valid ~ label {
+        input:focus~label,
+        input:not(:placeholder-shown)~label,
+        input:valid~label {
             top: -.7rem;
             font-size: 0.8rem;
             color: $color-primary;
-        }
-    
-        @include color-scheme(dark) {
-            label, input {
-                background-color: $dark-background-color;
-                color: $dark-text-color;
-            }
         }
     }
 
     .message {
         font-size: .8em;
+
         .error-message {
             color: $color-error;
             font-size: inherit;
         }
+
         .success-message {
             color: $color-success;
             font-size: inherit;
         }
+    }
+}
+
+body[data-theme='dark'] {
+    .custom-input {
+
+        label,
+        input {
+            background-color: $dark-background-color;
+            color: $dark-text-color;
+        }
+    }
+}
+
+.switch {
+    font-size: 0.8rem;
+    display: flex;
+    background-color: #1818187a;
+    padding: .3rem;
+    border-radius: .3rem;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+    position: relative;
+    overflow: hidden;
+
+    .item {
+        display: flex;
+        padding: .2rem;
+        gap: .5rem;
+        align-items: center;
+        height: 100%;
+        width: 50%;
+        cursor: pointer;
+    }
+
+    .indecator {
+        position: absolute;
+        left: 50%;
+        top: 0;
+        background-color: #6b6b6b5c;
+        width: 50%;
+        height: 100%;
+        transition: 0.5s all ease;
     }
 }

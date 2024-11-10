@@ -6,8 +6,10 @@ type Doc = {
 	content: string;
 };
 
-interface UserWithAccess extends User {
+interface UserWithAccess {
+	isRequester: boolean;
 	accessLevel: 'viewer' | 'editor' | 'owner';
+	user: User;
 }
 
 interface FullDoc extends Doc {

@@ -37,11 +37,20 @@ export const MenuItem: React.FC<{ item: DropDownMenuContent }> = ({ item }) => {
 		});
 	}, [itemRef]);
 
+	const handelItemClick = () => {
+		if (item.disabled) return;
+		if (item.children) {
+			setChildManuActive(true);
+		}
+		item.action();
+	};
+
 	return (
 		<>
 			<li
 				ref={itemRef}
-				onClick={() => (item.children ? setChildManuActive(true) : undefined)}
+				onClick={handelItemClick}
+				className={`${item.disabled ? 'disabled' : ''}`}
 			>
 				<div className="left">
 					<item.icon />

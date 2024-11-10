@@ -9,9 +9,11 @@
         padding: 2rem;
     }
 
-    @include color-scheme(dark) {
-        background-color: $dark-background-color;
-        color: $dark-text-color;
+}
+body[data-theme='dark'] {
+    .document-page {
+    background-color: $dark-background-color;
+    color: $dark-text-color;
     }
 }
 
@@ -71,7 +73,22 @@
         }
     }
 
-    @include color-scheme(dark) {
+    .doc-filter-btns {
+        display: flex;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        justify-content: center;
+
+        button {
+            min-width: 4rem;
+            border: 1px solid $color-primary;
+            border-radius: 2rem;
+        }
+    }
+
+}
+body[data-theme='dark'] {
+    .documents-page {
         .document-card {
             &:hover {
                 box-shadow: $dark-box-shadow !important;
@@ -83,13 +100,87 @@
                 object-fit: cover;
             }
         }
-        
-        .new-document-btn {
+    }
+    
+    .new-document-btn {
+        background-color: darken($dark-background-color, 5%);
+        &:hover {
             background-color: darken($dark-background-color, 5%);
-            &:hover {
-                background-color: darken($dark-background-color, 5%);
-                box-shadow: $dark-box-shadow;
+            box-shadow: $dark-box-shadow;
+        }
+    }
+}
+
+.doc-share {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #ffffff3d;
+    height: 100%;
+    width: 100%;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    .container {
+        height: 30rem;
+        width: 30rem;
+        background-color: $background-color;
+        color: black;
+        padding: 1rem;
+        border-radius: .5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .body {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            .add-new {
+                position: relative;
+
+                .submit {
+                    position: absolute;
+                    top: 0.4rem;
+                    right: 0.5rem;
+                }
             }
+        }
+
+    }
+
+    .share-list {
+        display: flex;
+        flex-direction: column;
+        gap: .5rem;
+        li {
+            height: 3rem;
+            width: 100%;
+            background-color: #292929;
+            border-radius: .3rem;
+            display: flex;
+            justify-content: space-between;
+            padding: .5rem;
+            align-items: center;
+        }
+    }
+    
+}
+body[data-theme='dark'] {
+    .doc-share {
+        background-color: #0000003d;
+        .container {
+            background-color: $dark-background-color;
+            color: $dark-text-color;
         }
     }
 }
