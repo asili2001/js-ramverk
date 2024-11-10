@@ -30,7 +30,7 @@ jobs:
         working-directory: backend
         run: |
           echo "NODE_ENV=development" >> .env.dev
-          echo "PORT=1337" >> .env.dev
+          echo "PORT=3000" >> .env.dev
           echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> .env.dev
           echo "FRONTEND_DOMAIN='http://localhost:5173'" >> .env.dev
           echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env.dev
@@ -59,16 +59,13 @@ jobs:
       - name: Start Vite application
         working-directory: frontend
         run: |
-          echo "VITE_MAIN_API_URL = 'http://localhost:1337/api'" >> .env
+          echo "VITE_MAIN_API_URL = 'http://localhost:3000/api'" >> .env
           npm install
           npm run dev -- --host 0.0.0.0 &
 
       # Step 5: Wait for Vite and API to be ready
       - name: Wait for Vite to be ready
         run: npx wait-on http://localhost:5173/ --timeout 60000
-
-      # - name: Wait for API to be ready
-      #   run: npx wait-on http://localhost:1337/ --timeout 60000
 
       # Step 6: Run Cypress tests
       - name: Run Cypress tests
