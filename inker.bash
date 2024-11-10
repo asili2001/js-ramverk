@@ -88,6 +88,9 @@ deploy() {
     if [ -n "$1" ] && [ "$1" == "deploy" ]; then
         install_sshpass  # Ensure sshpass is installed
 
+        sudo chmod -R 777 backend/drafts
+
+
         # Deploying Frontend
         if [ "$2" == "frontend" ]; then
             echo "Deploying Frontend..."
@@ -103,7 +106,7 @@ deploy() {
         # Deploying Backend
         elif [ "$2" == "backend" ]; then
             echo "Deploying Backend..."
-            sshpass -p "$DEPLOY_SSH_PASSWORD" rsync -av --delete --exclude='node_modules/' -e "ssh -p 2303" backend/. "$DEPLOY_SSH_USERNAME@$DEPLOY_SSH_HOST:inker/api"  || { echo "An error occurred"; error_occurred=true; }
+            sshpass -p "$DEPLOY_SSH_PASSWORD" rsync -av --delete --exclude='drafts/' --exclude='node_modules/' -e "ssh -p 2303" backend/. "$DEPLOY_SSH_USERNAME@$DEPLOY_SSH_HOST:inker/api" || { echo "An error occurred"; error_occurred=true; }
 
             # Use sshpass to run npm install on the server
             sshpass -p "$DEPLOY_SSH_PASSWORD" ssh -p 2303 "$DEPLOY_SSH_USERNAME@$DEPLOY_SSH_HOST" 'cd inker/api && npm install'  || { echo "An error occurred"; error_occurred=true; }
