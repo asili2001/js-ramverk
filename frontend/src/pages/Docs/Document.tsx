@@ -62,7 +62,6 @@ const Document = () => {
 		setTitle(data.title);
 		setUser(data.usersWithAccess);
 		setDocType(data.docType);
-		console.log("DATA USERRS WITH ACCESS NAME: ", user)
 	};
 
 	useEffect(() => {
@@ -85,18 +84,27 @@ const Document = () => {
 	};
 
 	
-	// const handleCommentUpdate = (recived: any) => {
-	// 	// if (recived.owner !== socket.current.id) {
-	// 	// 	setRecivedCommentUpdate(recived);
-	// 	// }
-	// 	console.log("updating comment. Document.tsx");
-	// 	setRecivedCommentUpdate(recived);
-
-	// };
+	const handleSocketComments = (data: any ) => {
+		console.log("Updating Comments in Document.tsx");
+		console.log("data: ", data);
+		console.log("comments: ", comments);
+		setTimeout(() => {
+			setComments((prevComments) => {
+				console.log("previous comments: ", prevComments);
+				const foundComment = prevComments.find(comment => comment.position === data.data.position);
+				if (!foundComment) {
+					console.log("comment not already placed");
+					return [...prevComments, data];
+				} else {
+					return prevComments;
+				}
+			});
+		}, 500)
+	};
 
 	// Use the WebSocket hook for handling document updates
 	if (!documentId) return;
-	const { socket, submitChange, submitComment } = useDocSocket(documentId, handleSocketUpdate);
+	const { socket, submitChange, submitComment } = useDocSocket(documentId, handleSocketUpdate, handleSocketComments);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);

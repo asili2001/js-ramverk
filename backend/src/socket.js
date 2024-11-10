@@ -180,9 +180,18 @@ io.on('connection', async (socket) => {
     socket.on('doc comment', async (data) => {
         console.log("COMMENT CREATE -> backend socket data: ", data);
         console.log("document id: ", documentId);
-        // const update = { owner: socket.id, data };
-        //addToQueue(documentId, socket.user.id, update);
         await DocumentController.updateDocumentComments(data, documentId);
+        const update = { owner: socket.id, data };
+        try {
+            const clients = await io.in(documentId).fetchSockets();
+            if (clients.length > 0) {
+                io.to(documentId).emit('updateComment', update);
+            } else {
+                console.warn(`No clients connected for document: ${documentId}`);
+            }
+        } catch (error) {
+            console.error(`Error sending comment update for document ${documentId}:`, error);
+        }
     });
 
     socket.on('disconnect', () => {
