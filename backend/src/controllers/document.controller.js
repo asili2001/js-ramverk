@@ -51,6 +51,7 @@ class DocumentController {
     try {
       // get document from files
       const document = await Document.findById(req.params.id);
+      console.log("document before .docType: ", document);
       if (!document) {
         return returner(res, "error", statusCodes.NOT_FOUND, null, "Document not found");
       }
@@ -67,13 +68,21 @@ class DocumentController {
         blocks: [],
         entityMap: {}
       };
-      if (!fs.existsSync(filePath)) {
+
+      if (!fs.existsSync(filePath) && document.docType === "text") {
         fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
+
+      } else if (!fs.existsSync(filePath) && document.docType === "code") {
+        const defaultContent = 'console.log("Hello World");' + '\n'.repeat(20);
+
+        fs.writeFileSync(filePath, defaultContent);
       }
 
       let fileContent = fs.readFileSync(filePath, 'utf8');
       const compressedFileContent = LZString.compress(fileContent);
+
       return returner(res, "success", statusCodes.OK, { ...document._doc, content: compressedFileContent }, "");
+
     } catch (error) {
       console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
@@ -99,6 +108,37 @@ class DocumentController {
       if (!document) {
         return returner(res, "error", statusCodes.FORBIDDEN, null, "Document not found");
       }
+
+      // Return the updated document
+      return returner(res, "success", statusCodes.OK, document, "");
+    } catch (error) {
+      console.error(error);
+      return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
+    }
+  }
+
+  // Method for updating a document
+  async updateCodeDocument(req, res) {
+    const userId = res.locals.authenticatedUser._id;
+
+    try {
+      // Find the document and check if the user has 'owner' or 'editor' access
+      const document = await Document.findOneAndUpdate({
+        _id: req.params.id,
+        "usersWithAccess._id": userId,
+        $or: [
+          { "usersWithAccess.accessLevel": "owner" },
+          { "usersWithAccess.accessLevel": "editor" }
+        ]
+      }, req.body, { new: true });
+
+      // If no document is found or the user doesn't have the required access
+      if (!document) {
+        return returner(res, "error", statusCodes.FORBIDDEN, null, "Document not found");
+      }
+
+      const dir = `${appRoot.path}/drafts/${userId}/${req.params.id}/document`;
+      fs.writeFileSync(dir, LZString.compress(req.body.content));
 
       // Return the updated document
       return returner(res, "success", statusCodes.OK, document, "");

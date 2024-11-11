@@ -39,9 +39,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const contentState = convertFromRaw(initialContent);
 	const [editorState, setEditorState] = useState<EditorState>(EditorState.createWithContent(contentState));
 
-	const [previousRecivedChanges, setPreviousRecivedChanges] = useState<RawDraftContentState[]>(
-		[]
-	);
+	const [previousRecivedChanges, setPreviousRecivedChanges] = useState<RawDraftContentState[]>([]);
 	const [prevContent, setPrevContent] = useState<RawDraftContentState | null>(initialContent);
 
 	useEffect(() => {
@@ -186,11 +184,8 @@ const TextBox: React.FC<TextBoxProps> = ({
 	};
 
 	const handleMouseUp = () => {
-		// const contentState = editorState.getCurrentContent();
-		// const selectionState: SelectionState = editorState.getSelection();
 		const selection: Selection | any = window.getSelection();
 
-		// selection == undefined && setSelectedText(selection.anchorNode.data);
 		if (!selection.isCollapsed && showCommentBox == false) {
 			console.log(selection.anchorNode.data);
 			setSelectedText(selection.anchorNode.data);
@@ -219,7 +214,6 @@ const TextBox: React.FC<TextBoxProps> = ({
 					onChange={handleEditorStateChange}
 					placeholder="Start typing here..."
 					readOnly={!editable}
-					// onUpArrow={() => getCurrentBlock(editorState)}
 				/>
 			</div>
 			{comments.map((comment, index) => (

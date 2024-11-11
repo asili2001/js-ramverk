@@ -33,10 +33,6 @@ const CommentBox: React.FC<CommentProps> = ({
         console.log("sending socket comment!");
         console.log("fields: ", commentContent, selection, position);
 
-        // console.log("selection: ", selection);
-        // console.log("position: ", position);
-        // console.log("comment: ", commentContent);
-        //createComment(selection, )
         const data: Comment = {
             commentContent: commentContent,
             selectedText: selection,
@@ -52,8 +48,6 @@ const CommentBox: React.FC<CommentProps> = ({
 	};
 
     useEffect(() => {
-
-        // expand textarea when text overflows
         const textArea: HTMLDivElement | any = document.getElementById("comment-textarea");
         textArea.addEventListener('input', function() {
             textArea.style.height = `${textArea.scrollHeight}px`;
@@ -65,7 +59,7 @@ const CommentBox: React.FC<CommentProps> = ({
 		<div className="comment-container" style={{ margin: `${position}px 50px 0` }}>
 			<div className="user">
                 <h2>User: Axel Jönsson</h2>
-                <h3>Email: 41.52@hotmail.com</h3>
+                <h3>Email: test@hotmail.com</h3>
 			</div>
             <div className="box">
                 <textarea id="comment-textarea" placeholder="Write your comment here...">

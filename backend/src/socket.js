@@ -181,7 +181,7 @@ io.on('connection', async (socket) => {
         console.log("COMMENT CREATE -> backend socket data: ", data);
         console.log("document id: ", documentId);
         await DocumentController.updateDocumentComments(data, documentId);
-        const update = { owner: socket.id, data };
+        const update = data;
         try {
             const clients = await io.in(documentId).fetchSockets();
             if (clients.length > 0) {

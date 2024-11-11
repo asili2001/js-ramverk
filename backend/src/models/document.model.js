@@ -29,7 +29,10 @@ const documentSchema = new mongoose.Schema(
       enum: ["text", "code"],
       default: "text",
       required: true,
-    },      
+    },
+    content: {
+      type: String,
+    },
     comments: [
       {
         commentContent: {

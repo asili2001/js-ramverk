@@ -39,6 +39,7 @@ const Document = () => {
 	const { getDoc, updateDoc, isLoading } = useAPIDocs();
 	const navigate = useNavigate();
 	const [docType, setDocType] = useState('');
+	const [docContent, setDocContent] = useState('');
 	const [comments, setComments] = useState<Comment[]>([]);
 
 	const loadDoc = async () => {
@@ -48,20 +49,27 @@ const Document = () => {
 			navigate('/documents');
 			return;
 		}
-		console.log("comments: ", data.comments);
 		// @ts-ignore
 		setComments(data.comments);
-		// let docContent = emptyRawContentState;
-		const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
-		if (isRawDraftContentState(receivedDoc)) {
-			setContent(receivedDoc);
-		} else {
-			setContent(emptyRawContentState);
-		}
+		if (data.docType === "text") {
+			const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
+			if (isRawDraftContentState(receivedDoc)) {
+				setContent(receivedDoc);
+			} else {
+				setContent(emptyRawContentState);
+			}
+		} else if (data.docType === "code") {
+			const docContent = LZString.decompress(data.content);
+			const docContentDone = LZString.decompress(docContent);
 
+			console.log("data.content decompressed: ", docContent);
+			console.log("docContent decompressed: ", docContentDone);
+
+			setDocContent(docContentDone);
+			setDocType("code");
+		}
 		setTitle(data.title);
 		setUser(data.usersWithAccess);
-		setDocType(data.docType);
 	};
 
 	useEffect(() => {
@@ -85,15 +93,10 @@ const Document = () => {
 
 	
 	const handleSocketComments = (data: any ) => {
-		console.log("Updating Comments in Document.tsx");
-		console.log("data: ", data);
-		console.log("comments: ", comments);
 		setTimeout(() => {
 			setComments((prevComments) => {
-				console.log("previous comments: ", prevComments);
-				const foundComment = prevComments.find(comment => comment.position === data.data.position);
+				const foundComment = prevComments.find(comment => comment.position === data.position);
 				if (!foundComment) {
-					console.log("comment not already placed");
 					return [...prevComments, data];
 				} else {
 					return prevComments;
@@ -119,7 +122,10 @@ const Document = () => {
 			<div className="document-page">
 				<DocumentNavbar documentTitle={title} onTitleChange={handleTitleChange} />
 				{docType === "code" ? (
-					<CodeBox/>
+					<CodeBox
+						documentId={documentId}
+						initialContent={docContent}
+					/>
 				) : (
 				<TextBox
 					initialContent={content}

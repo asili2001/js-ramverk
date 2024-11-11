@@ -5,7 +5,7 @@ type Doc = {
 	usersWithAccess: UserWithAccess[];
 	content: string;
 	docType: string;
-	comments: Comments[];
+	comments: Comment[];
 };
 
 interface UserWithAccess extends User {
