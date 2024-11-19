@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw, SelectionState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Toolbar from './Toolbar';
-import { debounce } from 'arias';
+import { debounce, throttle } from 'arias';
 import CommentBox from '../Comment';
 import CommentIcon from '../../assets/comment.png';
 import { CommentData } from '../../hooks/useDocSocket';
@@ -134,15 +134,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 	};
 
 	// These functions will be used for comment positions
-	const getCurrentBlock = function getCurrentBlock(editorState: EditorState) {
-		// Get the selection state
-		const selectionState = editorState.getSelection();
-		const anchorKey = selectionState.getAnchorKey();
-		const contentState = editorState.getCurrentContent();
-		const currentBlock = contentState.getBlockForKey(anchorKey);
+	// const getCurrentBlock = function getCurrentBlock(editorState: EditorState) {
+	// 	// Get the selection state
+	// 	const selectionState = editorState.getSelection();
+	// 	const anchorKey = selectionState.getAnchorKey();
+	// 	const contentState = editorState.getCurrentContent();
+	// 	const currentBlock = contentState.getBlockForKey(anchorKey);
 
-		getBlockPosition(currentBlock.getKey());
-	}
+	// 	getBlockPosition(currentBlock.getKey());
+	// }
 
 	const getBlockPosition = function getBlockPosition(blockKey: string) {
 		const offsetKey = `${blockKey}-0-0`;
@@ -172,6 +172,8 @@ const TextBox: React.FC<TextBoxProps> = ({
 	const [showCommentBox, setShowCommentBox] = useState(false);
 	const [selectionPosition, setSelectionPosition] = useState(100);
 	const [selectedText, setSelectedText] = useState('');
+	const [clickTimes, setClickTimes] = useState([0]);
+	const [selections, setSelections] = useState(['']);
 
 	const toggleCommentBox = () => {
 		setShowCommentBox(true);
@@ -183,22 +185,63 @@ const TextBox: React.FC<TextBoxProps> = ({
 		setShowCommentBtn(false);
 	};
 
-	const handleMouseUp = () => {
-		const selection: Selection | any = window.getSelection();
+	const handleMouseUp = async()=> {
+		await retrieveSelection();
+	};
 
-		if (!selection.isCollapsed && showCommentBox == false) {
-			console.log(selection.anchorNode.data);
-			setSelectedText(selection.anchorNode.data);
+	/*
+	* Function for retrieving selection.
+	* Keeps track of related clicks;
+	* (clicking 3 times within a short time frame counts as a single selection)
+	* This function might be hard to understand, there is room for improvement.
+	*/
+	const retrieveSelection = throttle( ()=> {
+		// get and add time for click
+		// & get and add content for click
+		const currentTime = Date.now();
+		const newClickTimes = [...clickTimes, currentTime];
+		const winSel: Selection | any = window.getSelection();
+		let newSelections = selections;
+
+		if(winSel.anchorNode.data !== undefined) {
+			newSelections = [...selections, winSel.anchorNode.data];
+		}
+
+		// remove the oldest time and content if more than 3
+		if (newClickTimes.length > 3) {
+			newClickTimes.shift();
+		}
+		if (newSelections.length > 3) {
+			newSelections.shift();
+		}
+	
+		// set new times and contents
+		setClickTimes(newClickTimes);
+		setSelections(newSelections);
+
+		// Logic for retrieving correct content.
+		let selectedText: any = "";
+		const timeDifference = newClickTimes[2] - newClickTimes[0];
+		if (timeDifference < 800)  { // 3 clicks
+			selectedText = selections.at(-1);
+		} else if (!winSel.isCollapsed && showCommentBox == false) { // double click or drag
+			selectedText = winSel.anchorNode.data;
+		}
+		
+		// Selection is retrieved.
+		// Save selection and show comment divs.
+		if (showCommentBox == false && selectedText !== undefined && selectedText.length > 0) {
+			setSelectedText(selectedText);
 			const selectionState: SelectionState = editorState.getSelection();
+			// the position is not working perfectly, due to draft-js editorState, (or how it's updated maybe?)
 			const position = getBlockPosition(selectionState.getStartKey());
-
 			position != null && setSelectionPosition(position.top);
 			setShowCommentBtn(true);			
 		} else {
 			setShowCommentBtn(false);
 		}
-	};
-	
+	}, 500);
+
 
 	return (
 		<div>
