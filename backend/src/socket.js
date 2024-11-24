@@ -171,15 +171,12 @@ io.on('connection', async (socket) => {
 
     // Handle document insert text event
     socket.on('doc change', async (data) => {
-        console.log("backend socket data: ", data);
         const update = { owner: socket.id, data };
         addToQueue(documentId, socket.user.id, update);
     });
 
     // Handle new comments on document
     socket.on('doc comment', async (data) => {
-        console.log("COMMENT CREATE -> backend socket data: ", data);
-        console.log("document id: ", documentId);
         await DocumentController.updateDocumentComments(data, documentId);
         const update = data;
         try {

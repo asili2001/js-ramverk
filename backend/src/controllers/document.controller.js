@@ -51,7 +51,6 @@ class DocumentController {
     try {
       // get document from files
       const document = await Document.findById(req.params.id);
-      console.log("document before .docType: ", document);
       if (!document) {
         return returner(res, "error", statusCodes.NOT_FOUND, null, "Document not found");
       }
@@ -151,7 +150,6 @@ class DocumentController {
   // Method for updating a documents comments
   async updateDocumentComments(data, documentID) {
     // const userId = res.locals.authenticatedUser;
-    console.log("UPDATING COMMENT IN CONTROLLER")
     try {
       const newComment = {
         commentContent: data.commentContent,
@@ -166,15 +164,12 @@ class DocumentController {
 
       // If no document is found or the user doesn't have the required access
       if (!document) {
-        console.log("NO DOCUMENT FOUND!");
         return "doc not found";
       }
-      console.log("SHOULD BE OK!");
 
       // Return the updated document
       return "success";
     } catch (error) {
-      console.log("ERROR OCCURRED!");
       console.error(error);
       return "error";
     }
