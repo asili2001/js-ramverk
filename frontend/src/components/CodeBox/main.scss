@@ -1,0 +1,41 @@
+@import "../../styles/variables.scss";
+
+
+.cm-editor {
+    margin: 1% 0 0 20%;
+    background-color: white;
+    color: black;
+    width: 60%;
+    height: 510px;
+}
+
+
+.execute-code-btn {
+    position: relative;
+    background-color: green;
+    padding: 5px 15px;
+    width: 120px;
+    margin: 1% 0 0 20%;
+}
+
+
+
+.execute-code-btn:hover {
+    background-color: green;
+    padding: 5px 15px;
+    width: 120px;
+}
+
+
+.code-output {
+    position: relative;
+    z-index: 2;
+    width: 60%;
+    margin: 1% 0 0 20%;
+    background-color: rgb(44, 44, 44);
+    border: solid white 2px;
+    color: white;
+    min-height: 200px;
+    padding: 25px;
+}
+

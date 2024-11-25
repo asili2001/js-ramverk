@@ -24,6 +24,31 @@ const documentSchema = new mongoose.Schema(
         },
       },
     ],
+    docType: {
+      type: String,
+      enum: ["text", "code"],
+      default: "text",
+      required: true,
+    },
+    content: {
+      type: String,
+    },
+    comments: [
+      {
+        commentContent: {
+            type: String,
+            required: true,
+        },
+        selectedText: {
+          type: String,
+          required: true,
+        },
+        position: {
+          type: String,
+          required: true,
+        }
+      },
+    ],
   },
   {
     timestamps: true,

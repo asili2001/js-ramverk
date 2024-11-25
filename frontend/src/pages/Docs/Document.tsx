@@ -8,6 +8,8 @@ import useDocSocket, { RChange, RChangeData } from '../../hooks/useDocSocket';
 import TextBox from '../../components/TextBox';
 import { RawDraftContentState } from 'draft-js';
 import LZString from 'lz-string';
+import CodeBox from '../../components/CodeBox';
+import { Comment } from '../../components/TextBox';
 
 function isRawDraftContentState(data: unknown): data is RawDraftContentState {
 	// Check if data is an object and has 'blocks' and 'entityMap' properties
@@ -31,9 +33,14 @@ const Document = () => {
 	};
 	const [content, setContent] = useState<RawDraftContentState>(emptyRawContentState);
 	const [recivedUpdate, setRecivedUpdate] = useState<{changes: RawDraftContentState[], currentBlockKeys: string[]}|null>(null);
+	const [recivedCommentUpdate, setRecivedCommentUpdate] = useState<any>(null);
 	const [loadedDoc, setLoadedDoc] = useState(false);
 	const { getDoc, updateDoc, isLoading } = useAPIDocs();
 	const navigate = useNavigate();
+	const [docType, setDocType] = useState('');
+	const [docContent, setDocContent] = useState('');
+	const [comments, setComments] = useState<Comment[]>([]);
+	const [user, setUser] = useState<any>('');
 
 	const loadDoc = async () => {
 		if (!documentId) return;
@@ -42,15 +49,26 @@ const Document = () => {
 			navigate('/documents');
 			return;
 		}
-		// let docContent = emptyRawContentState;
-		const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
+		// @ts-ignore
+		setComments(data.comments);
+		if (data.docType === "text") {
+			const receivedDoc = JSON.parse(LZString.decompress(data.content)) as RawDraftContentState;
+			if (isRawDraftContentState(receivedDoc)) {
+				setContent(receivedDoc);
+			} else {
+				setContent(emptyRawContentState);
+			}
+		} else if (data.docType === "code") {
+			const docContent = LZString.decompress(data.content);
+			const docContentDone = LZString.decompress(docContent);
 
-		if (isRawDraftContentState(receivedDoc)) {
-			setContent(receivedDoc);
-		} else {
-			setContent(emptyRawContentState);
+			console.log("data.content decompressed: ", docContent);
+			console.log("docContent decompressed: ", docContentDone);
+
+			setDocContent(docContentDone);
+			setDocType("code");
 		}
-
+		setUser(data.usersWithAccess);
 		setTitle(data.title);
 	};
 
@@ -73,9 +91,21 @@ const Document = () => {
 		if (recivedItemsNotOwned.length > 0 && currentBlockKeys) setRecivedUpdate({changes: recivedItemsNotOwned, currentBlockKeys: currentBlockKeys});
 	};
 
+	const handleSocketComments = (data: any ) => {
+		setTimeout(() => {
+			setComments((prevComments) => {
+				const foundComment = prevComments.find(comment => comment.position === data.position);
+				if (!foundComment) {
+					return [...prevComments, data];
+				} else {
+					return prevComments;
+				}
+			});
+		}, 500)
+	};
 	
-	const { socket, submitChange } = useDocSocket(documentId, handleSocketUpdate);
-	
+	const { socket, submitChange, submitComment } = useDocSocket(documentId, handleSocketUpdate, handleSocketComments);
+
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
@@ -89,12 +119,23 @@ const Document = () => {
 		documentId && (
 			<div className="document-page">
 				<DocumentNavbar documentTitle={title} onTitleChange={handleTitleChange} />
-				<TextBox
-					initialContent={content}
-					onChange={submitChange}
-					recivedChanges={recivedUpdate}
-					editable={true}
-				/>
+				{docType === "code" ? (
+					<CodeBox
+						documentId={documentId}
+						initialContent={docContent}
+					/>
+				) : (
+					<TextBox
+						initialContent={content}
+						onChange={submitChange}
+						onComment={submitComment}
+						recivedChanges={recivedUpdate}
+						editable={true}
+						socketCommentUpdate={recivedCommentUpdate}
+						comments={comments}
+						setComments={setComments}
+					/>
+				)}
 				{isLoading && <LoadingSpinner floating />}
 			</div>
 		)

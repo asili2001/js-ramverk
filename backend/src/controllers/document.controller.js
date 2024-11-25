@@ -12,13 +12,14 @@ class DocumentController {
   async createDocument(req, res) {
     const userId = res.locals.authenticatedUser;
     try {
-      const { title } = req.body;
+      const { title, docType } = req.body;
       const docData = {
         title,
         usersWithAccess: [{
           _id: userId,
           accessLevel: "owner"
-        }]
+        }],
+        docType: docType
       }
       const document = new Document(docData);
       await document.save();
@@ -66,8 +67,13 @@ class DocumentController {
         blocks: [],
         entityMap: {}
       };
-      if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, LZString.compress(JSON.stringify(emptyRawDraftContentState)));
+
+      if (!fs.existsSync(filePath) && document.docType === "text") {
+        fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
+      } else if (!fs.existsSync(filePath) && document.docType === "code") {
+        const defaultContent = 'console.log("Hello World");' + '\n'.repeat(20);
+
+        fs.writeFileSync(filePath, defaultContent);
       }
 
       let fileContent = fs.readFileSync(filePath, 'utf8');
@@ -104,6 +110,66 @@ class DocumentController {
     } catch (error) {
       console.error(error);
       return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
+    }
+  }
+
+
+  // Method for updating a document
+  async updateCodeDocument(req, res) {
+    const userId = res.locals.authenticatedUser._id;
+
+    try {
+      // Find the document and check if the user has 'owner' or 'editor' access
+      const document = await Document.findOneAndUpdate({
+        _id: req.params.id,
+        "usersWithAccess._id": userId,
+        $or: [
+          { "usersWithAccess.accessLevel": "owner" },
+          { "usersWithAccess.accessLevel": "editor" }
+        ]
+      }, req.body, { new: true });
+
+      // If no document is found or the user doesn't have the required access
+      if (!document) {
+        return returner(res, "error", statusCodes.FORBIDDEN, null, "Document not found");
+      }
+
+      const dir = `${appRoot.path}/drafts/${userId}/${req.params.id}/document`;
+      fs.writeFileSync(dir, LZString.compress(req.body.content));
+
+      // Return the updated document
+      return returner(res, "success", statusCodes.OK, document, "");
+    } catch (error) {
+      console.error(error);
+      return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
+    }
+  }
+
+  // Method for updating a documents comments
+  async updateDocumentComments(data, documentID) {
+    // const userId = res.locals.authenticatedUser;
+    try {
+      const newComment = {
+        commentContent: data.commentContent,
+        selectedText: data.selectedText,
+        position: data.position
+      };
+      
+      // Find the document and check if the user has 'owner' or 'editor' access
+      const document = await Document.findOneAndUpdate({
+        _id: documentID,
+      }, { $push: { comments: newComment } }, { new: true });
+
+      // If no document is found or the user doesn't have the required access
+      if (!document) {
+        return "doc not found";
+      }
+
+      // Return the updated document
+      return "success";
+    } catch (error) {
+      console.error(error);
+      return "error";
     }
   }
 

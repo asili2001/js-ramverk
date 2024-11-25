@@ -1,0 +1,90 @@
+@import "../../styles/variables.scss";
+
+.comment-container {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 10000;
+    //right: 300px;
+    display: flex;
+    flex-direction: column;
+    width: 400px;
+    background-color:#242424;
+    border: solid #494949 3px;
+    border-radius: 20px;
+    padding: 5px;
+    .user {
+        padding: 10px;
+        margin: 5px;
+        min-height: 40px;
+        color: white;
+        border-radius: 20px;
+
+    }
+
+    .box {
+
+        textarea {
+            width: 96%;
+            height: auto;
+            overflow: hidden;
+            resize: none;
+            min-height: 80px;
+            background-color: #333333;
+            padding: 10px;
+            margin: 5px;
+            color: white;
+            border: solid #494949 1px;
+            border-radius: 10px;
+            outline: none;
+            transition: border-color 0.1s;
+        }
+        textarea:focus {
+            border-color: rgba(239, 239, 239, 0.839);
+            background-color: #454545;
+
+        }
+
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        justify-content: end;
+        .button {
+            margin: 10px 5px 10px 5px;
+            padding: 10px;
+            font-size: 35px;
+            font-weight: bold;
+            border-radius: 25px;
+            position: relative; 
+            float: right;
+            border: solid rgba(255, 255, 255, 0) 1px; 
+
+        }
+
+        .submit {
+            text-align: center;
+            width: 45%;
+            background-color: rgba(47, 47, 47, 0.884);
+            color: white;
+            border: solid rgb(86, 86, 86) 1px; 
+
+        }
+        .submit:hover {
+            background-color: rgba(71, 71, 71, 0.884);
+            border: solid rgb(0, 183, 0) 1px; 
+
+        }
+
+        .cancel {
+            text-align: center;
+            width: 20%;
+        }
+        .cancel:hover {
+            background-color: rgb(58, 58, 58);
+            border: solid rgb(250, 73, 73) 1px; 
+
+        }
+    }
+}
