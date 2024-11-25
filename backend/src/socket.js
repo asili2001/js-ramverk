@@ -5,6 +5,7 @@ const connectDB = require('./config/db.js');
 var fs = require('fs');
 const LZString = require('lz-string');
 const appRoot = require('app-root-path');
+const DocumentController = require('../src/controllers/document.controller.js')
 
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev';
@@ -173,6 +174,22 @@ io.on('connection', async (socket) => {
     socket.on('doc change', async (data) => {
         const update = { owner: socket.id, data };
         addToQueue(documentId, socket.user.id, update);
+    });
+
+    // Handle new comments on document
+    socket.on('doc comment', async (data) => {
+        await DocumentController.updateDocumentComments(data, documentId);
+        const update = data;
+        try {
+            const clients = await io.in(documentId).fetchSockets();
+            if (clients.length > 0) {
+                io.to(documentId).emit('updateComment', update);
+            } else {
+                console.warn(`No clients connected for document: ${documentId}`);
+            }
+        } catch (error) {
+            console.error(`Error sending comment update for document ${documentId}:`, error);
+        }
     });
 
     socket.on('disconnect', () => {

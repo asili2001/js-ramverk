@@ -14,6 +14,7 @@ router.post('/', authMiddleware.checkUser, documentValidator.newDocument, Docume
 router.get('/', authMiddleware.checkUser, DocumentController.getDocuments);
 router.get('/:id', authMiddleware.checkUser, DocumentController.getDocumentById);
 router.put('/:id', authMiddleware.checkUser, documentValidator.updateDocument, DocumentController.updateDocument);
+router.put('/code/:id', authMiddleware.checkUser, documentValidator.updateDocument, DocumentController.updateCodeDocument);
 router.delete('/:id', authMiddleware.checkUser, DocumentController.deleteDocument);
 
 module.exports = router;

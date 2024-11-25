@@ -1,7 +1,7 @@
 import './main.scss';
 import DocumentsNavbar from '../../components/Navbar/DocumentsNavbar';
 import { useNavigate } from 'react-router-dom';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaCode } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import useAPIDocs from '../../hooks/useAPIDocs';
 import LoadingSpinner from '../../components/Loading';
@@ -10,6 +10,7 @@ const Documents = () => {
 	const [docs, setDocs] = useState<Doc[]>([]);
 	const navigate = useNavigate();
 	const { getDocs, newDoc, isLoading } = useAPIDocs();
+    const [chooseDoc, setChooseDoc] = useState(false);
 
 	const loadDocs = async () => {
 		const result = await getDocs();
@@ -17,11 +18,23 @@ const Documents = () => {
 	};
 
 	const handleNewDocCreation = async () => {
-		const newDocument = await newDoc();
+		const newDocument = await newDoc('Untitled', "text");
 		if (newDocument) {
 			navigate(`/documents/${newDocument.id}`);
 		}
 	};
+
+	const handleNewCodeDocCreation = async () => {
+        const newDocument = await newDoc('Untitled', "code");
+
+        if (newDocument) {
+            navigate(`/documents/${newDocument.id}`);
+        }
+    };
+
+	const toggleDocBox = async () => {
+        setChooseDoc(chooseDoc => !chooseDoc);
+    };
 
 	useEffect(() => {
 		loadDocs();
@@ -59,9 +72,21 @@ const Documents = () => {
 				})}
 			</div>
 
-			<div className="new-document-btn" onClick={handleNewDocCreation}>
+			<div className="new-document-btn" onClick={toggleDocBox}>
 				<FaPlus />
 			</div>
+
+			{ chooseDoc &&
+				<div className="new-doc-box">
+					<div className="create-doc-btn" onClick={handleNewDocCreation}>
+						<FaPlus className="new-doc-icon"/><p className="new-doc-text">New Doc</p>
+					</div>
+					<div className="create-doc-btn" onClick={handleNewCodeDocCreation}>
+						<FaCode className="new-doc-icon"/><p className="new-doc-text">New Code</p>
+					</div>
+				</div>
+			}
+			
 		</div>
 	);
 };
