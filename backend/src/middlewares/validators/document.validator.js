@@ -8,6 +8,7 @@ class DocumentValidator {
 
         const schema = Joi.object({
             title: Joi.string().required(),
+            docType: Joi.string().required(),
         });
 
         const { error } = schema.validate(body);

@@ -26,10 +26,17 @@ const GET_DOCUMENT = gql`
                         createdAt
                         title
                         updatedAt
+                        docType
+                        comments {
+                                commentContent
+                                selectedText
+                                position
+                        }
                         usersWithAccess {
                                 user {
                                         id
                                         email
+                                        name
                                 }
                                 accessLevel
                                 isRequester
@@ -52,8 +59,8 @@ const GET_DOCUMENT_USERS = gql`
         }
 `;
 const CREATE_DOCUMENT = gql`
-        mutation createDocument($title: String!) {
-                createDocument(title: $title) {
+        mutation createDocument($title: String!, $docType: String!) {
+                createDocument(title: $title, docType: $docType) {
                         id
                 }
         }

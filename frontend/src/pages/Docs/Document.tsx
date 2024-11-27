@@ -2,7 +2,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import DocumentNavbar from '../../components/Navbar/DocumentNavbar';
 import './main.scss';
 import { useEffect, useState } from 'react';
-import useAPIDocs from '../../hooks/useAPIDocs';
 import LoadingSpinner from '../../components/Loading';
 import useDocSocket, { RChange, RChangeData } from '../../hooks/useDocSocket';
 import TextBox from '../../components/TextBox';
@@ -14,6 +13,8 @@ import { DropDownMenuContent } from '../../components/DropDownMenu/types';
 import { FaShare, FaTrash } from 'react-icons/fa';
 import DocShare from './DocShare';
 import toast from 'react-hot-toast';
+import CodeBox from '../../components/CodeBox';
+import { Comment } from '../../components/TextBox';
 
 function isRawDraftContentState(data: unknown): data is RawDraftContentState {
 	// Check if data is an object and has 'blocks' and 'entityMap' properties
@@ -54,7 +55,10 @@ const Document = () => {
 		changes: RawDraftContentState[];
 		currentBlockKeys: string[];
 	} | null>(null);
-	const { updateDoc } = useAPIDocs();
+	const [comments, setComments] = useState<Comment[]>([]);
+	const [user, setUser] = useState<User|null>(null);
+	const [docType, setDocType] = useState('');
+	const [docContent, setDocContent] = useState<string[]>([]);
 
 	const loadDoc = async () => {
 		if (!documentId || !documentData) return;
@@ -65,14 +69,43 @@ const Document = () => {
 		const receivedDoc = JSON.parse(
 			LZString.decompress(documentData.content)
 		) as RawDraftContentState;
-
-		if (isRawDraftContentState(receivedDoc)) {
-			setContent(receivedDoc);
+		
+		if (data.getDocument.docType === "text") {
+			setDocType("text");
+			if (isRawDraftContentState(receivedDoc)) {
+				setContent(receivedDoc);
+			} else {
+				setContent(emptyRawContentState);
+			}
 		} else {
-			setContent(emptyRawContentState);
+			setDocType("code");
+			const decompressedContent = LZString.decompress(documentData.content);
+			const parsedContent = JSON.parse(decompressedContent);
+
+			setDocContent(parsedContent);
 		}
 
+		const usersWithAccess: UserWithAccess[] = data.getDocument.usersWithAccess;
+		const ownerExists = usersWithAccess.filter(user => user.accessLevel === "owner");
+		if (!ownerExists) return;
+		const owner = ownerExists[0].user;
+
 		setTitle(data.getDocument.title);
+		setUser(owner);
+		setComments(data.getDocument.comments);
+	};
+
+	const handleSocketComments = (data: any ) => {
+		setTimeout(() => {
+			setComments((prevComments) => {
+				const foundComment = prevComments.find(comment => comment.position === data.position);
+				if (!foundComment) {
+					return [...prevComments, data];
+				} else {
+					return prevComments;
+				}
+			});
+		}, 500)
 	};
 
 	useEffect(() => {
@@ -95,7 +128,7 @@ const Document = () => {
 			setRecivedUpdate({ changes: recivedItemsNotOwned, currentBlockKeys: currentBlockKeys });
 	};
 
-	const { socket, submitChange, updateDocument } = useDocSocket(documentId, handleSocketUpdate);
+	const { socket, submitChange, updateDocument, submitComment } = useDocSocket(documentId, handleSocketUpdate, handleSocketComments);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
@@ -141,10 +174,11 @@ const Document = () => {
 	};
 
 	if (loading) return <LoadingSpinner floating />;
+	
 
 	return (
 		!loading &&
-		documentId && (
+		documentId && user && (
 			<>
 				{docShareModal && (
 					<DocShare onClose={() => setDocShareModal(false)} document={documentData} />
@@ -155,8 +189,19 @@ const Document = () => {
 						onTitleChange={handleTitleChange}
 						menuBarItems={menuBarItems}
 					/>
+					{docType === "code" ? (
+					<CodeBox
+						documentId={documentId}
+						initialContent={docContent}
+					/>
+				) : (
 					<TextBox
 						initialContent={content}
+						onComment={submitComment}
+						socketCommentUpdate={null}
+						setComments={setComments}
+						comments={comments}
+						owner={user}
 						onChange={submitChange}
 						recivedChanges={recivedUpdate}
 						editable={
@@ -167,6 +212,7 @@ const Document = () => {
 							) ?? false
 						}
 					/>
+				)}
 				</div>
 			</>
 		)

@@ -100,7 +100,6 @@ class EmailService {
 
         try {
             // Attempt to send the email and log the result
-            console.log("-------------------->", mailOptions);
             await transporter.sendMail(mailOptions);
             
         } catch (error) {

@@ -1,0 +1,9 @@
+# Commit Message Template
+# -----------------------
+# Title: Short description of changes (50 chars max)
+#
+# Body: Detailed description of changes (wrap at 72 chars)
+#
+# Footer: Reference to issue tracker or other notes
+#
+# Lines starting with # will be ignored.

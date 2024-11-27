@@ -21,10 +21,17 @@ export type RChangeData = {
 	currentBlockKeys?: string[];
 };
 
+export type CommentData = {
+    commentContent: string;
+    selectedText: string;
+    position: string;
+};
+
 const useDocSocket = (
-	docId: string | undefined,
-	handleSocketUpdate: (updatedText: RChange[]) => void
-) => {
+		docId: string|undefined,
+		handleSocketUpdate: (updatedText: RChange[]) => void,
+		handleSocketComments: (data: any) => void
+	) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const socket = useRef<null | Socket>(null);
 	const navigate = useNavigate();
@@ -53,7 +60,12 @@ const useDocSocket = (
 			cleanupSocket();
 			return;
 		});
-	};
+		socket.current.on('updateComment', handleSocketComments);
+		// Connection Error
+		socket.current.on("connect_error", (err:any) => {
+			console.error(`connect_error due to ${err.message}`);
+		});
+	}
 
 	// Function to clean up the socket connection
 	const cleanupSocket = () => {
@@ -74,6 +86,11 @@ const useDocSocket = (
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [docId]);
 
+
+	const submitComment = (data: CommentData) => {
+		socket.current?.emit('doc comment', data);
+	};
+
 	const submitChange = (changes: RawDraftContentState, currentBlockKeys: string[]) => {
 		const data = LZString.compress(
 			JSON.stringify({ content: changes, currentBlockKeys, docId })
@@ -86,7 +103,7 @@ const useDocSocket = (
 		socket.current?.emit('doc update', data);
 	};
 
-	return { isConnected, submitChange, updateDocument, socket: socket };
+	return { isConnected, submitChange, updateDocument, socket, submitComment };
 };
 
 export default useDocSocket;

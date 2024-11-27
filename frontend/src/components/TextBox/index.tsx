@@ -1,29 +1,121 @@
 import './main.scss';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw } from 'draft-js';
+import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw, SelectionState } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Toolbar from './Toolbar';
-import { debounce } from 'arias';
+import { debounce, throttle } from 'arias';
+import CommentBox from '../Comment';
+import CommentIcon from '../../assets/comment.png';
+import { CommentData } from '../../hooks/useDocSocket';
 
 export interface TextBoxProps {
 	initialContent: RawDraftContentState;
 	onChange: (changes: RawDraftContentState, currentBlockKeys: string[]) => void;
 	recivedChanges: { changes: RawDraftContentState[]; currentBlockKeys: string[] } | null;
 	editable: boolean;
+	socketCommentUpdate: any;
+	comments: Comment[];
+	onComment: (data: CommentData) => void;
+	setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+	owner: User;
+}
+
+export interface Comment {
+	_id?: string;
+	commentContent: string;
+	selectedText: string;
+	position: string;
 }
 
 const TextBox: React.FC<TextBoxProps> = ({
 	initialContent,
 	onChange,
+	onComment,
 	recivedChanges,
 	editable,
+	comments,
+	setComments,
+	owner
 }) => {
 	const [editorState, setEditorState] = useState<EditorState | null>(null);
-
 	const [previousRecivedChanges, setPreviousRecivedChanges] = useState<RawDraftContentState[]>(
 		[]
 	);
 	const [prevContent, setPrevContent] = useState<RawDraftContentState | null>(initialContent);
+	const [showCommentBtn, setShowCommentBtn] = useState(false);
+	const [showCommentBox, setShowCommentBox] = useState(false);
+	const [selectionPosition, setSelectionPosition] = useState(100);
+	const [selectedText, setSelectedText] = useState('');
+	const [clickTimes, setClickTimes] = useState([0]);
+	const [selections, setSelections] = useState(['']);
+
+	const toggleCommentBox = () => {
+		setShowCommentBox(true);
+		setShowCommentBtn(false);
+	};
+
+	const hideCommentBox = () => {
+		setShowCommentBox(false);
+		setShowCommentBtn(false);
+	};
+
+	const handleMouseUp = async () => {
+		await retrieveSelection();
+	};
+
+	/*
+	* Function for retrieving selection.
+	* Keeps track of related clicks;
+	* (clicking 3 times within a short time frame counts as a single selection)
+	* This function might be hard to understand, there is room for improvement.
+	*/
+	const retrieveSelection = throttle(() => {
+		if (!editorState) return;
+		// get and add time for click
+		// & get and add content for click
+		const currentTime = Date.now();
+		const newClickTimes = [...clickTimes, currentTime];
+		const winSel: Selection | any = window.getSelection();
+		let newSelections = selections;
+
+		if (winSel.anchorNode.data !== undefined) {
+			newSelections = [...selections, winSel.anchorNode.data];
+		}
+
+		// remove the oldest time and content if more than 3
+		if (newClickTimes.length > 3) {
+			newClickTimes.shift();
+		}
+		if (newSelections.length > 3) {
+			newSelections.shift();
+		}
+
+		// set new times and contents
+		setClickTimes(newClickTimes);
+		setSelections(newSelections);
+
+		// Logic for retrieving correct content.
+		let selectedText: any = "";
+		const timeDifference = newClickTimes[2] - newClickTimes[0];
+		if (timeDifference < 800) { // 3 clicks
+			selectedText = selections.length > 0 ? selections[selections.length - 1] : undefined;
+		} else if (!winSel.isCollapsed && showCommentBox == false) { // double click or drag
+			selectedText = winSel.anchorNode.data;
+		}
+
+		// Selection is retrieved.
+		// Save selection and show comment divs.
+		if (showCommentBox == false && selectedText !== undefined && selectedText.length > 0) {
+			setSelectedText(selectedText);
+			const selectionState: SelectionState = editorState.getSelection();
+			// the position is not working perfectly, due to draft-js editorState, (or how it's updated maybe?)
+			const position = getBlockPosition(selectionState.getStartKey());
+			position != null && setSelectionPosition(position.top);
+			setShowCommentBtn(true);
+		} else {
+			setShowCommentBtn(false);
+		}
+	}, 500);
 
 	useEffect(() => {
 		if (!initialContent) return;
@@ -134,21 +226,65 @@ const TextBox: React.FC<TextBoxProps> = ({
 		};
 	};
 
+	const getBlockPosition = function getBlockPosition(blockKey: string) {
+		const offsetKey = `${blockKey}-0-0`;
+		const blockElement = document.querySelector(`[data-offset-key="${offsetKey}"]`);
+
+		if (blockElement) {
+			const rect = blockElement.getBoundingClientRect();
+			return {
+				top: rect.top,
+				left: rect.left,
+				width: rect.width,
+				height: rect.height,
+			};
+		}
+
+		return null;
+	}
+
 	return (
 		editorState && (
-			<div className="editor-container page">
-				<Toolbar
-					editableState={editorState}
-					setEditableState={setEditorState}
-					onEditorStateChange={handleEditorStateChange}
-				/>
+			<div>
+				<div className="editor-container page" onMouseUp={handleMouseUp}>
+					<Toolbar
+						editableState={editorState}
+						setEditableState={setEditorState}
+						onEditorStateChange={handleEditorStateChange}
+					/>
 
-				<Editor
-					editorState={editorState}
-					onChange={handleEditorStateChange}
-					placeholder="Start typing here..."
-					readOnly={!editable}
-				/>
+					<Editor
+						editorState={editorState}
+						onChange={handleEditorStateChange}
+						placeholder="Start typing here..."
+						readOnly={!editable}
+					/>
+				</div>
+				{comments.map((comment, index) => (
+					<div className="comment-indicator" key={index} style={{ margin: `${comment.position}px 50px 0` }}>
+						{comment.commentContent}
+					</div>
+				))}
+				{showCommentBtn && (
+					<div className="comment-button"
+						onClick={toggleCommentBox}
+						style={{ margin: `${selectionPosition}px 50px 0` }}
+					>
+						<img src={CommentIcon} alt="comment logo" />
+					</div>
+				)}
+				{showCommentBox && (
+					<CommentBox
+						position={`${selectionPosition}`}
+						selection={selectedText}
+						onClick={hideCommentBox}
+						onComment={onComment}
+						comments={comments}
+						setComments={setComments}
+						setShowCommentBox={setShowCommentBox}
+						owner={owner}
+					/>
+				)}
 			</div>
 		)
 	);

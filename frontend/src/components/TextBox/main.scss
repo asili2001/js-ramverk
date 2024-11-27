@@ -216,3 +216,39 @@ body[data-theme='dark'] {
     font-size: 1em;
   }
 }
+
+#page-body {
+  display: flex;
+  flex-direction: row;
+  align-items: start;
+  justify-content: center;
+}
+
+.comment-button {
+  position: absolute;
+  align-content: center;
+  margin: 25px;
+  padding: 8px;
+  border-radius: 25%;
+  line-height: 0;
+  color: black;
+  z-index: 10000;
+  top: 0;
+  right: 0;
+}
+
+.comment-button:hover {
+  background-color: rgb(70, 69, 69);
+}
+
+.comment-indicator {
+  position: absolute;
+  z-index: 10000;
+  padding: 8px;
+  background-color: rgb(191, 206, 206);
+  color: rgb(23, 23, 23);
+  top: 0;
+  right: 0;
+  border-radius: 5px;
+  width: 200px;
+}

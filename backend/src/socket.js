@@ -230,6 +230,22 @@ io.on('connection', async (socket) => {
         }
     });
 
+    // Handle new comments on document
+    socket.on('doc comment', async (data) => {
+        await documentController.updateDocumentComments(data, documentId);
+        const update = data;
+        try {
+            const clients = await io.in(documentId).fetchSockets();
+            if (clients.length > 0) {
+                io.to(documentId).emit('updateComment', update);
+            } else {
+                console.warn(`No clients connected for document: ${documentId}`);
+            }
+        } catch (error) {
+            console.error(`Error sending comment update for document ${documentId}:`, error);
+        }
+    });
+
     socket.on('disconnect', () => {
         console.log(`Client disconnected: ${socket.id}`);
     });

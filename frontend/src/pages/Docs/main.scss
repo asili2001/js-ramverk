@@ -88,6 +88,48 @@ body[data-theme='dark'] {
     }
 
 }
+
+.new-doc-box {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+    height: 6rem;
+    width: 14rem;
+    position: fixed;
+    bottom: 3.2rem;
+    right: 1rem;
+    background-color: darken($dark-background-color, 5%);
+    padding: 10px;
+    border-radius: 15px;
+    box-shadow: $dark-box-shadow;
+}
+
+.create-doc-btn {
+    display: flex;
+    flex-direction: row;
+    justify-items: start;
+    align-items: center;
+    margin: 0;
+    padding: 10px;
+    width: 9rem;
+    border-radius: 15px;
+}
+
+.create-doc-btn:hover {
+    background-color: darken($dark-background-color, 7%);
+}
+
+.new-doc-icon {
+    font-size: 20px;
+    margin-right: 20px;
+}
+
+.new-doc-text {
+    font-size: 16px;
+}
+
+
 body[data-theme='dark'] {
     .documents-page {
         .document-card {
@@ -104,9 +146,9 @@ body[data-theme='dark'] {
     }
     
     .new-document-btn {
-        background-color: darken($dark-background-color, 5%);
+        background-color: color.scale($dark-background-color, $lightness: -5%);
         &:hover {
-            background-color: darken($dark-background-color, 5%);
+            background-color: color.scale($dark-background-color, $lightness: -5%);
             box-shadow: $dark-box-shadow;
         }
     }

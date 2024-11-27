@@ -30,7 +30,7 @@ jobs:
         working-directory: backend
         run: |
           echo "NODE_ENV=development" >> .env.dev
-          echo "PORT=3000" >> .env.dev
+          echo "API_PORT=3000" >> .env.dev
           echo "MONGODB_URL=${{secrets.MONGODB_URL}}" >> .env.dev
           echo "FRONTEND_DOMAIN='http://localhost:5173'" >> .env.dev
           echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env.dev
@@ -44,6 +44,7 @@ jobs:
           echo "MAIL_USER=${{secrets.MAIL_USER}}" >> .env.dev
           echo "CRYPTO_SECRET=${{secrets.CRYPTO_SECRET}}" >> .env.dev
           echo "CRYPTO_SECRET_IV=${{secrets.CRYPTO_SECRET_IV}}" >> .env.dev
+          echo "ALLOWED_ORIGINS=${{secrets.ALLOWED_ORIGINS}}" >> .env.dev
 
 
       - name: Start backend server

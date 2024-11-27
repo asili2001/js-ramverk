@@ -11,11 +11,12 @@ const { ObjectId } = mongoose.Types;
 
 class DocumentController {
     // Method for creating a new document
-    async createDocument(userId, title) {
+    async createDocument(userId, title, docType) {
         const getUser = await User.findById(userId);
         try {
             const docData = {
                 title,
+                docType,
                 usersWithAccess: [{
                     user: getUser,
                     accessLevel: "owner"
@@ -89,7 +90,7 @@ class DocumentController {
             }
             // get document from files
             let dbDocument = await Document.findById(docId).populate("usersWithAccess.user");
-
+            
             if (!dbDocument) {
                 throw new Error("Document Not Found");
             }
@@ -133,12 +134,16 @@ class DocumentController {
             };
 
             if (!fs.existsSync(filePath)) {
-                fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
+                let defaultDocVal = [];
+                if (document.docType === "text") {
+                    defaultDocVal = emptyRawDraftContentState;
+                }
+
+                fs.writeFileSync(filePath, JSON.stringify(defaultDocVal));
             }
 
             const fileContent = fs.readFileSync(filePath, 'utf8');
-            const compressedFileContent = LZString.compress(fileContent);
-
+            const compressedFileContent = LZString.compress(fileContent);            
 
             return { ...document, content: compressedFileContent };
 
@@ -292,6 +297,33 @@ class DocumentController {
             });
         }
     }
+
+    async updateDocumentComments(data, documentID) {
+        // const userId = res.locals.authenticatedUser;
+        try {
+          const newComment = {
+            commentContent: data.commentContent,
+            selectedText: data.selectedText,
+            position: data.position
+          };
+          
+          // Find the document and check if the user has 'owner' or 'editor' access
+          const document = await Document.findOneAndUpdate({
+            _id: documentID,
+          }, { $push: { comments: newComment } }, { new: true });
+    
+          // If no document is found or the user doesn't have the required access
+          if (!document) {
+            return "doc not found";
+          }
+    
+          // Return the updated document
+          return "success";
+        } catch (error) {
+          console.error(error);
+          return "error";
+        }
+      }
 }
 
 // Export an instance of the DocumentController class

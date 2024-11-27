@@ -10,6 +10,13 @@ const typeDefs = `#graphql
         createdAt: String!
         updatedAt: String!
         content: String!
+        comments: [Comment]!
+        docType: String!
+    }
+    type Comment {
+        commentContent: String!
+        selectedText: String!
+        position: String!
     }
     type User {
         id: ID!
@@ -46,7 +53,7 @@ const typeDefs = `#graphql
 
 
     type Mutation {
-        createDocument(title: String!): Document
+        createDocument(title: String!, docType: String!): Document
         deleteDocument(docId: ID!): Boolean
         shareDocument(docId:ID!, shareWithEmail: String!, accessLevel: String): Boolean
 
@@ -76,11 +83,11 @@ const resolvers = {
         },
     },
     Mutation: {
-        createDocument: async (_, { title }, { authenticatedUser }) => {            
+        createDocument: async (_, { title, docType }, { authenticatedUser }) => {            
             if (!authenticatedUser) {
                 throw new Error("Unauthorized");
             }
-            return DocumentController.createDocument(authenticatedUser._id, title);
+            return DocumentController.createDocument(authenticatedUser._id, title, docType);
         },
         deleteDocument: async (_, { docId }, { authenticatedUser }) => {            
             if (!authenticatedUser) {

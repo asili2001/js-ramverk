@@ -1,7 +1,7 @@
 import './main.scss';
 import DocumentsNavbar from '../../components/Navbar/DocumentsNavbar';
 import { useNavigate } from 'react-router-dom';
-import { FaPlus } from 'react-icons/fa';
+import { FaPlus, FaCode } from 'react-icons/fa';
 import { useEffect, useState } from 'react';
 import LoadingSpinner from '../../components/Loading';
 import { CREATE_DOCUMENT, GET_DOCUMENTS } from '../../api/queries';
@@ -15,6 +15,7 @@ const Documents = () => {
 	const navigate = useNavigate();
 	const gqlGetDocsRes = useQuery(GET_DOCUMENTS, { variables: { type: documentsType } });
 	const [newDoc] = useMutation(CREATE_DOCUMENT);
+    const [chooseDoc, setChooseDoc] = useState(false);
 
 	useEffect(() => {
 		if (gqlGetDocsRes.error) {
@@ -31,12 +32,24 @@ const Documents = () => {
 	}, [gqlGetDocsRes.data]);
 
 	const handleNewDocCreation = async () => {
-		const gqlNewDocRes = await newDoc({ variables: { title: 'Untitled' } });
+		const gqlNewDocRes = await newDoc({ variables: { title: 'Untitled', docType: "text" } });
 
 		if (gqlNewDocRes.data) {
 			navigate(`/documents/${gqlNewDocRes.data.createDocument.id}`);
 		}
 	};
+
+	const handleNewCodeDocCreation = async () => {
+        const newDocument = await newDoc({ variables: { title: 'Untitled', docType: "code" } });		
+
+        if (newDocument) {
+            navigate(`/documents/${newDocument.data.createDocument.id}`);
+        }
+    };
+
+	const toggleDocBox = async () => {
+        setChooseDoc(chooseDoc => !chooseDoc);
+    };
 
 	if (gqlGetDocsRes.loading) return <LoadingSpinner floating />;
 
@@ -90,9 +103,21 @@ const Documents = () => {
 				})}
 			</div>
 
-			<div className="new-document-btn" onClick={handleNewDocCreation}>
+			<div className="new-document-btn" onClick={toggleDocBox}>
 				<FaPlus />
 			</div>
+
+			{ chooseDoc &&
+				<div className="new-doc-box">
+					<div className="create-doc-btn" onClick={handleNewDocCreation}>
+						<FaPlus className="new-doc-icon"/><p className="new-doc-text">New Doc</p>
+					</div>
+					<div className="create-doc-btn" onClick={handleNewCodeDocCreation}>
+						<FaCode className="new-doc-icon"/><p className="new-doc-text">New Code</p>
+					</div>
+				</div>
+			}
+			
 		</div>
 	);
 };
