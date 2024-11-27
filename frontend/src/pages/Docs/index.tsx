@@ -7,6 +7,7 @@ import LoadingSpinner from '../../components/Loading';
 import { CREATE_DOCUMENT, GET_DOCUMENTS } from '../../api/queries';
 import { useMutation, useQuery } from '@apollo/client';
 import toast from 'react-hot-toast';
+import Logo from '../../assets/logo.svg';
 
 const Documents = () => {
 	const [docs, setDocs] = useState<Doc[]>([]);
@@ -74,7 +75,7 @@ const Documents = () => {
 							className="document-card"
 							onClick={() => navigate(`/documents/${document.id}`)}
 						>
-							<img className="preview" src={document.previewImage} alt="" />
+							<img className="preview" src={`${import.meta.env.VITE_MAIN_API_URL}/previews/${document.id}`} alt="" onError={(e) => e.currentTarget.src=Logo} />
 							<div className="detailes">
 								<h3>{document.title}</h3>
 								<p>

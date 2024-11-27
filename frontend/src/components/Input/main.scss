@@ -102,7 +102,8 @@ body[data-theme='dark'] {
 .switch {
     font-size: 0.8rem;
     display: flex;
-    background-color: #1818187a;
+    background-color: rgb(134 125 253);
+    color: white;
     padding: .3rem;
     border-radius: .3rem;
     align-items: center;
@@ -125,7 +126,7 @@ body[data-theme='dark'] {
         position: absolute;
         left: 50%;
         top: 0;
-        background-color: #6b6b6b5c;
+        background-color: rgb(255 255 255 / 50%);
         width: 50%;
         height: 100%;
         transition: 0.5s all ease;

@@ -95,12 +95,12 @@ const Document = () => {
 			setRecivedUpdate({ changes: recivedItemsNotOwned, currentBlockKeys: currentBlockKeys });
 	};
 
-	const { socket, submitChange } = useDocSocket(documentId, handleSocketUpdate);
+	const { socket, submitChange, updateDocument } = useDocSocket(documentId, handleSocketUpdate);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
 		if (documentId) {
-			await updateDoc(documentId, newTitle);
+			updateDocument({ title: newTitle });
 		}
 	};
 

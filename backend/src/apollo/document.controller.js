@@ -41,24 +41,24 @@ class DocumentController {
             switch (type) {
                 case "own":
                     userDocs = await Document.find({
-                        usersWithAccess: { 
+                        usersWithAccess: {
                             $elemMatch: {
-                                "user": userId, 
-                                accessLevel: "owner" 
-                            } 
+                                "user": userId,
+                                accessLevel: "owner"
+                            }
                         }
                     }).populate("usersWithAccess.user");
                     break;
                 case "shared":
                     userDocs = await Document.find({
-                        usersWithAccess: { 
-                            $elemMatch: { 
+                        usersWithAccess: {
+                            $elemMatch: {
                                 "user": userId,
                                 $or: [
                                     { accessLevel: "reader" },
                                     { accessLevel: "editor" }
                                 ]
-                            } 
+                            }
                         }
                     }).populate("usersWithAccess.user");
                     break;
@@ -67,7 +67,7 @@ class DocumentController {
                         "usersWithAccess.user": userId
                     }).populate("usersWithAccess.user");
                     break;
-            }            
+            }
 
             const jsonDocs = userDocs.map(doc => doc.toJSON());
             return jsonDocs;
@@ -89,7 +89,7 @@ class DocumentController {
             }
             // get document from files
             let dbDocument = await Document.findById(docId).populate("usersWithAccess.user");
-            
+
             if (!dbDocument) {
                 throw new Error("Document Not Found");
             }
@@ -108,11 +108,11 @@ class DocumentController {
                     code: 'FORBIDDEN',
                     statusCode: 403
                 });
-            }            
+            }
 
             const usersWithAccess = dbDocument.usersWithAccess.map(access => {
                 let updatedUser = {
-                    user: {...access.user._doc, id: access.user._id.toString()},
+                    user: { ...access.user._doc, id: access.user._id.toString() },
                     accessLevel: access.accessLevel,
                     isRequester: access.user._id.equals(userId)
                 };
@@ -138,7 +138,7 @@ class DocumentController {
 
             const fileContent = fs.readFileSync(filePath, 'utf8');
             const compressedFileContent = LZString.compress(fileContent);
-            
+
 
             return { ...document, content: compressedFileContent };
 
@@ -211,8 +211,8 @@ class DocumentController {
                 "usersWithAccess.accessLevel": "owner"
             }).populate("usersWithAccess.user");
 
-            
-            
+
+
             // If no document is found or the user doesn't have the required access
             if (!document) {
                 throw new GraphQLError("Document not found", {
@@ -229,23 +229,23 @@ class DocumentController {
             }
 
             const userExist = document.usersWithAccess.find(access => access.user._id.toString() === shareWithUser._id.toString());
-            
-            
+
+
             if (!userExist) {
                 const newAccess = {
-                    user: {...shareWithUser},
+                    user: { ...shareWithUser },
                     accessLevel: accessLevel === "editor" ? "editor" : "reader"
                 };
                 document.usersWithAccess.push(newAccess);
             } else {
                 const updatedAccess = document.usersWithAccess.map(access => {
-                    
+
                     if (access.user._id.equals(shareWithUser._id)) {
                         access.accessLevel = accessLevel;
                     }
                     return access;
                 });
-                
+
                 document.usersWithAccess = [...updatedAccess];
             }
             document.save();
@@ -256,6 +256,37 @@ class DocumentController {
                 throw error;
             }
             throw new GraphQLError("Internal server error occurred while sharing document.", {
+                code: 'INTERNAL_SERVER_ERROR',
+                statusCode: 500,
+            });
+        }
+    }
+
+    // Method for updating a document title
+    async updateDocumentTitle(userId, documentId, documentTitle) {
+        try {
+            // Find the document and check if the user has 'owner' or 'editor' access
+            const document = await Document.findOneAndUpdate({
+                _id: documentId,
+                "usersWithAccess.user": userId,
+                $or: [
+                    { "usersWithAccess.accessLevel": "owner" },
+                    { "usersWithAccess.accessLevel": "editor" }
+                ]
+            }, {title: documentTitle}, { new: true });
+
+            // If no document is found or the user doesn't have the required access
+            if (!document) {
+                throw new GraphQLError("Document not found.", {
+                    code: 'NOT_FOUND',
+                    statusCode: 500,
+                });
+            }
+
+            return document;
+        } catch (error) {
+            console.error(error);
+            throw new GraphQLError("Internal server error occurred while updating document.", {
                 code: 'INTERNAL_SERVER_ERROR',
                 statusCode: 500,
             });

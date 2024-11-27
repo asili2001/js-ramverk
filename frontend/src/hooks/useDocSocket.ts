@@ -82,7 +82,11 @@ const useDocSocket = (
 		socket.current?.emit('doc change', data);
 	};
 
-	return { isConnected, submitChange, socket: socket };
+	const updateDocument = (data: {title?: string, preview?: string}) => {
+		socket.current?.emit('doc update', data);
+	};
+
+	return { isConnected, submitChange, updateDocument, socket: socket };
 };
 
 export default useDocSocket;

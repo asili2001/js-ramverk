@@ -14,6 +14,7 @@ class AuthMiddleware {
     checkUser = async (req, res, next) => {
 
         const jwtSecret = this.JWT_SECRET;
+
         const token = req.cookies.key;
 
         if (!token) return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
@@ -25,6 +26,7 @@ class AuthMiddleware {
 
             if (decoded.exp < currentTime) {
                 res.clearCookie("key");
+                res.clearCookie("role");
                 return returner(res, "error", statusCodes.UNAUTHORIZED, [], "Unauthorized");
             }
 
@@ -32,6 +34,7 @@ class AuthMiddleware {
 
             if (!user) {
                 res.clearCookie("key");
+                res.clearCookie("role");
                 return returner(res, "error", statusCodes.UNAUTHORIZED, [], "Unauthorized");
             }
 
@@ -40,6 +43,7 @@ class AuthMiddleware {
             next();
         } catch (err) {
             res.clearCookie("key");
+            res.clearCookie("role");
             console.error("Error in middlewares/checkAuth/checkUser: ", err);
             return returner(res, "error", statusCodes.UNAUTHORIZED, null, "Unauthorized");
         }

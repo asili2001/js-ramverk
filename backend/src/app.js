@@ -8,8 +8,13 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const { typeDefs, resolvers } = require("./apollo/schema.js");
 const AuthMiddleware = require("./middlewares/checkAuth.js");
+const appRoot = require('app-root-path');
+const returner = require('./utils/returner.js');
+const statusCodes = require("./utils/HttpStatusCodes.js");
+const Document = require('./models/document.model.js');
+var fs = require('fs');
 
-const authMiddleware = new AuthMiddleware();
+
 
 const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev';
 require('dotenv').config({ path: `${__dirname}/../${envFile}` });
@@ -52,6 +57,43 @@ connectDB();
 app.use('/api/users', userRoutes);
 app.use('/api/documents', documentRoutes);
 
+const authMiddleware = new AuthMiddleware();
+app.get('/api/previews/:documentId', authMiddleware.checkUser, async (req, res) => {
+    const user = res.locals.authenticatedUser;
+
+    try {
+        // Find the document and check if the user has 'owner' or 'editor' access
+        const document = await Document.findOne({
+            _id: req.params.documentId,
+            "usersWithAccess.user": user._id
+        });
+
+        // If no document is found or the user doesn't have the required access
+        if (!document) {
+            return returner(res, "error", statusCodes.FORBIDDEN, null, "Document not found");
+        }
+        
+        
+        const dir = `${appRoot.path}/drafts/${user._id}/${document._id}`;
+
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+
+        const imagePath = `${dir}/preview.jpg`;
+        
+
+        // Send the image file
+        res.sendFile(imagePath, (err) => {
+            if (err) {
+                res.status(404).send('Image not found');
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        return returner(res, "error", statusCodes.INTERNAL_SERVER_ERROR, null, "Internal Server Error");
+    }
+});
 
 
 (async () => {
@@ -59,28 +101,26 @@ app.use('/api/documents', documentRoutes);
         await server.start();
 
         app.use(
-            // A named context function is required if you are not
-            // using ApolloServer<BaseContext>
             expressMiddleware(server, {
-              context: async ({ req, res }) => ({
-                req,
-                res,
-                authenticatedUser: await (async () => {
-                    const token = req.cookies.key;
-                    let authenticatedUser = null;
-                    
-                    if (token) {
-                        authenticatedUser = await authMiddleware.graphQLCheckUser(token).catch((err) => {
-                            console.error(err.message);
-                            throw new Error("Authentication failed");
-                        });
-                    }
+                context: async ({ req, res }) => ({
+                    req,
+                    res,
+                    authenticatedUser: await (async () => {
+                        const token = req.cookies.key;
+                        let authenticatedUser = null;
 
-                    return authenticatedUser;
-                })(),
-              }),
+                        if (token) {
+                            authenticatedUser = await authMiddleware.graphQLCheckUser(token).catch((err) => {
+                                console.error(err.message);
+                                throw new Error("Authentication failed");
+                            });
+                        }
+
+                        return authenticatedUser;
+                    })(),
+                }),
             }),
-          );
+        );
 
         app.use(
             '/graphql',
@@ -88,10 +128,10 @@ app.use('/api/documents', documentRoutes);
             express.json(),
             expressMiddleware(server),
         );
-        
+
     } catch (e) {
         console.error(e);
-        
+
     }
 })();
 

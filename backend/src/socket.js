@@ -14,6 +14,7 @@ const envFile = process.env.NODE_ENV === 'production' ? '.env.prod' : '.env.dev'
 require('dotenv').config({ path: `${__dirname}/../${envFile}` });
 
 const Document = require('./models/document.model.js');
+const documentController = require('./apollo/document.controller.js');
 
 const allowedOrigins = process.env.ALLOWED_ORIGINS.split(",");
 const socketServer = http.createServer();
@@ -191,10 +192,42 @@ io.on('connection', async (socket) => {
     socket.join(documentId);
     console.log(`Client ${socket.id} joined document: ${documentId}`);
 
-    // Handle document insert text event
+    // Handle document content change event
     socket.on('doc change', async (data) => {
         const update = { owner: socket.id, data };
         addToQueue(documentId, socket.user.id, update);
+    });
+
+    // Handle document name and preview image update event
+    socket.on('doc update', async (data) => {
+        if (data.preview) {
+            const imageBuffer = Buffer.from(data.preview, 'base64');
+    
+            const dir = `${appRoot.path}/drafts/${socket.user.id}/${documentId}`;
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+    
+            fs.writeFile(`${dir}/preview.jpg`, imageBuffer, (err) => {
+                if (err) {
+                    console.error(`Socket error saving preview image to document ${documentId}`, err);
+                }
+            });
+        }
+
+        if (data.title) {
+            try {
+                await documentController.updateDocumentTitle(socket.user.id, documentId, data.title);
+                io.to(documentId).emit("documentTitleChange", {
+                    id: documentId,
+                    title: data.title,
+                    owner: socket.id
+                })
+            } catch(err) {
+                console.error(`Socket error when updating document title document id: ${documentId}`, err)
+            }
+
+        }
     });
 
     socket.on('disconnect', () => {
