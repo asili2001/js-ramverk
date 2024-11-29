@@ -3,7 +3,7 @@ import DocumentNavbar from '../../components/Navbar/DocumentNavbar';
 import './main.scss';
 import { useEffect, useState } from 'react';
 import LoadingSpinner from '../../components/Loading';
-import useDocSocket, { RChange, RChangeData } from '../../hooks/useDocSocket';
+import useDocSocket, { CommentData, RChange, RChangeData } from '../../hooks/useDocSocket';
 import TextBox from '../../components/TextBox';
 import { RawDraftContentState } from 'draft-js';
 import LZString from 'lz-string';
@@ -14,7 +14,6 @@ import { FaShare, FaTrash } from 'react-icons/fa';
 import DocShare from './DocShare';
 import toast from 'react-hot-toast';
 import CodeBox from '../../components/CodeBox';
-import { Comment } from '../../components/TextBox';
 
 function isRawDraftContentState(data: unknown): data is RawDraftContentState {
 	// Check if data is an object and has 'blocks' and 'entityMap' properties
@@ -55,7 +54,7 @@ const Document = () => {
 		changes: RawDraftContentState[];
 		currentBlockKeys: string[];
 	} | null>(null);
-	const [comments, setComments] = useState<Comment[]>([]);
+	const [comments, setComments] = useState<CommentData[]>([]);
 	const [user, setUser] = useState<User | null>(null);
 	const [docType, setDocType] = useState('');
 	const [docContent, setDocContent] = useState<string>('');
@@ -97,7 +96,7 @@ const Document = () => {
 		setComments(data.getDocument.comments);
 	};
 
-	const handleSocketComments = (data: any) => {
+	const handleSocketComments = (data: CommentData) => {
 		setTimeout(() => {
 			setComments((prevComments) => {
 				const foundComment = prevComments.find(
@@ -203,7 +202,6 @@ const Document = () => {
 						<TextBox
 							initialContent={content}
 							onComment={submitComment}
-							socketCommentUpdate={null}
 							setComments={setComments}
 							comments={comments}
 							owner={user}

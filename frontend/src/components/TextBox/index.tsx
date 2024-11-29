@@ -20,19 +20,18 @@ export interface TextBoxProps {
 	onChange: (changes: RawDraftContentState, currentBlockKeys: string[]) => void;
 	recivedChanges: { changes: RawDraftContentState[]; currentBlockKeys: string[] } | null;
 	editable: boolean;
-	socketCommentUpdate: any;
-	comments: Comment[];
+	comments: CommentData[];
 	onComment: (data: CommentData) => void;
-	setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+	setComments: React.Dispatch<React.SetStateAction<CommentData[]>>;
 	owner: User;
 }
 
-export interface Comment {
-	_id?: string;
-	commentContent: string;
-	selectedText: string;
-	position: string;
-}
+// export interface Comment {
+// 	_id?: string;
+// 	commentContent: string;
+// 	selectedText: string;
+// 	position: string;
+// }
 
 const TextBox: React.FC<TextBoxProps> = ({
 	initialContent,
@@ -82,11 +81,14 @@ const TextBox: React.FC<TextBoxProps> = ({
 		// & get and add content for click
 		const currentTime = Date.now();
 		const newClickTimes = [...clickTimes, currentTime];
-		const winSel: Selection | any = window.getSelection();
+		const winSel: Selection | null = window.getSelection();
 		let newSelections = selections;
 
-		if (winSel.anchorNode.data !== undefined) {
-			newSelections = [...selections, winSel.anchorNode.data];
+		if (winSel && winSel.anchorNode && winSel.anchorNode.nodeType === Node.TEXT_NODE) {
+			const anchorNode = winSel.anchorNode as Text;
+			if (anchorNode.data !== undefined) {
+				newSelections = [...selections, anchorNode.data];
+			}
 		}
 
 		// remove the oldest time and content if more than 3
@@ -102,14 +104,15 @@ const TextBox: React.FC<TextBoxProps> = ({
 		setSelections(newSelections);
 
 		// Logic for retrieving correct content.
-		let selectedText: any = '';
+		let selectedText: string | undefined = '';
 		const timeDifference = newClickTimes[2] - newClickTimes[0];
 		if (timeDifference < 800) {
 			// 3 clicks
 			selectedText = selections.length > 0 ? selections[selections.length - 1] : undefined;
-		} else if (!winSel.isCollapsed && showCommentBox == false) {
+		} else if (winSel && winSel.anchorNode && !winSel.isCollapsed && showCommentBox == false) {
+			const anchorNode = winSel.anchorNode as Text;
 			// double click or drag
-			selectedText = winSel.anchorNode.data;
+			selectedText = anchorNode.data;
 		}
 
 		// Selection is retrieved.
@@ -119,7 +122,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 			const selectionState: SelectionState = editorState.getSelection();
 			// the position is not working perfectly, due to draft-js editorState, (or how it's updated maybe?)
 			const position = getBlockPosition(selectionState.getStartKey());
-			position != null && setSelectionPosition(position.top);
+			if (position != null) setSelectionPosition(position.top);
 			setShowCommentBtn(true);
 		} else {
 			setShowCommentBtn(false);

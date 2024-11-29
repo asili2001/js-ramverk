@@ -30,7 +30,7 @@ export type CommentData = {
 const useDocSocket = (
 	docId: string | undefined,
 	handleSocketUpdate: (updatedText: RChange[]) => void,
-	handleSocketComments: (data: any) => void
+	handleSocketComments: (data: CommentData) => void
 ) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const socket = useRef<null | Socket>(null);
@@ -62,7 +62,7 @@ const useDocSocket = (
 		});
 		socket.current.on('updateComment', handleSocketComments);
 		// Connection Error
-		socket.current.on('connect_error', (err: any) => {
+		socket.current.on('connect_error', (err) => {
 			console.error(`connect_error due to ${err.message}`);
 		});
 	};

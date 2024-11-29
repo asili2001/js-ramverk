@@ -16,12 +16,12 @@ export interface TextBoxProps {
 }
 
 const CodeBox: React.FC<TextBoxProps> = ({ editable, documentId, initialContent }) => {
-	const codeEditorRef = useRef(null);
+	const codeEditorRef = useRef<null | EditorView>(null);
 	const { updateCodeDoc } = useAPIDocs();
     
 	// config codeMirror
 	useEffect(() => {
-		let startState = EditorState.create({
+		const startState = EditorState.create({
 			doc: initialContent,
 			extensions: [
 				basicSetup,
@@ -35,7 +35,7 @@ const CodeBox: React.FC<TextBoxProps> = ({ editable, documentId, initialContent 
 		const codeMirrorDiv: HTMLElement | null = document.getElementById('code-mirror');
 
 		if (codeMirrorDiv && codeEditorRef.current !== null) {
-			let view = new EditorView({
+			const view = new EditorView({
 				state: startState,
 				parent: codeMirrorDiv,
 			});
@@ -46,14 +46,14 @@ const CodeBox: React.FC<TextBoxProps> = ({ editable, documentId, initialContent 
 		} else {
 			console.error('code-setup-fail');
 		}
-	}, []);
+	}, [initialContent]);
 
 	// Send code to execJS API
 	const sendCode = async () => {
 		if (codeEditorRef.current) {
 			const code = codeEditorRef.current.state.doc.toString();
 
-			var data = {
+			const data = {
 				code: btoa(code),
 			};
 
@@ -68,7 +68,7 @@ const CodeBox: React.FC<TextBoxProps> = ({ editable, documentId, initialContent 
 					return response.json();
 				})
 				.then(function (result) {
-					let decodedOutput = atob(result.data);
+					const decodedOutput = atob(result.data);
 
 					const outputDiv = document.getElementsByClassName('code-output')[0];
 
@@ -84,7 +84,7 @@ const CodeBox: React.FC<TextBoxProps> = ({ editable, documentId, initialContent 
 				Run
 			</div>
 
-			<div ref={codeEditorRef} contentEditable={editable} id={`code-mirror`} />
+			<div ref={codeEditorRef as unknown as LegacyRef<HTMLDivElement>} contentEditable={editable} id={`code-mirror`} />
 
 			<div className="code-output"></div>
 		</div>
