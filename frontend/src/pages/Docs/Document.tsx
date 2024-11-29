@@ -56,9 +56,9 @@ const Document = () => {
 		currentBlockKeys: string[];
 	} | null>(null);
 	const [comments, setComments] = useState<Comment[]>([]);
-	const [user, setUser] = useState<User|null>(null);
+	const [user, setUser] = useState<User | null>(null);
 	const [docType, setDocType] = useState('');
-	const [docContent, setDocContent] = useState<string[]>([]);
+	const [docContent, setDocContent] = useState<string>('');
 
 	const loadDoc = async () => {
 		if (!documentId || !documentData) return;
@@ -66,27 +66,29 @@ const Document = () => {
 			navigate('/documents');
 			return;
 		}
-		const receivedDoc = JSON.parse(
-			LZString.decompress(documentData.content)
-		) as RawDraftContentState;
-		
-		if (data.getDocument.docType === "text") {
-			setDocType("text");
+		console.log(LZString.decompress(documentData.content));
+
+		if (data.getDocument.docType === 'text') {
+			const receivedDoc = JSON.parse(
+				LZString.decompress(documentData.content)
+			) as RawDraftContentState;
+
+			setDocType('text');
 			if (isRawDraftContentState(receivedDoc)) {
 				setContent(receivedDoc);
 			} else {
 				setContent(emptyRawContentState);
 			}
 		} else {
-			setDocType("code");
+			setDocType('code');
 			const decompressedContent = LZString.decompress(documentData.content);
-			const parsedContent = JSON.parse(decompressedContent);
+			// const parsedContent = JSON.parse(decompressedContent);
 
-			setDocContent(parsedContent);
+			setDocContent(decompressedContent);
 		}
 
 		const usersWithAccess: UserWithAccess[] = data.getDocument.usersWithAccess;
-		const ownerExists = usersWithAccess.filter(user => user.accessLevel === "owner");
+		const ownerExists = usersWithAccess.filter((user) => user.accessLevel === 'owner');
 		if (!ownerExists) return;
 		const owner = ownerExists[0].user;
 
@@ -95,17 +97,19 @@ const Document = () => {
 		setComments(data.getDocument.comments);
 	};
 
-	const handleSocketComments = (data: any ) => {
+	const handleSocketComments = (data: any) => {
 		setTimeout(() => {
 			setComments((prevComments) => {
-				const foundComment = prevComments.find(comment => comment.position === data.position);
+				const foundComment = prevComments.find(
+					(comment) => comment.position === data.position
+				);
 				if (!foundComment) {
 					return [...prevComments, data];
 				} else {
 					return prevComments;
 				}
 			});
-		}, 500)
+		}, 500);
 	};
 
 	useEffect(() => {
@@ -128,7 +132,11 @@ const Document = () => {
 			setRecivedUpdate({ changes: recivedItemsNotOwned, currentBlockKeys: currentBlockKeys });
 	};
 
-	const { socket, submitChange, updateDocument, submitComment } = useDocSocket(documentId, handleSocketUpdate, handleSocketComments);
+	const { socket, submitChange, updateDocument, submitComment } = useDocSocket(
+		documentId,
+		handleSocketUpdate,
+		handleSocketComments
+	);
 
 	const handleTitleChange = async (newTitle: string) => {
 		setTitle(newTitle);
@@ -174,11 +182,11 @@ const Document = () => {
 	};
 
 	if (loading) return <LoadingSpinner floating />;
-	
 
 	return (
 		!loading &&
-		documentId && user && (
+		documentId &&
+		user && (
 			<>
 				{docShareModal && (
 					<DocShare onClose={() => setDocShareModal(false)} document={documentData} />
@@ -189,30 +197,27 @@ const Document = () => {
 						onTitleChange={handleTitleChange}
 						menuBarItems={menuBarItems}
 					/>
-					{docType === "code" ? (
-					<CodeBox
-						documentId={documentId}
-						initialContent={docContent}
-					/>
-				) : (
-					<TextBox
-						initialContent={content}
-						onComment={submitComment}
-						socketCommentUpdate={null}
-						setComments={setComments}
-						comments={comments}
-						owner={user}
-						onChange={submitChange}
-						recivedChanges={recivedUpdate}
-						editable={
-							documentData?.usersWithAccess.some(
-								(item) =>
-									item.isRequester &&
-									['owner', 'editor'].includes(item.accessLevel)
-							) ?? false
-						}
-					/>
-				)}
+					{docType === 'code' ? (
+						<CodeBox documentId={documentId} initialContent={docContent} />
+					) : (
+						<TextBox
+							initialContent={content}
+							onComment={submitComment}
+							socketCommentUpdate={null}
+							setComments={setComments}
+							comments={comments}
+							owner={user}
+							onChange={submitChange}
+							recivedChanges={recivedUpdate}
+							editable={
+								documentData?.usersWithAccess.some(
+									(item) =>
+										item.isRequester &&
+										['owner', 'editor'].includes(item.accessLevel)
+								) ?? false
+							}
+						/>
+					)}
 				</div>
 			</>
 		)

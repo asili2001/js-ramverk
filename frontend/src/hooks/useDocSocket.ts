@@ -22,16 +22,16 @@ export type RChangeData = {
 };
 
 export type CommentData = {
-    commentContent: string;
-    selectedText: string;
-    position: string;
+	commentContent: string;
+	selectedText: string;
+	position: string;
 };
 
 const useDocSocket = (
-		docId: string|undefined,
-		handleSocketUpdate: (updatedText: RChange[]) => void,
-		handleSocketComments: (data: any) => void
-	) => {
+	docId: string | undefined,
+	handleSocketUpdate: (updatedText: RChange[]) => void,
+	handleSocketComments: (data: any) => void
+) => {
 	const [isConnected, setIsConnected] = useState(false);
 	const socket = useRef<null | Socket>(null);
 	const navigate = useNavigate();
@@ -62,10 +62,10 @@ const useDocSocket = (
 		});
 		socket.current.on('updateComment', handleSocketComments);
 		// Connection Error
-		socket.current.on("connect_error", (err:any) => {
+		socket.current.on('connect_error', (err: any) => {
 			console.error(`connect_error due to ${err.message}`);
 		});
-	}
+	};
 
 	// Function to clean up the socket connection
 	const cleanupSocket = () => {
@@ -86,7 +86,6 @@ const useDocSocket = (
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [docId]);
 
-
 	const submitComment = (data: CommentData) => {
 		socket.current?.emit('doc comment', data);
 	};
@@ -99,7 +98,7 @@ const useDocSocket = (
 		socket.current?.emit('doc change', data);
 	};
 
-	const updateDocument = (data: {title?: string, preview?: string}) => {
+	const updateDocument = (data: { title?: string; preview?: string }) => {
 		socket.current?.emit('doc update', data);
 	};
 

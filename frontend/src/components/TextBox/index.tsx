@@ -1,6 +1,13 @@
 import './main.scss';
 import React, { useState, useEffect, useCallback } from 'react';
-import { Editor, EditorState, convertFromRaw, RawDraftContentState, convertToRaw, SelectionState } from 'draft-js';
+import {
+	Editor,
+	EditorState,
+	convertFromRaw,
+	RawDraftContentState,
+	convertToRaw,
+	SelectionState,
+} from 'draft-js';
 import 'draft-js/dist/Draft.css';
 import Toolbar from './Toolbar';
 import { debounce, throttle } from 'arias';
@@ -35,7 +42,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 	editable,
 	comments,
 	setComments,
-	owner
+	owner,
 }) => {
 	const [editorState, setEditorState] = useState<EditorState | null>(null);
 	const [previousRecivedChanges, setPreviousRecivedChanges] = useState<RawDraftContentState[]>(
@@ -64,11 +71,11 @@ const TextBox: React.FC<TextBoxProps> = ({
 	};
 
 	/*
-	* Function for retrieving selection.
-	* Keeps track of related clicks;
-	* (clicking 3 times within a short time frame counts as a single selection)
-	* This function might be hard to understand, there is room for improvement.
-	*/
+	 * Function for retrieving selection.
+	 * Keeps track of related clicks;
+	 * (clicking 3 times within a short time frame counts as a single selection)
+	 * This function might be hard to understand, there is room for improvement.
+	 */
 	const retrieveSelection = throttle(() => {
 		if (!editorState) return;
 		// get and add time for click
@@ -95,11 +102,13 @@ const TextBox: React.FC<TextBoxProps> = ({
 		setSelections(newSelections);
 
 		// Logic for retrieving correct content.
-		let selectedText: any = "";
+		let selectedText: any = '';
 		const timeDifference = newClickTimes[2] - newClickTimes[0];
-		if (timeDifference < 800) { // 3 clicks
+		if (timeDifference < 800) {
+			// 3 clicks
 			selectedText = selections.length > 0 ? selections[selections.length - 1] : undefined;
-		} else if (!winSel.isCollapsed && showCommentBox == false) { // double click or drag
+		} else if (!winSel.isCollapsed && showCommentBox == false) {
+			// double click or drag
 			selectedText = winSel.anchorNode.data;
 		}
 
@@ -173,7 +182,10 @@ const TextBox: React.FC<TextBoxProps> = ({
 		(
 			currentRawContent: RawDraftContentState,
 			prevContent: RawDraftContentState,
-			onChange: (changedContentState: RawDraftContentState, currentBlockKeys: string[]) => void
+			onChange: (
+				changedContentState: RawDraftContentState,
+				currentBlockKeys: string[]
+			) => void
 		) => {
 			if (prevContent) {
 				const changedContentState = getChangedContentState(currentRawContent, prevContent);
@@ -241,7 +253,7 @@ const TextBox: React.FC<TextBoxProps> = ({
 		}
 
 		return null;
-	}
+	};
 
 	return (
 		editorState && (
@@ -261,12 +273,17 @@ const TextBox: React.FC<TextBoxProps> = ({
 					/>
 				</div>
 				{comments.map((comment, index) => (
-					<div className="comment-indicator" key={index} style={{ margin: `${comment.position}px 50px 0` }}>
+					<div
+						className="comment-indicator"
+						key={index}
+						style={{ margin: `${comment.position}px 50px 0` }}
+					>
 						{comment.commentContent}
 					</div>
 				))}
 				{showCommentBtn && (
-					<div className="comment-button"
+					<div
+						className="comment-button"
 						onClick={toggleCommentBox}
 						style={{ margin: `${selectionPosition}px 50px 0` }}
 					>

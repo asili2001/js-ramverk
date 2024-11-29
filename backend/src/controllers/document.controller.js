@@ -117,13 +117,16 @@ class DocumentController {
 
   // Method for updating a document
   async updateCodeDocument(req, res) {
+    console.log("BACKEND: ",res.locals.authenticatedUser );
+
     const userId = res.locals.authenticatedUser._id;
+
 
     try {
       // Find the document and check if the user has 'owner' or 'editor' access
       const document = await Document.findOneAndUpdate({
         _id: req.params.id,
-        "usersWithAccess._id": userId,
+        "usersWithAccess.user": res.locals.authenticatedUser,
         $or: [
           { "usersWithAccess.accessLevel": "owner" },
           { "usersWithAccess.accessLevel": "editor" }
@@ -136,7 +139,7 @@ class DocumentController {
       }
 
       const dir = `${appRoot.path}/drafts/${userId}/${req.params.id}/document`;
-      fs.writeFileSync(dir, LZString.compress(req.body.content));
+      fs.writeFileSync(dir, req.body.content);
 
       // Return the updated document
       return returner(res, "success", statusCodes.OK, document, "");

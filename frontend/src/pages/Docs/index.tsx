@@ -15,7 +15,7 @@ const Documents = () => {
 	const navigate = useNavigate();
 	const gqlGetDocsRes = useQuery(GET_DOCUMENTS, { variables: { type: documentsType } });
 	const [newDoc] = useMutation(CREATE_DOCUMENT);
-    const [chooseDoc, setChooseDoc] = useState(false);
+	const [chooseDoc, setChooseDoc] = useState(false);
 
 	useEffect(() => {
 		if (gqlGetDocsRes.error) {
@@ -32,7 +32,7 @@ const Documents = () => {
 	}, [gqlGetDocsRes.data]);
 
 	const handleNewDocCreation = async () => {
-		const gqlNewDocRes = await newDoc({ variables: { title: 'Untitled', docType: "text" } });
+		const gqlNewDocRes = await newDoc({ variables: { title: 'Untitled', docType: 'text' } });
 
 		if (gqlNewDocRes.data) {
 			navigate(`/documents/${gqlNewDocRes.data.createDocument.id}`);
@@ -40,16 +40,16 @@ const Documents = () => {
 	};
 
 	const handleNewCodeDocCreation = async () => {
-        const newDocument = await newDoc({ variables: { title: 'Untitled', docType: "code" } });		
+		const newDocument = await newDoc({ variables: { title: 'Untitled', docType: 'code' } });
 
-        if (newDocument) {
-            navigate(`/documents/${newDocument.data.createDocument.id}`);
-        }
-    };
+		if (newDocument) {
+			navigate(`/documents/${newDocument.data.createDocument.id}`);
+		}
+	};
 
 	const toggleDocBox = async () => {
-        setChooseDoc(chooseDoc => !chooseDoc);
-    };
+		setChooseDoc((chooseDoc) => !chooseDoc);
+	};
 
 	if (gqlGetDocsRes.loading) return <LoadingSpinner floating />;
 
@@ -88,7 +88,12 @@ const Documents = () => {
 							className="document-card"
 							onClick={() => navigate(`/documents/${document.id}`)}
 						>
-							<img className="preview" src={`${import.meta.env.VITE_MAIN_API_URL}/previews/${document.id}`} alt="" onError={(e) => e.currentTarget.src=Logo} />
+							<img
+								className="preview"
+								src={`${import.meta.env.VITE_MAIN_API_URL}/previews/${document.id}`}
+								alt=""
+								onError={(e) => (e.currentTarget.src = Logo)}
+							/>
 							<div className="detailes">
 								<h3>{document.title}</h3>
 								<p>
@@ -107,17 +112,18 @@ const Documents = () => {
 				<FaPlus />
 			</div>
 
-			{ chooseDoc &&
+			{chooseDoc && (
 				<div className="new-doc-box">
 					<div className="create-doc-btn" onClick={handleNewDocCreation}>
-						<FaPlus className="new-doc-icon"/><p className="new-doc-text">New Doc</p>
+						<FaPlus className="new-doc-icon" />
+						<p className="new-doc-text">New Doc</p>
 					</div>
 					<div className="create-doc-btn" onClick={handleNewCodeDocCreation}>
-						<FaCode className="new-doc-icon"/><p className="new-doc-text">New Code</p>
+						<FaCode className="new-doc-icon" />
+						<p className="new-doc-text">New Code</p>
 					</div>
 				</div>
-			}
-			
+			)}
 		</div>
 	);
 };

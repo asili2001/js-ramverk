@@ -146,9 +146,9 @@ body[data-theme='dark'] {
     }
     
     .new-document-btn {
-        background-color: color.scale($dark-background-color, $lightness: -5%);
+        background-color: darken($dark-background-color, 5%);
         &:hover {
-            background-color: color.scale($dark-background-color, $lightness: -5%);
+            background-color: darken($dark-background-color, 5%);
             box-shadow: $dark-box-shadow;
         }
     }
