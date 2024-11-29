@@ -1,0 +1,36 @@
+.theme-toggle {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 1rem;
+  }
+  
+  .theme-toggle-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: none;
+    cursor: pointer;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border-radius: 20px;
+    transition: background-color 0.3s, color 0.3s;
+  
+    .icon {
+      font-size: 1.5rem;
+    }
+  
+    .sun-icon {
+      color: #fbc02d; // Sunny yellow
+    }
+  
+    .moon-icon {
+      color: #90caf9; // Light blue for moon
+    }
+  
+    .theme-label {
+      font-size: 1rem;
+    }
+  }
+  

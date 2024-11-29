@@ -168,9 +168,6 @@ class AuthController {
             let cookieDomain = new URL(origin).hostname;
             cookieDomain = cookieDomain.startsWith('www.') ? cookieDomain.slice(4) : cookieDomain;
 
-            console.log(cookieDomain);
-            
-
             const userData = await User.findOne({ email: req.body.email });
 
             if (!userData || !userData.isActive) return returner(res, "error", statusCodes.FORBIDDEN, null, "Incorrect email or password");

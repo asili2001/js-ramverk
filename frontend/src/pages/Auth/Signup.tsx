@@ -1,17 +1,18 @@
 import { useEffect, useState } from 'react';
 import Input from '../../components/Input';
 import './main.scss';
-import useAPIAuth from '../../hooks/useAPIAuth';
 import { useNavigate } from 'react-router-dom';
 import { useRoleContext } from '../../context/RoleContext';
 import LoadingSpinner from '../../components/Loading';
 import toast from 'react-hot-toast';
+import { ApolloError, useMutation } from '@apollo/client';
+import { USER_SIGNUP } from '../../api/queries';
 
 const Signup = () => {
 	const [name, setName] = useState<string>('');
 	const [email, setEmail] = useState<string>('');
 	const [responseMessage, setResponseMessage] = useState<string>('');
-	const { signUp, isLoading } = useAPIAuth();
+	const [signUp, { loading }] = useMutation(USER_SIGNUP);
 	const navigate = useNavigate();
 	const { role } = useRoleContext();
 
@@ -33,13 +34,25 @@ const Signup = () => {
 	};
 
 	const handleUserRegisteration = async () => {
-		const signUpResponseMessage = await signUp(name, email);
-		setResponseMessage(signUpResponseMessage);
-		if (signUpResponseMessage === 'success') {
-			toast.success("We've sent an activation link to your email. Please check your inbox.", {
-				duration: 5000,
-			});
-			navigate('/');
+		try {
+			const { data } = await signUp({ variables: { email, name } });
+			const signUpResponse = data?.signUp;
+
+			if (signUpResponse.id) {
+				toast.success(
+					"We've sent an activation link to your email. Please check your inbox."
+				);
+				navigate('/');
+			}
+		} catch (err) {
+			let errorMessage = '';
+			if (err instanceof ApolloError) {
+				errorMessage = err.message;
+				setResponseMessage(errorMessage);
+				toast.error(errorMessage);
+			} else {
+				toast.error('An unknown error occurred');
+			}
 		}
 	};
 
@@ -57,7 +70,9 @@ const Signup = () => {
 						title="Name"
 						placeholder=" "
 						onChange={handleNameChange}
-						errorMsg={responseMessage.includes('name') ? responseMessage : ''}
+						errorMsg={
+							responseMessage.toLowerCase().includes('name') ? responseMessage : ''
+						}
 						required
 					/>
 					<Input
@@ -66,21 +81,23 @@ const Signup = () => {
 						title="Email"
 						placeholder=" "
 						onChange={handleEmailChange}
-						errorMsg={responseMessage.includes('email') ? responseMessage : ''}
+						errorMsg={
+							responseMessage.toLowerCase().includes('email') ? responseMessage : ''
+						}
 						required
 					/>
 					<button
 						className="primary-button active"
 						onClick={handleUserRegisteration}
-						disabled={isLoading}
+						disabled={loading}
 					>
-						Sign Up {isLoading && <LoadingSpinner size={20} />}
+						Sign Up {loading && <LoadingSpinner size={20} />}
 					</button>
 				</div>
 
 				<div className="footer">
 					<span>Already a Member?</span>
-					<a href={`${import.meta.env.VITE_BASENAME}/`}>Sign In</a>
+					<a href={`/`}>Sign In</a>
 				</div>
 			</div>
 		</div>

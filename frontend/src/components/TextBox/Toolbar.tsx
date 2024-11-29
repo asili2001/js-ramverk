@@ -5,7 +5,7 @@ import './main.scss';
 
 interface IToolbar {
 	editableState: EditorState;
-	setEditableState: React.Dispatch<React.SetStateAction<EditorState>>;
+	setEditableState: React.Dispatch<React.SetStateAction<EditorState | null>>;
 	onEditorStateChange: (state: EditorState) => void;
 }
 

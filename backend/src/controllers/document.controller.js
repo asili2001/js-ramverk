@@ -1,7 +1,6 @@
 const Document = require('../models/document.model.js');
 const statusCodes = require("../utils/HttpStatusCodes.js");
 const returner = require('../utils/returner.js');
-const { dirname } = require('path');
 const LZString = require('lz-string');
 var fs = require('fs');
 const appRoot = require('app-root-path');
@@ -16,12 +15,13 @@ class DocumentController {
       const docData = {
         title,
         usersWithAccess: [{
-          _id: userId,
+          user: userId,
           accessLevel: "owner"
         }],
         docType: docType
       }
       const document = new Document(docData);
+
       await document.save();
       return returner(res, "success", statusCodes.CREATED, document, "");
     } catch (error) {
@@ -35,7 +35,7 @@ class DocumentController {
     const userId = res.locals.authenticatedUser;
 
     try {
-      const userDocs = await Document.find({ "usersWithAccess._id": userId });
+      const userDocs = await Document.find({ "usersWithAccess.user._id": userId });
       const jsonDocs = userDocs.map(doc => doc.toJSON());
 
       return returner(res, "success", statusCodes.OK, jsonDocs, "");
@@ -54,7 +54,7 @@ class DocumentController {
       if (!document) {
         return returner(res, "error", statusCodes.NOT_FOUND, null, "Document not found");
       }
-      const hasAccess = document.usersWithAccess.find(access => access._id.equals(userId));
+      const hasAccess = document.usersWithAccess.find(access => access.user._id.equals(userId));
 
       if (!hasAccess) return returner(res, "error", statusCodes.FORBIDDEN, null, "You don't have access to this document");
 
@@ -71,13 +71,14 @@ class DocumentController {
       if (!fs.existsSync(filePath) && document.docType === "text") {
         fs.writeFileSync(filePath, JSON.stringify(emptyRawDraftContentState));
       } else if (!fs.existsSync(filePath) && document.docType === "code") {
-        const defaultContent = 'console.log("Hello World");' + '\n'.repeat(20);
+        const defaultContent = '';
 
         fs.writeFileSync(filePath, defaultContent);
       }
 
       let fileContent = fs.readFileSync(filePath, 'utf8');
       const compressedFileContent = LZString.compress(fileContent);
+      
       return returner(res, "success", statusCodes.OK, { ...document._doc, content: compressedFileContent }, "");
     } catch (error) {
       console.error(error);
@@ -93,7 +94,7 @@ class DocumentController {
       // Find the document and check if the user has 'owner' or 'editor' access
       const document = await Document.findOneAndUpdate({
         _id: req.params.id,
-        "usersWithAccess._id": userId,
+        "usersWithAccess.user": userId,
         $or: [
           { "usersWithAccess.accessLevel": "owner" },
           { "usersWithAccess.accessLevel": "editor" }
@@ -116,13 +117,16 @@ class DocumentController {
 
   // Method for updating a document
   async updateCodeDocument(req, res) {
+    console.log("BACKEND: ",res.locals.authenticatedUser );
+
     const userId = res.locals.authenticatedUser._id;
+
 
     try {
       // Find the document and check if the user has 'owner' or 'editor' access
       const document = await Document.findOneAndUpdate({
         _id: req.params.id,
-        "usersWithAccess._id": userId,
+        "usersWithAccess.user": res.locals.authenticatedUser,
         $or: [
           { "usersWithAccess.accessLevel": "owner" },
           { "usersWithAccess.accessLevel": "editor" }
@@ -135,7 +139,7 @@ class DocumentController {
       }
 
       const dir = `${appRoot.path}/drafts/${userId}/${req.params.id}/document`;
-      fs.writeFileSync(dir, LZString.compress(req.body.content));
+      fs.writeFileSync(dir, req.body.content);
 
       // Return the updated document
       return returner(res, "success", statusCodes.OK, document, "");
@@ -179,7 +183,7 @@ class DocumentController {
     try {
       const document = await Document.findOneAndDelete({
         _id: req.params.id,
-        "usersWithAccess._id": userId,
+        "usersWithAccess.user._id": userId,
         "usersWithAccess.accessLevel": "owner"
       });
 

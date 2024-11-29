@@ -96,11 +96,9 @@ describe('DocumentController getDocumentById tests', () => {
             await controller.getDocuments(req, res);
 
 
-            assert(Document.find.calledWith({ "usersWithAccess._id": 'testUser1234' }));
+            assert(Document.find.calledWith({ "usersWithAccess.user._id": 'testUser1234' }));
 
             const responseBody = res.json.getCall(0).args[0];
-
-            //console.log(responseBody.data, mockDocuments.map(doc=> doc.toJSON()));
             
             assert.equal(JSON.stringify(responseBody.data), JSON.stringify(mockDocuments.map(doc=> doc.toJSON())));
 

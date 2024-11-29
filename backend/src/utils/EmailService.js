@@ -25,8 +25,17 @@ class EmailService {
             auth: {
                 user: process.env.MAIL_USER,
                 pass: process.env.MAIL_PASS,
-            },
+            }
         });
+    }
+
+    /**
+     * Validates email
+     * @param {string} email - The email recipient.
+     */
+    validateEmail(email) {
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailRegex.test(email);
     }
 
     /**
@@ -36,6 +45,9 @@ class EmailService {
      * @returns {Promise<void>} A Promise that resolves when the email is sent.
      */
     async sendEmail(to, data) {
+        if (!this.validateEmail(to)) {
+            throw new Error("Wrong email format");
+        }
         await this.sendMail(this.transporter, to, data);
     }
 
@@ -89,6 +101,7 @@ class EmailService {
         try {
             // Attempt to send the email and log the result
             await transporter.sendMail(mailOptions);
+            
         } catch (error) {
             // Handle errors and throw an exception
             console.error(error);
