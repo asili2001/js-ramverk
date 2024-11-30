@@ -26,13 +26,6 @@ export interface TextBoxProps {
 	owner: User;
 }
 
-// export interface Comment {
-// 	_id?: string;
-// 	commentContent: string;
-// 	selectedText: string;
-// 	position: string;
-// }
-
 const TextBox: React.FC<TextBoxProps> = ({
 	initialContent,
 	onChange,

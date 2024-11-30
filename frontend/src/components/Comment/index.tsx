@@ -2,15 +2,14 @@ import './main.scss';
 
 import React, { useState, useEffect } from 'react';
 import { CommentData } from '../../hooks/useDocSocket';
-import { Comment } from '../TextBox';
 
 export interface CommentProps {
 	position: string;
 	selection: string;
 	onClick: () => void;
 	onComment: (data: CommentData) => void;
-	comments: Comment[];
-	setComments: React.Dispatch<React.SetStateAction<Comment[]>>;
+	comments: CommentData[];
+	setComments: React.Dispatch<React.SetStateAction<CommentData[]>>;
 	setShowCommentBox: React.Dispatch<React.SetStateAction<boolean>>;
 	owner: User;
 }
@@ -29,7 +28,7 @@ const CommentBox: React.FC<CommentProps> = ({
 
 	// Create Comment
 	const sendComment = () => {
-		const data: Comment = {
+		const data: CommentData = {
 			commentContent: commentContent,
 			selectedText: selection,
 			position: position,
